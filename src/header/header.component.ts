@@ -3,7 +3,6 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
 import { Actions } from '../datagrid.props';
 import { Datagrid } from '../datagrid';
-import { ResizeEvent } from 'angular-resizable-element';
 
 @Component({
     selector: 'datagrid-header',
@@ -81,7 +80,7 @@ export class HeaderComponent implements OnInit, OnChanges{
      * If the column was resized
      * @param event
      */
-	public onResizeEnd(event: ResizeEvent, column: Datagrid.Column, columnIndex: number, type: 'columnsInternal' | 'columnsPinned') {
+	public onResizeEnd(event, column: Datagrid.Column, columnIndex: number, type: 'columnsInternal' | 'columnsPinned') {
 		//console.warn('onResizeEnd', column, event)
 		column.width = Math.floor(event.rectangle.width);
 

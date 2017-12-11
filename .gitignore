@@ -10,6 +10,7 @@
 
 # IDEs and editors
 /.vs
+/.vs/*
 /.idea
 .project
 .classpath

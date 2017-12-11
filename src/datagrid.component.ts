@@ -5,8 +5,6 @@ import 'rxjs/add/observable/fromEvent';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { Subscription } from 'rxjs/Subscription';
 
-import { ResizeEvent } from 'angular-resizable-element';
-
 import { DataGridService } from './datagrid.service';
 import { Actions, Operators } from './datagrid.props';
 import { Datagrid } from './datagrid';

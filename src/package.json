@@ -1,7 +1,7 @@
 {
 	"name": "@mello-labs/datagrid",
 	"description": "A grid for visualizing and organizing complex data sets",
-	"version": "0.1.0",
+	"version": "0.1.2",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/JerrolKrause/mello-labs-datagrid"
@@ -22,8 +22,8 @@
 	"jsnext:main": "mello-labs-datagrid.js",
 	"typings": "mello-labs-datagrid.d.ts",
 	"peerDependencies": {
-		"@angular/core": "^4.0.0",
-		"@angular/forms": "4.4.6",
+		"@angular/core": "^5.0.5",
+		"@angular/forms": "^5.0.5",
 		"@ng-bootstrap/ng-bootstrap": "1.0.0-beta.5",
 		"angular-resizable-element": "1.2.4",
 		"bootstrap": "4.0.0-alpha.6",

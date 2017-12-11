@@ -3,7 +3,6 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
 import { Actions } from '../datagrid.props';
 import { Datagrid } from '../datagrid';
-import { ResizeEvent } from 'angular-resizable-element';
 
 @Component({
     selector: 'datagrid-body',
