@@ -36,11 +36,11 @@ import { TemplatesCellComponent } from './templates/templates-cell.component';
    DataGridComponent
   ]
 })
-export class SampleModule {
+export class Datagrid {
   static forRoot(): ModuleWithProviders {
     return {
-      ngModule: SampleModule,
-      providers: [DataGridService]
+		ngModule: Datagrid,
+		providers: [DataGridService]
     };
   }
 }

@@ -1,11 +1,11 @@
-# mello-labs-datagrid
+# @mello-labs/datagrid
 
 ## Installation
 
 To install this library, run:
 
 ```bash
-$ npm install mello-labs-datagrid --save
+$ npm install @mello-labs/datagrid --save
 ```
 
 ## Consuming your library
@@ -13,7 +13,7 @@ $ npm install mello-labs-datagrid --save
 Once you have published your library to npm, you can import your library in any Angular application by running:
 
 ```bash
-$ npm install mello-labs-datagrid
+$ npm install @mello-labs/datagrid
 ```
 
 and then from your Angular `AppModule`:
@@ -25,7 +25,7 @@ import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 
 // Import your library
-import { SampleModule } from 'mello-labs-datagrid';
+import { Datagrid } from '@mello-labs/datagrid';
 
 @NgModule({
   declarations: [
@@ -35,7 +35,7 @@ import { SampleModule } from 'mello-labs-datagrid';
     BrowserModule,
 
     // Specify your library as an import
-    LibraryModule
+    Datagrid
   ],
   providers: [],
   bootstrap: [AppComponent]
