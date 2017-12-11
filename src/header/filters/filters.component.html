@@ -1,0 +1,140 @@
+<!--
+<div class="btn-group" role="group">
+        <button type="button" class="btn btn-interact-outline"><i aria-hidden="true" class="fa fa-filter"></i> Filter</button>
+        <button type="button" class="btn btn-interact-outline"><i aria-hidden="true" class="fa fa-remove"></i> Clear</button>
+</div>
+-->
+
+ <!-- Filtering -->
+ <div *ngIf="column.canSearch">
+    <label class="icon filter ml-2 mr-2 mt-2" *ngIf="status.filters[column.prop]">
+        <input class="form-control form-control-sm" placeholder="Filter" name="filterSearch" [ngModel]="status.filters[column.prop].contains" (ngModelChange)="modifyFilter(column.prop, 'contains', $event, status.filters[column.prop].contains)"  [attr.data-qa]="'controls-filter-search'"/>
+        <a class="clear" (click)="modifyFilter(column.prop, 'contains', '', status.filters[column.prop].contains)" *ngIf="status.filters[column.prop].contains != ''">
+            <i class="fa fa-remove"></i></a>
+    </label>
+</div>
+
+<!-- Strings -->
+<ng-container *ngIf="column.columnType == 'string'">
+    <div class="terms-list" [attr.data-qa]="'controls-filter-terms'">
+        <ng-container *ngIf="options?.columnData && options?.columnData[column.prop];else filterList">
+            <label class="term form-check-label field-{{column.prop + '-' + term[modelValue]}} {{term[modelClasses]}}" [ngStyle]="term[modelStyles]" *ngFor="let term of model">
+                <input type="checkbox" class="form-check-input" [value]="term[modelValue]"
+                [ngModel]="status.filters[column.prop]?.eq[term[modelValue]]" (ngModelChange)="modifyFilter(column.prop, 'eq', term[modelValue], status.filters[column.prop].eq[term[modelValue]])">
+                <span>{{term[modelLabel]}}</span>
+            </label>
+        </ng-container>
+        <ng-template #filterList>
+            <ng-container *ngIf="filterTerms[this.column.prop]?.length">
+                <label class="term form-check-label" *ngFor="let term of filterTerms[this.column.prop]">
+                    <input type="checkbox" class="form-check-input" [value]="term" [attr.data-qa]="'controls-filter-term' + term"
+                           [ngModel]="status.filters[column.prop]?.eq[term]" (ngModelChange)="modifyFilter(column.prop, 'eq', term, status.filters[column.prop].eq[term])">
+                    <span>{{term}}</span>
+                </label>
+            </ng-container>
+            <span *ngIf="!filterTerms[this.column.prop]?.length" class="term">No filter terms found</span>
+        </ng-template>
+        
+    </div>
+</ng-container>
+
+<!-- Numbers and Money 
+<ng-container *ngIf="column.columnType == 'int' || column.columnType == 'money'">
+    <h6 class="dropdown-header">Show items with values that:</h6>
+    <div class="box">
+        <div class="form-group">
+            <select class="form-control form-control-sm mb-1">
+                <option>Is Equal To</option>
+                <option>Is Not Equal To</option>
+                <option>Is Greater Than Or Equal To</option>
+                <option>Is Greater Than</option>
+                <option>Is Less Than Or Equal To</option>
+                <option>Is Less Than</option>
+                <option>Is Null</option>
+                <option>Is Not Null</option>
+            </select>
+            <input class="form-control form-control-sm" type="number" />
+        </div>
+        <div class="form-group">
+            <select class="form-control form-control-sm">
+                <option>And</option>
+                <option>Or</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <select class="form-control form-control-sm mb-1">
+                <option>Is Equal To</option>
+                <option>Is Not Equal To</option>
+                <option>Is Greater Than Or Equal To</option>
+                <option>Is Greater Than</option>
+                <option>Is Less Than Or Equal To</option>
+                <option>Is Less Than</option>
+                <option>Is Null</option>
+                <option>Is Not Null</option>
+            </select>
+            <input class="form-control form-control-sm" type="number" />
+        </div>
+    </div>
+</ng-container>
+-->
+<!-- Dates -->
+<ng-container *ngIf="column.columnType == 'date'">
+    <h6 class="dropdown-header">Show items with values that:</h6>
+    <div class="box">
+        <div class="form-group">
+            <select class="form-control form-control-sm mb-1" [(ngModel)]="model" >
+                <option>Is Equal To</option>
+                <option>Is Not Equal To</option>
+                <option>Is Greater Than Or Equal To</option>
+                <option>Is Greater Than</option>
+                <option>Is Less Than Or Equal To</option>
+                <option>Is Less Than</option>
+                <option>Is Null</option>
+                <option>Is Not Null</option>
+            </select>
+            <form class="form-inline">
+                <div class="form-group w-100">
+                    <div class="input-group">
+                        <input class="form-control" placeholder="yyyy-mm-dd"
+                               name="dp" [(ngModel)]="model" ngbDatepicker #d="ngbDatepicker">
+                        <button class="input-group-addon" (click)="d.toggle()" type="button">
+                            <i class="fa fa-calendar"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!---->
+        <div class="form-group">
+            <select class="form-control form-control-sm">
+                <option>And</option>
+                <option>Or</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <select class="form-control form-control-sm mb-1">
+                <option>Is Equal To</option>
+                <option>Is Not Equal To</option>
+                <option>Is Greater Than Or Equal To</option>
+                <option>Is Greater Than</option>
+                <option>Is Less Than Or Equal To</option>
+                <option>Is Less Than</option>
+                <option>Is Null</option>
+                <option>Is Not Null</option>
+            </select>
+            <form class="form-inline">
+                <div class="form-group w-100">
+                    <div class="input-group">
+                        <input class="form-control" placeholder="yyyy-mm-dd"
+                               name="dp" [(ngModel)]="model2" ngbDatepicker #d2="ngbDatepicker">
+                        <button class="input-group-addon" (click)="d.toggle()" type="button">
+                            <i class="fa fa-calendar"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+    </div>
+</ng-container>
+

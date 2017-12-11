@@ -1,0 +1,168 @@
+<div class="datagrid-header-container" [ngStyle]="{'width': gridProps.widthBody + 'px'}">
+    <div class="datagrid-header" [ngStyle]="{'width' : gridProps.widthTotal + 'px', 'transform' : 'translate3d(' + -scrollProps.scrollLeft + 'px, 0px, 0px)' }">
+        <!-- Header Row -->
+        <div class="datagrid-header-row">
+            <div class="datagrid-header-pinned" [ngStyle]="{'width' : gridProps.widthPinned + 'px' }" dnd-sortable-container [sortableData]="columnsPinned">
+                <!-- Header Cell -->
+                <div class="datagrid-header-cell" [attr.data-qa]="'column column-'+column.prop" title="{{column.label}}"
+                     *ngFor="let column of columnsPinned; let columnIndex = index; trackBy:trackColumn"
+                     mwlResizable [enableGhostResize]="true" [resizeEdges]="{right: column.canResize || false}" (resizeEnd)="onResizeEnd($event, column, columnIndex,'columnsPinned')"
+                     [ngClass]="{'reorderable': column.canReorder }"
+                     [ngStyle]="{'width' : column.width + 'px' }">
+                    <span class="datagrid-header-cell-label">
+                        {{column.label}}
+                    </span>
+                    <!-- Controls Dropdown -->
+                    <datagrid-controls *ngIf="options.controlsDropdown" [options]="options" [status]="status" [column]="column" [filterTerms]="filterTerms"></datagrid-controls>
+                    <!-- Resize Handle -->
+                    <a class="resize-handle" mwlResizeHandle [resizeEdges]="{right: true}" *ngIf="column.canResize" (mousedown)="reSizing = true"></a>
+                </div>
+            </div>
+            <div class="datagrid-header-main" [ngStyle]="{'width' : gridProps.widthMain + 'px' }" dnd-sortable-container [sortableData]="columnsInternal">
+                <!-- Header Cell -->
+                <div class="datagrid-header-cell" [attr.data-qa]="'column column-'+column.prop" title="{{column.label}}"
+                     *ngFor="let column of columnsInternal; let columnIndex = index; trackBy:trackColumn"
+                     dnd-sortable [sortableIndex]="columnIndex" [dragEnabled]="column.canReorder && !column.pinnedLeft" (onDragSuccess)="onReorderSuccess($event)"
+                     mwlResizable [enableGhostResize]="true" [resizeEdges]="{right: column.canResize || false}" (resizeEnd)="onResizeEnd($event, column, columnIndex, 'columnsInternal')"
+                     [ngClass]="{'reorderable': column.canReorder }"
+                     [ngStyle]="{'width' : column.width + 'px' }">
+                    <span class="datagrid-header-cell-label" dnd-sortable-handle>
+                        {{column.label}}
+                    </span>
+                    <!-- Controls Dropdown -->
+                    <datagrid-controls *ngIf="options.controlsDropdown" [options]="options" [status]="status" [column]="column" [filterTerms]="filterTerms"></datagrid-controls>
+                    <!-- Resize Handle -->
+                    <a class="resize-handle" mwlResizeHandle [resizeEdges]="{right: true}" *ngIf="column.canResize" (mousedown)="reSizing = true"></a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!--<div class="header-content" [ngStyle]="{'width': columnWidth, 'min-width': '42px' }">
+    <ng-content></ng-content>
+</div>
+
+<ng-container *ngIf="options.controlsDropdown">
+    <div ngbDropdown id="headerComponentDropdown" class="header-controls d-inline-block dropdown" #myDrop="ngbDropdown" placement="{{columnIndex < 1 ? 'bottom-left' : 'bottom-right'}}">
+        <a ngbDropdownToggle *ngIf="status?.groups || status?.sorts || status?.filters" [attr.data-qa]="'controls-dropdown'"
+           [ngClass]="{'active' : status.groups[column.prop] || status.sorts[column.prop] || status.filters[column.prop]?.hasFilters || column.pinnedLeft }">
+            <i class="fa fa-bars" aria-hidden="true" title="Toggle options"></i>
+        </a>
+        <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+
+            <!-- Sorting ->
+            <button class="dropdown-item" *ngIf="column.canSort && status?.sorts" (click)="modifySorts('sort', column.prop, status.sorts[column.prop])" [attr.data-qa]="'controls-sort'"
+                    [ngClass]="{'active' : status.sorts[column.prop] }">
+                <ng-container *ngIf="status.sorts[column.prop] == 'asc'">
+                    <span class="fa-stack fa-stack-groupsort">
+                        <i class="fa fa-fw fa-sort-amount-asc" aria-hidden="true"></i>
+                    </span> Sorted Ascending
+                </ng-container>
+                <ng-container *ngIf="status.sorts[column.prop] == 'desc'">
+                    <span class="fa-stack fa-stack-groupsort">
+                        <i class="fa fa-fw fa-sort-amount-asc fa-flip-vertical" aria-hidden="true"></i>
+                    </span> Sorted Descending
+                </ng-container>
+                <ng-container *ngIf="!status.sorts[column.prop]">
+                    <span class="fa-stack fa-stack-groupsort">
+                        <i class="fa fa-fw fa-sort-amount-desc" aria-hidden="true"></i>
+                    </span> Sort By {{column.label}}
+                </ng-container>
+            </button>
+
+            <!-- Grouping ->
+            <button class="dropdown-item" *ngIf="column.canGroup && status?.groups" (click)="modifySorts('group', column.prop, status.groups[column.prop])" [attr.data-qa]="'controls-group'"
+                    [ngClass]="{'active' : status.groups[column.prop] }">
+                <ng-container *ngIf="status.groups[column.prop] == 'asc'">
+                    <span class="fa-stack fa-stack-groupsort">
+                        <i class="fa arrow fa-long-arrow-down" aria-hidden="true"></i>
+                        <i class="fa fa-object-group" aria-hidden="true"></i>
+                    </span> Grouped Ascending
+                </ng-container>
+                <ng-container *ngIf="status.groups[column.prop] == 'desc'">
+                    <span class="fa-stack fa-stack-groupsort">
+                        <i class="fa arrow fa-long-arrow-up" aria-hidden="true"></i>
+                        <i class="fa fa-object-group" aria-hidden="true"></i>
+                    </span> Grouped Descending
+                </ng-container>
+                <ng-container *ngIf="!status.groups[column.prop]">
+                    <span class="fa-stack fa-stack-groupsort">
+                        <i class="fa arrow fa-long-arrow-down" aria-hidden="true"></i>
+                        <i class="fa fa-object-group" aria-hidden="true"></i>
+                    </span> Group By {{column.label}}
+                </ng-container>
+            </button>
+
+            <!-- Pinning ->
+            <button class="dropdown-item" *ngIf="column.canPinLeft" (click)="myDrop.close();modifyPinned('pinLeft', column, columnIndex)" [attr.data-qa]="'controls-pinLeft'"
+                    [ngClass]="{'active' : column.pinnedLeft }">
+                <ng-container *ngIf="column.pinnedLeft">
+                    <span class="fa-stack fa-stack-groupsort">
+                        <i class="fa fa-caret-square-o-left" aria-hidden="true"></i>
+                    </span> Pinned
+                </ng-container>
+                <ng-container *ngIf="!column.pinnedLeft">
+                    <span class="fa-stack fa-stack-groupsort">
+                        <i class="fa fa-caret-square-o-left" aria-hidden="true"></i>
+                    </span> Pin {{column.label}}
+                </ng-container>
+            </button>
+
+            <!-- Filtering ->
+            <div class="dropdown-submenu" *ngIf="(column.canFilter || column.canSearch) && status?.filters" [attr.data-qa]="'controls-filter'"
+                 [ngClass]="{'dropdown-submenu-left': columnIndex > (columnsCount - 5)}" (click)="$event.stopPropagation()">
+                <button class="dropdown-item dropdown-submenu-button" [attr.data-qa]="'controls-filter-dropdown'"
+                        [ngClass]="{'active' :  status.filters[column.prop]?.hasFilters }">
+                    <span class="fa-stack fa-stack-groupsort">
+                        <i class="fa fa-filter" aria-hidden="true"></i>
+                    </span> Filters
+                </button>
+                <div class="dropdown-menu dropdown-submenu-flyout">
+                    <filters [column]="column" [state]="state" [status]="status" [options]="options" [filterTerms]="filterTerms" (onFiltersUpdated)="modifyFilters($event)"></filters>
+                    <div class="pl-2 pt-1 pr-2 pb-0">
+                        <button class="btn btn-interact-outline btn-sm mt-2 w-100" (click)="clearFilters(column.prop)" [attr.data-qa]="'controls-filter-clear'">Clear Filters</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Custom Links ->
+            <ng-container *ngIf="column?.controlsCustomLinks?.length">
+                <div class="dropdown-divider"></div>
+                <!-- Loop through custom links ->
+                <ng-container *ngFor="let link of column.controlsCustomLinks">
+                    <div class="dropdown-submenu"
+                         [ngClass]="{'dropdown-submenu-left': columnIndex > (columnsCount - 5) }"
+                         [attr.data-qa]="'controls-custom-link-dropdown'">
+                        <button class="dropdown-item" [attr.data-qa]="'controls-custom-link'" [ngClass]="{ 'dropdown-submenu-button' : link?.submenu?.length }">
+                            <span class="fa-stack fa-stack-groupsort">
+                                <i class="{{link.icon}}" aria-hidden="true" *ngIf="link.icon"></i>
+                            </span> {{link.label}}
+                        </button>
+                        <!-- If submenu links, show flyout ->
+                        <div class="dropdown-menu dropdown-submenu-flyout" *ngIf="link?.submenu?.length">
+                            <button class="dropdown-item" [attr.data-qa]="'controls-custom-link'" *ngFor="let submenu of link.submenu" (click)="customLinkAction(submenu,column)">
+                                <span class="fa-stack fa-stack-groupsort">
+                                    <i class="{{submenu.icon}}" aria-hidden="true" *ngIf="submenu.icon"></i>
+                                </span> {{submenu.label}}
+                            </button>
+                        </div>
+                    </div>
+                </ng-container>
+            </ng-container>
+
+            <!-- Deleting ->
+            <ng-container *ngIf="column.canDelete">
+                <div class="dropdown-divider"></div>
+                <button class="dropdown-item" (click)="deleteColumn(columnIndex)" [attr.data-qa]="'controls-delete'">
+                    <span class="fa-stack fa-stack-groupsort">
+                        <i class="fa fa-remove" aria-hidden="true"></i>
+                    </span> Delete This Column
+                </button>
+            </ng-container>
+
+        </div>
+    </div>
+</ng-container>-->
+
+

@@ -1,0 +1,92 @@
+<ng-container *ngIf="options.templatesId == 'columnChooser'">
+    <ng-container *ngIf="column.prop == 'sampleData';else contentTpl">
+        <ng-container [ngSwitch]="rowData.columnFieldName" *ngIf="options.templatesId == 'columnChooser'">
+
+            <!-- Locked -->
+            <ng-container *ngSwitchCase="'IsLocked'">
+                <i class="fa fa-lock ml" aria-hidden="true"></i>
+            </ng-container>
+            <!-- Private Notes-->
+            <ng-container *ngSwitchCase="'HasPrivateNote'">
+                <i class="fa fa-file-text" aria-hidden="true"></i>
+            </ng-container>
+            <!-- Row Colors -->
+            <ng-container *ngSwitchCase="'RowColor'">
+                <i class="fa fa-check-square" aria-hidden="true"></i>
+            </ng-container>
+            <!-- Tags -->
+            <ng-container *ngSwitchCase="'ColorCategory'">
+                <a class="d-inline-block"
+                   [ngStyle]="{'background': 'red' }"
+                   style="width:13px;height:13px;border: 1px solid #848484;position: relative;top: 2px;">
+                </a>
+            </ng-container>
+
+            <!-- Default -->
+            <ng-container *ngSwitchDefault>
+                <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+</ng-container>
+
+
+
+<ng-container [ngSwitch]="column.prop" *ngIf="options.templatesId == 'pipeline'">
+
+    <!-- Locked -->
+    <ng-container *ngSwitchCase="'IsLocked'">
+        <i class="fa fa-lock ml-2" aria-hidden="true" *ngIf="rowData.IsLocked"
+        placement="bottom-left" ngbPopover="Locked by {{rowData.LockedBy}}" triggers="mouseenter:mouseleave" container="body"
+        ></i>
+    </ng-container>
+
+    <!-- Private Notes-->
+    <ng-container *ngSwitchCase="'HasPrivateNote'">
+        <ng-container *ngIf="notes$ | async as notes">
+            <a (click)="addPrivateNoteModal(rowData.LNKey)" style="padding-left:10px;" title="{{notes?.lookup[rowData?.LNKey]?.Note || 'No note'}}"
+               *ngIf="notes?.lookup" [ngClass]="{ 'grey': !notes?.lookup[rowData?.LNKey] }">
+                <i class="fa fa-file-text" aria-hidden="true"></i>
+            </a>
+        </ng-container>
+    </ng-container>
+
+    <!-- Row Colors -->
+    <ng-container *ngSwitchCase="'RowColor'">
+        <ng-container *ngIf="rowColors$ | async as tags">
+            <ng-container *ngIf="tagDefs$ | async as tagDef">
+                <a (click)="removeRowColor(rowData, tags.lookup[rowData.LNKey]?.order[0], rowData?.LNKey)" *ngIf="rowData?.RowColor?.length && tags.lookup[rowData.LNKey]" class="mt-2" title="Remove this row color">
+                    <i class="fa fa-check-square" aria-hidden="true"></i>
+                </a>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+
+    <!-- Tags -->
+    <ng-container *ngSwitchCase="'ColorCategory'">
+        <ng-container *ngIf="tags$ | async as tags">
+            <ng-container *ngIf="tagDefs$ | async as tagDef">
+                <ng-container *ngFor="let tag of rowData.ColorCategory">
+                    <a class="d-inline-block" (click)="removeTag(tags?.lookup[rowData.LNKey][tag], rowData.LNKey)" title="{{tagDef?.lookup[tag].tagText}}"
+                       *ngIf="tagDef?.lookup && tagDef?.lookup[tag] && tagDef?.lookup[tag].tagColor"
+                       [ngStyle]="{'background': tagDef.lookup[tag].tagColor }"
+                       style="width:13px;height:13px;border: 1px solid #848484;position: relative;top: 2px;">
+                    </a>
+                </ng-container>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+
+    <!-- Default -->
+    <ng-container *ngSwitchDefault>
+        <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
+    </ng-container>
+
+</ng-container>
+
+<ng-container *ngIf="!options.templatesId">
+    <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
+</ng-container>
+
+
+<ng-template #contentTpl><ng-content></ng-content></ng-template>
