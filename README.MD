@@ -1,3 +1,5 @@
+This project is intended for internal loanDepot/mello Labs use and is not (currently) publically supported. 
+
 # @mello-labs/datagrid
 
 ## Installation

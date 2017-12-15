@@ -23,7 +23,7 @@ export class ControlsComponent implements OnInit, OnDestroy{
 
 	@Output() onStateUpdated: EventEmitter<any> = new EventEmitter();
 	@Output() onCustomLinkEvent: EventEmitter<any> = new EventEmitter();
-
+	public columnIndex;
 	private subs: Subscription[] = [];
 
 	constructor(

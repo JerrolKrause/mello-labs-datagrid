@@ -19,7 +19,7 @@ export class BodyComponent implements OnInit, OnChanges{
 	@Input() status: Datagrid.Status;
 	@Input() options: Datagrid.Options;
 	@Input() gridProps: Datagrid.Props;
-
+	 
 	@Output() onColumnsUpdated: EventEmitter<any[]> = new EventEmitter();
 	@Output() onStateUpdated: EventEmitter<any> = new EventEmitter();
 	@Output() onCustomLinkEvent: EventEmitter<any> = new EventEmitter();
@@ -28,6 +28,7 @@ export class BodyComponent implements OnInit, OnChanges{
     ) { }
 
 	ngOnInit() {
+		console.log(this.rowsInternal);
 	}
 
 	ngOnChanges() {

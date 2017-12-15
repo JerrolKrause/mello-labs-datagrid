@@ -1,17 +1,18 @@
 <div id="datagrid" class="datagrid" #dataGrid data-qa="datagrid"
     [ngClass]="{
-    'maxHeight' : options.heightMax, 
+    
     'noWrap' : options.noWrap, 
     'selectable' : options.selectionType,
     'truncatable' : options.columnsTruncate,
     'virtualScroll' : options.virtualScroll}">
-    <!-- 'scrollH' : options.scrollbarH, 
+    <!-- 'scrollH' : options.scrollbarH,
+    'maxHeight' : options.heightMax, 
     [ngStyle]="{'height': gridProps.heightTotal + 'px'}"-->
     <div *ngIf="!appReady" class="container-fluid pt-3" style="font-size:1rem;"><i class="fa fa-spinner fa-spin"></i> Loading View...</div>
 
     <div class="datagrid-container" *ngIf="appReady">
 
-        <!--TODO: Add readonly div -->
+        <!--TODO: Add readonly div --> 
 
         <!-- Header -->
         <datagrid-header [columnsInternal]="columnsInternal"

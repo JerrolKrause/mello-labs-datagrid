@@ -1,7 +1,7 @@
 <td [attr.colspan]="width" class="datagrid-group-header-cell">
     <a (click)="toggleGroup(group)" [ngClass]="{'active': group.visible}">
         <span class="sticky-left">
-        	<strong><span class="red" *ngIf="settings?.lookup?.HideGroupText == 'false'">{{group.columnLabel}}:</span> {{groupLabel}}</strong> <small><em>({{group.rows.length}})</em></small>
+        	<strong> {{groupLabel}}</strong> <small><em>({{group.rows.length}})</em></small>
         </span>
     </a>
 </td>

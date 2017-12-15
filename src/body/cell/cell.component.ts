@@ -32,6 +32,7 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit {
 	}
 
 	ngOnChanges() {
+		//console.log(this.row, this.column);
 		//if (this.loaded) {
 		//	this.checkIfTruncated();
 		//}

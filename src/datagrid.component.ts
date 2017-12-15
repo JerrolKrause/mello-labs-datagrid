@@ -10,6 +10,7 @@ import { Actions, Operators } from './datagrid.props';
 import { Datagrid } from './datagrid';
 import { debounce } from 'rxjs/operator/debounce';
 
+
 /**
 TODOS:
 - Refactor DT to support 2 types of grids only: Single line grids with H scroll and full screen grids with word wrap
@@ -149,14 +150,16 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		});
         */
 	}
-    
+
 	ngOnChanges(model) {
-		//console.warn('ngOnChanges', model);
+		console.warn('ngOnChanges', model);
+
         // If columns or rows are not available, set app ready to false to show loading screen
 		if (!this.columns || !this.rows) {
 			this.appReady = false;
 		}
-		
+
+
 		// If state is passed
 		if (model.state && this.state) {
             //console.log(this.state)
@@ -255,7 +258,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
      * @param rows
      */
 	public getVisibleRows(rows: any[]): any[] {
-		let buffer = 10;
+		//console.log('getVisibleRowsoffSetRowsFromTop', rows, this.scrollProps, this.rowHeight, this.gridProps);
+		let buffer = 0;
 		let offSetRowsFromTop = Math.floor(this.scrollProps.scrollTop / this.rowHeight);
 		if (offSetRowsFromTop - buffer > 0){
 			offSetRowsFromTop -= buffer;
@@ -269,20 +273,20 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			rowsEnd = rows.length;
 		}
 
-		//console.log(offSetRowsFromTop, rowsEnd)
+		//console.log('getVisibleRowsoffSetRowsFromTop', rowsEnd)
 		return [...rows].slice(offSetRowsFromTop, rowsEnd);
 	}
 
-    /**
+    /**   
      * Create the view by assembling everything that modifies the state
      * @param state
      */
     public viewCreate(state: Datagrid.State = this.state) {
-		//console.warn('createView');
+		console.warn('createView');
 		//console.time('Creating View');
-
-		let newRows = [...this.rows];
-		console.log('Total Rows', newRows.length)
+		 
+		let newRows = [...this.rows]; 
+		//console.log('Total Rows', newRows.length)
         // If global filter option is set filter 
 		if (this.options.filterGlobal && this.options.filterGlobal.term) {
 			newRows = this.dgSvc.filterGlobal(newRows, this.options);
@@ -325,7 +329,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		this.rowsInternal = newRows;
         // Updated rows to go to the DOM
 		this.rowsExternal = this.getVisibleRows(this.rowsInternal);
-		console.log(newRows.length, this.rowsExternal.length)
+		console.log('Rows', newRows.length, this.rowsExternal.length)
         // Update DOM
 		//this.rowsInternal = newRows;
 

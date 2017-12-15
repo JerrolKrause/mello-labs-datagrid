@@ -14,7 +14,7 @@ declare namespace Datagrid {
 		rowsTotal?: number;
 		widthBody?: number;
 	}
-
+	 
 	export interface ScrollProps {
 		scrollTop?: number;
 		scrollLeft?: number;

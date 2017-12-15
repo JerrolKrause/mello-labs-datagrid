@@ -25,7 +25,7 @@ $border-color: #ccc;
     }
 
     #drag-select{width:20px;height:20px;background:red;position:fixed;opacity:0.3;z-index:1000;}
-    .datagrid-container{margin:0;background-color:#fff;
+    .datagrid-container{margin:0;background-color:#fff;overflow: hidden;
         .datagrid-header-container{overflow:hidden;height:24px;}
         .datagrid-header{
             .datagrid-header-row{background-color: #f1f1f1;display: flex;flex-flow: row;}
@@ -70,9 +70,9 @@ $border-color: #ccc;
                 }
             }
             
-        }
+        } 
 
-        .datagrid-body-container{overflow:scroll;position:relative;}
+        .datagrid-body-container{overflow:scroll;position:relative;}/** <- Autogen this*/
         .datagrid-body{
             .datagrid-body-row{display: flex;flex-flow: row;backface-visibility: hidden;position:absolute;}
             .datagrid-body-pinned{position:sticky;left:0;box-shadow: 2px 5px 5px rgba(0, 0, 0, 0.3);background-color:#fff;z-index: 4;}
