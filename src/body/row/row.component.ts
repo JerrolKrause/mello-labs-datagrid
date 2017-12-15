@@ -11,6 +11,7 @@ export class RowComponent implements OnInit, OnChanges  {
 	@Input() columns: Datagrid.Column[];
 	@Input() options: Datagrid.Options;
 	@Input() row: any[];
+	@Input() colsVisible: Datagrid.ColsVisible;
 
     @Output() updateDatatable: EventEmitter<any> = new EventEmitter();
 

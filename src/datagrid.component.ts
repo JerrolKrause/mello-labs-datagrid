@@ -76,6 +76,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	public gridProps: Datagrid.Props = {};
 	/** Properties related to scrolling of the main grid */
 	public scrollProps: Datagrid.ScrollProps = { scrollTop: 0, scrollLeft: 0 };
+    /** Which columns are visible. Key/value pair with the column prop as the key, true if present */
+	public colsVisible: { [key: string]: boolean };
 
 	private scrollDebounce$: BehaviorSubject<Datagrid.ScrollProps> = new BehaviorSubject(this.scrollProps);
     /** A dictionary of columns based on primary key, used for lookups */
@@ -235,10 +237,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	}
     
 	ngAfterViewInit() {}
-    
 	ngAfterViewChecked() {}
-
-
+    
 	/**
 	* When the datatable is scrolled
 	* @param event
@@ -251,6 +251,35 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		//this.scrollDebounce$.next(scrollProps);
 		this.scrollProps = { ...scrollProps };
 		this.rowsExternal = this.getVisibleRows(this.rowsInternal);
+		this.getVisibleColumns();
+	}
+
+    /**
+     * Create an object of columns that should be visible based on horizontal scroll width
+     */
+	public getVisibleColumns() {
+		//console.log('getVisibleColumns', this.scrollProps, this.gridProps, this.columnsInternal.length);
+
+		let colsVisible = {};
+		
+		//let widthTotal = this.scrollProps.scrollLeft;
+		let widthCurrent = 0;
+        // Loop through column widths
+		for (let i = 0; i < this.columnsInternal.length; i++){
+			let column = this.columnsInternal[i];
+
+            // If current column width + all widths before this one is greater than the left scroll position
+            // If total column widths is less than the width of the body minus the left scroll position
+			if (
+				column.width + widthCurrent > this.scrollProps.scrollLeft &&
+				widthCurrent < this.gridProps.widthBody + this.scrollProps.scrollLeft
+			) {
+				colsVisible[column.prop] = true; //
+			}
+            // Update current width by adding the current column
+			widthCurrent = widthCurrent + column.width;
+		}
+		this.colsVisible = colsVisible;
 	}
 
     /**
@@ -318,8 +347,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 				newRows = this.dgSvc.sortArray(newRows, this.state.sorts[0].prop, this.state.sorts[0].dir);
 			}
 		}
-        
+
+		
 		this.updateGridProps();
+		this.getVisibleColumns();
 		this.createRowClasses();
 		this.createRowStyles();
 		//this.columnCalculations();

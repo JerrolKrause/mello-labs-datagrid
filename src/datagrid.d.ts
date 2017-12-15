@@ -20,6 +20,10 @@ declare namespace Datagrid {
 		scrollLeft?: number;
 	}
 
+	export interface ColsVisible {
+		[key: string]: boolean;
+	}
+
     export interface StateChange {
 		action?: 'group' | 'sort' | 'filter' | 'pinLeft' | 'pinRight' | 'reset' | 'column';
 		data?: {
