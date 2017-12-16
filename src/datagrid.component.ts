@@ -66,6 +66,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 
     /** Columns that are sent to the DOM after any modification is done */
 	public columnsInternal: Datagrid.Column[];
+	/** Columns that are sent to the DOM after any modification is done */
+	public columnsExternal: Datagrid.Column[];
 	/** Columns that are pinned */
 	public columnsPinned: Datagrid.Column[];
     /** Rows that are sent to the DOM after any modification is done */
@@ -76,8 +78,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	public gridProps: Datagrid.Props = {};
 	/** Properties related to scrolling of the main grid */
 	public scrollProps: Datagrid.ScrollProps = { scrollTop: 0, scrollLeft: 0 };
-    /** Which columns are visible. Key/value pair with the column prop as the key, true if present */
-	public colsVisible: { [key: string]: boolean };
 
 	private scrollDebounce$: BehaviorSubject<Datagrid.ScrollProps> = new BehaviorSubject(this.scrollProps);
     /** A dictionary of columns based on primary key, used for lookups */
@@ -140,10 +140,14 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	}
 
 	ngOnInit() {
+		this.ref.detach();
         // On window resize, fire change detection
 		window.onresize = (event) => {
 			this.updateGridProps();
-			this.rowsExternal = this.getVisibleRows(this.rowsInternal);
+            // Update columns that go to the DOM
+			this.columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
+			// Updated rows to go to the DOM
+			this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
 		};
         /*
 		this.scrollDebounce$.debounceTime(10).subscribe(scrollProps => {
@@ -224,11 +228,11 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			this.viewCreate();
 
             // Only on initial load, set app ready on with a settimeout. This prevents the app from hanging on a route change
-			setTimeout(() => {
-				this.appReady = true;
-				this.ref.markForCheck();
-			}, 0);
-
+			//setTimeout(() => {
+			this.appReady = true;
+			//	this.ref.markForCheck();
+			//}, 0);
+			this.ref.reattach();
 			
 			//Emit the state change to the parent component now that the first initial view has been created
 			this.emitState(this.state);
@@ -250,61 +254,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		}
 		//this.scrollDebounce$.next(scrollProps);
 		this.scrollProps = { ...scrollProps };
-		this.rowsExternal = this.getVisibleRows(this.rowsInternal);
-		this.getVisibleColumns();
+		this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
+		this.columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
 	}
-
-    /**
-     * Create an object of columns that should be visible based on horizontal scroll width
-     */
-	public getVisibleColumns() {
-		//console.log('getVisibleColumns', this.scrollProps, this.gridProps, this.columnsInternal.length);
-
-		let colsVisible = {};
-		
-		//let widthTotal = this.scrollProps.scrollLeft;
-		let widthCurrent = 0;
-        // Loop through column widths
-		for (let i = 0; i < this.columnsInternal.length; i++){
-			let column = this.columnsInternal[i];
-
-            // If current column width + all widths before this one is greater than the left scroll position
-            // If total column widths is less than the width of the body minus the left scroll position
-			if (
-				column.width + widthCurrent > this.scrollProps.scrollLeft &&
-				widthCurrent < this.gridProps.widthBody + this.scrollProps.scrollLeft
-			) {
-				colsVisible[column.prop] = true; //
-			}
-            // Update current width by adding the current column
-			widthCurrent = widthCurrent + column.width;
-		}
-		this.colsVisible = colsVisible;
-	}
-
-    /**
-     * 
-     * @param rows
-     */
-	public getVisibleRows(rows: any[]): any[] {
-		//console.log('getVisibleRowsoffSetRowsFromTop', rows, this.scrollProps, this.rowHeight, this.gridProps);
-		let buffer = 0;
-		let offSetRowsFromTop = Math.floor(this.scrollProps.scrollTop / this.rowHeight);
-		if (offSetRowsFromTop - buffer > 0){
-			offSetRowsFromTop -= buffer;
-		}
-		if (offSetRowsFromTop < buffer){
-			offSetRowsFromTop = 0;
-		}
-
-		let rowsEnd = offSetRowsFromTop + this.gridProps.rowsVisible + (buffer * 2);
-		if (rowsEnd > rows.length) {
-			rowsEnd = rows.length;
-		}
-
-		//console.log('getVisibleRowsoffSetRowsFromTop', rowsEnd)
-		return [...rows].slice(offSetRowsFromTop, rowsEnd);
-	}
+    
 
     /**   
      * Create the view by assembling everything that modifies the state
@@ -350,7 +303,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 
 		
 		this.updateGridProps();
-		this.getVisibleColumns();
+		
 		this.createRowClasses();
 		this.createRowStyles();
 		//this.columnCalculations();
@@ -358,8 +311,11 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 
         // Update internal modified rows
 		this.rowsInternal = newRows;
+
+		this.columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
         // Updated rows to go to the DOM
-		this.rowsExternal = this.getVisibleRows(this.rowsInternal);
+		this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
+
 		console.log('Rows', newRows.length, this.rowsExternal.length)
         // Update DOM
 		//this.rowsInternal = newRows;

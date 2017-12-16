@@ -15,7 +15,7 @@
         <!--TODO: Add readonly div --> 
 
         <!-- Header -->
-        <datagrid-header [columnsInternal]="columnsInternal"
+        <datagrid-header [columnsInternal]="columnsExternal"
                          [columnsPinned]="columnsPinned"
                          [state]="state$ | async"
                          [status]="status"
@@ -28,15 +28,13 @@
         
         <!-- Body -->
         <div class="datagrid-body-container" #dataGridBody [ngStyle]="{'height': gridProps.heightTotal + 'px'}" (scroll)="onScroll($event)">
-            <datagrid-body [columnsInternal]="columnsInternal"
+            <datagrid-body [columnsInternal]="columnsExternal"
                            [columnsPinned]="columnsPinned"
                            [rowsInternal]="rowsExternal"
                            [state]="state"
                            [status]="status"
                            [options]="options"
-                           [gridProps]="gridProps"
-                           [colsVisible]="colsVisible"
-                           >
+                           [gridProps]="gridProps">
             </datagrid-body>
         </div>
     </div>

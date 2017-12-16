@@ -9,7 +9,7 @@
                 <div class="datagrid-header-cell" [attr.data-qa]="'column column-'+column.prop" title="{{column.label}}"
                      *ngFor="let column of columnsPinned; let columnIndex = index; trackBy:trackColumn"
                      [ngClass]="{'reorderable': column.canReorder }"
-                     [ngStyle]="{'width' : column.width + 'px' }">
+                     [ngStyle]="{'width' : column.width + 'px', 'transform' : 'translate3d(' + column.$$leftOffset + 'px, 0px, 0px)' }">
                     <span class="datagrid-header-cell-label">
                         {{column.label}}
                     </span>
@@ -28,7 +28,7 @@
                      *ngFor="let column of columnsInternal; let columnIndex = index; trackBy:trackColumn"
                      dnd-sortable [sortableIndex]="columnIndex" [dragEnabled]="column.canReorder && !column.pinnedLeft" (onDragSuccess)="onReorderSuccess($event)"
                      [ngClass]="{'reorderable': column.canReorder }"
-                     [ngStyle]="{'width' : column.width + 'px' }">
+                     [ngStyle]="{'width' : column.width + 'px', 'transform' : 'translate3d(' + column.$$leftOffset + 'px, 0px, 0px)' }">
                     <span class="datagrid-header-cell-label" dnd-sortable-handle>
                         {{column.label}}
                     </span>

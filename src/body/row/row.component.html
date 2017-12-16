@@ -1,14 +1,14 @@
 <div class="datagrid-row">
 
     <ng-container *ngFor="let column of columns; let columnIndex = index; trackBy:trackColumn">
-        <ng-container *ngIf="colsVisible && colsVisible[column.prop]">
+        
             <!-- [ngStyle]="{'transform' : 'translate3d(' + TEMP + 'px, 0px, 0px)'}" -->
             <datagrid-cell class="datagrid-cell" [ngStyle]="{'transform' : 'translate3d(' + column.$$leftOffset + 'px, 0px, 0px)'}"
                            [column]="column"
                            [row]="row"
                            [options]="options">
             </datagrid-cell>
-        </ng-container>
+       
     </ng-container>
 </div>
 

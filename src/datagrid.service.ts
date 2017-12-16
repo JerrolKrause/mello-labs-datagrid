@@ -70,7 +70,60 @@ export class DataGridService {
         let columnMap = {};
         columns.forEach(column => columnMap[column.prop] = column);
         return columnMap;
-    }
+	}
+
+    /**
+     * 
+     * @param rows
+     */
+	public getVisibleRows(rows: any[], scrollProps, gridProps, rowHeight): any[] {
+		//console.log('getVisibleRowsoffSetRowsFromTop', rows, this.scrollProps, this.rowHeight, this.gridProps);
+		let rowsNew = [...rows];
+		let buffer = 0;
+		let offSetRowsFromTop = Math.floor(scrollProps.scrollTop / rowHeight);
+		if (offSetRowsFromTop - buffer > 0) {
+			offSetRowsFromTop -= buffer;
+		}
+		if (offSetRowsFromTop < buffer) {
+			offSetRowsFromTop = 0;
+		}
+
+		let rowsEnd = offSetRowsFromTop + gridProps.rowsVisible + (buffer * 2);
+		if (rowsEnd > rowsNew.length) {
+			rowsEnd = rowsNew.length;
+		}
+
+		//console.log('getVisibleRowsoffSetRowsFromTop', rowsEnd)
+		return rowsNew.slice(offSetRowsFromTop, rowsEnd);
+	}
+
+    /**
+     * Create an object of columns that should be visible based on horizontal scroll width
+     */
+	public getVisibleColumns(columns: any[], scrollProps, gridProps) {
+		//console.log('getVisibleColumns', this.scrollProps, this.gridProps, this.columnsInternal.length);
+		let colsExternal = [];
+
+		//let widthTotal = this.scrollProps.scrollLeft;
+		let widthCurrent = 0;
+		// Loop through column widths
+		for (let i = 0; i < columns.length; i++) {
+			let column = columns[i];
+
+			// If current column width + all widths before this one is greater than the left scroll position
+			// If total column widths is less than the width of the body minus the left scroll position
+			if (
+				column.width + widthCurrent > scrollProps.scrollLeft &&
+				widthCurrent < gridProps.widthBody + scrollProps.scrollLeft
+			) {
+				colsExternal.push(column);
+			}
+			// Update current width by adding the current column
+			widthCurrent = widthCurrent + column.width;
+		}
+		return [...colsExternal];
+		//this.columnsExternal = colsExternal;
+	}
 
     /**
      * Filters based on the global object. Also creates the necessary filter structure.
