@@ -16,7 +16,8 @@ import { RowComponent } from './body/row/row.component';
 import { CellComponent } from './body/cell/cell.component';
 
 import { InfoComponent } from './info/info.component';
- 
+
+import { Datagrid } from './typings';
 
 // 3rd party controls  
 import { DndModule } from 'ng2-dnd'; // Drag and drop

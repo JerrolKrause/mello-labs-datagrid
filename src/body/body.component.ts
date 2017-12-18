@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
 import { Actions } from '../datagrid.props';
-import { Datagrid } from '../datagrid';
+import { Datagrid } from '../typings';
 
 @Component({
     selector: 'datagrid-body',

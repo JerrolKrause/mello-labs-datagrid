@@ -9,7 +9,10 @@
 /node_modules
 
 # IDEs and editors
+.vs
 /.vs
+src/.vs
+src/.vs/*
 /.vs/*
 /.idea
 .project

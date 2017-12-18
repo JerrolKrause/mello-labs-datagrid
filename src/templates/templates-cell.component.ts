@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, Input, ViewContainerRef, ViewChild, Output, EventEmitter } from '@angular/core';
-import { Datagrid } from '../datagrid';
+import { Datagrid } from '../typings';
 import { Observable } from 'rxjs/Observable';
 
 @Component({

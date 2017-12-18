@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Datagrid } from './datagrid';
+import { Datagrid } from './typings';
 
 
 @Injectable()

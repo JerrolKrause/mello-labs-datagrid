@@ -7,7 +7,7 @@ import { Subscription } from 'rxjs/Subscription';
 
 import { DataGridService } from './datagrid.service';
 import { Actions, Operators } from './datagrid.props';
-import { Datagrid } from './datagrid';
+import { Datagrid } from './typings';
 import { debounce } from 'rxjs/operator/debounce';
 
 import * as _ from 'lodash';

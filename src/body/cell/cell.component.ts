@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, Input, ViewContainerRef, ViewChild, Output, EventEmitter, ElementRef, AfterViewInit, OnChanges } from '@angular/core';
-import { Datagrid } from '../../datagrid';
+import { Datagrid } from '../../typings';
 import { BehaviorSubject } from 'rxjs';
 
 

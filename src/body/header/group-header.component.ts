@@ -3,7 +3,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs';
 import { Actions } from '../../datagrid.props';
-import { Datagrid } from '../../datagrid';
+import { Datagrid } from '../../typings';
 
 
 @Component({

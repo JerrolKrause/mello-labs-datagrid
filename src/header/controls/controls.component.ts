@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
 import { DataGridService } from '../../datagrid.service';
-import { Datagrid } from '../../datagrid';
+import { Datagrid } from '../../typings';
 import { Subscription } from 'rxjs';
 import { Actions } from '../../datagrid.props';
 
