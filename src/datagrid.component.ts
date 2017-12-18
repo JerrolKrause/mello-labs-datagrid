@@ -10,6 +10,7 @@ import { Actions, Operators } from './datagrid.props';
 import { Datagrid } from './datagrid';
 import { debounce } from 'rxjs/operator/debounce';
 
+import * as _ from 'lodash';
 
 /**
 TODOS:
@@ -40,7 +41,7 @@ TODOS:
 		'(document:keyup)': 'handleKeyboardEvents($event)',
         //'(document:mousedown )': 'handleMouseDown($event)',
         '(document:mouseup )': 'handleMouseUp($event)',
-        '(document:mousemove )': 'handleMouseMove($event)'
+		'(document:mousemove )': 'handleMouseMove($event)'
     }
 })
 export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, AfterViewChecked, OnDestroy  {
@@ -139,7 +140,9 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	) {
 	}
 
+
 	ngOnInit() {
+    
 		this.ref.detach();
         // On window resize, fire change detection
 		window.onresize = (event) => {
@@ -164,7 +167,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		if (!this.columns || !this.rows) {
 			this.appReady = false;
 		}
-
 
 		// If state is passed
 		if (model.state && this.state) {
@@ -232,7 +234,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			this.appReady = true;
 			//	this.ref.markForCheck();
 			//}, 0);
-			this.ref.reattach();
+			
 			
 			//Emit the state change to the parent component now that the first initial view has been created
 			this.emitState(this.state);
@@ -242,12 +244,20 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
     
 	ngAfterViewInit() {}
 	ngAfterViewChecked() {}
-    
+
+    /**
+    * Throttle the scroll event
+    */
+	public onScrollThrottled = _.throttle(event => this.onScroll(event), 75, { trailing: true, leading: true });
+
 	/**
 	* When the datatable is scrolled
 	* @param event
 	*/
-	public onScroll(event) {
+	private onScroll(event) {
+        console.log('Scrolling')
+        // Manual change detection
+		this.ref.detach();
 		let scrollProps = {
 			scrollTop: event.target.scrollTop,
 			scrollLeft: event.target.scrollLeft
@@ -256,6 +266,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		this.scrollProps = { ...scrollProps };
 		this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
 		this.columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
+		this.ref.reattach();
 	}
     
 
@@ -265,6 +276,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
      */
     public viewCreate(state: Datagrid.State = this.state) {
 		console.warn('createView');
+        // Set manual change detection
+		this.ref.detach();
 		//console.time('Creating View');
 		 
 		let newRows = [...this.rows]; 
@@ -326,6 +339,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		
 		this.status = this.dgSvc.createStatuses(this.state, this.columnsInternal);
 		this.state = { ...state };
+        // Turn change detection back on
+		this.ref.reattach();
 		//console.timeEnd('Creating View');
 	}
 

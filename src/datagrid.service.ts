@@ -79,7 +79,7 @@ export class DataGridService {
 	public getVisibleRows(rows: any[], scrollProps, gridProps, rowHeight): any[] {
 		//console.log('getVisibleRowsoffSetRowsFromTop', rows, this.scrollProps, this.rowHeight, this.gridProps);
 		let rowsNew = [...rows];
-		let buffer = 0;
+		let buffer = 10;
 		let offSetRowsFromTop = Math.floor(scrollProps.scrollTop / rowHeight);
 		if (offSetRowsFromTop - buffer > 0) {
 			offSetRowsFromTop -= buffer;

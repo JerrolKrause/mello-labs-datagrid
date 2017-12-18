@@ -27,7 +27,7 @@
         </datagrid-header>
         
         <!-- Body -->
-        <div class="datagrid-body-container" #dataGridBody [ngStyle]="{'height': gridProps.heightTotal + 'px'}" (scroll)="onScroll($event)">
+        <div class="datagrid-body-container" id="dataGridBody" #dataGridBody [ngStyle]="{'height': gridProps.heightTotal + 'px'}" (scroll)="onScrollThrottled($event)">
             <datagrid-body [columnsInternal]="columnsExternal"
                            [columnsPinned]="columnsPinned"
                            [rowsInternal]="rowsExternal"
