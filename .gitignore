@@ -10,9 +10,11 @@
 
 # IDEs and editors
 .vs
+*.vs
 /.vs
 src/.vs
 src/.vs/*
+*src/.vs/*
 /.vs/*
 /.idea
 .project

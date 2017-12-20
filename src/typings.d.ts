@@ -11,7 +11,7 @@ declare namespace Datagrid {
 		widthMain?: number;
 		heightTotal?: number;
 		rowsVisible?: number;
-		rowsTotal?: number;
+		heightBody?: number;
 		widthBody?: number;
 	}
 	 

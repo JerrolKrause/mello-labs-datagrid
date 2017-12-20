@@ -36,11 +36,12 @@ export class HeaderComponent implements OnInit, OnChanges{
 	@Input() columnIndex: number;
 	@Input() filterTerms: any;
 	@Input() columnsCount:number;
+    
 	@Output() onStateUpdated: EventEmitter<any> = new EventEmitter();
 	@Output() onCustomLinkEvent: EventEmitter<any> = new EventEmitter();
-
-	public columnWidth: string = '';
     */
+	public columnWidth: string = '';
+    
 	constructor(
     ) { }
 
@@ -49,6 +50,14 @@ export class HeaderComponent implements OnInit, OnChanges{
 
 	ngOnChanges() {
 
+	}
+
+    /**
+     * Pass state changes up from controls component
+     * @param event
+     */
+	public stateUpdated(event) {
+		this.onStateUpdated.emit(event);
 	}
 
     /**

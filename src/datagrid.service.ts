@@ -1,9 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Datagrid } from './typings';
 
+import * as _ from 'lodash';
 
 @Injectable()
 export class DataGridService {
+
+	public uniqueId: string;
+
+	public cache = {
+		sortArray: _.memoize(this.sortArray, () => this.uniqueId),
+		
+	}
     
 	constructor(
 	) {
@@ -79,7 +87,7 @@ export class DataGridService {
 	public getVisibleRows(rows: any[], scrollProps, gridProps, rowHeight): any[] {
 		//console.log('getVisibleRowsoffSetRowsFromTop', rows, this.scrollProps, this.rowHeight, this.gridProps);
 		let rowsNew = [...rows];
-		let buffer = 10;
+		let buffer = 1;
 		let offSetRowsFromTop = Math.floor(scrollProps.scrollTop / rowHeight);
 		if (offSetRowsFromTop - buffer > 0) {
 			offSetRowsFromTop -= buffer;
@@ -275,7 +283,7 @@ export class DataGridService {
 	* @param sortType
 	*/
 	public sortArray(array: any[], prop: string, sortType: string): any[] {
-		//console.warn('sortRows', prop, sortType);
+		console.warn('sortRows', prop, sortType);
 		//console.warn('sortRows', array);
 		let mapProp = (prop) => {
 			// If string, make lower case and remove special characters

@@ -12,6 +12,7 @@ import { debounce } from 'rxjs/operator/debounce';
 
 import * as _ from 'lodash';
 
+
 /**
 TODOS:
 - Refactor DT to support 2 types of grids only: Single line grids with H scroll and full screen grids with word wrap
@@ -37,12 +38,13 @@ TODOS:
 	encapsulation: ViewEncapsulation.None,
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	host: {
-		'(document:keydown)': 'handleKeyboardEvents($event)',
-		'(document:keyup)': 'handleKeyboardEvents($event)',
+		//'(document:keydown)': 'handleKeyboardEvents($event)',
+		//'(document:keyup)': 'handleKeyboardEvents($event)',
         //'(document:mousedown )': 'handleMouseDown($event)',
-        '(document:mouseup )': 'handleMouseUp($event)',
-		'(document:mousemove )': 'handleMouseMove($event)'
-    }
+        //'(document:mouseup)': 'handleMouseUp($event)',
+		//'(document:mousemove)': 'handleMouseMove($event)',
+		'(window:resize)': 'onResizeEvent($event)'
+	}
 })
 export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, AfterViewChecked, OnDestroy  {
     /** Self reference */
@@ -96,15 +98,13 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
     /** A dictionary that holds css STYLES for a given row. The lookup is the primary key specified in the options. Gets its data from options.rowStyle */
 	public rowStyles = {};
     /** Holds the left offsets used for column pinning */
-	public leftOffsets: number[] = [];
+	//public leftOffsets: number[] = [];
     /** Does the datatable have the data it needs to draw the dom? */
 	public appReady: boolean = false;
     /** Height of the containing div that has the overflow scroll */
 	public tableContainerHeight: number = 300;
     /** Height of the actual table, used for vScroll */
 	public tableHeight: string;
-    /** Holds the vertical positioning of all elements that use */
-	public virtualScrollPositions: any;
     /** Is the user dragging with the mouse */
 	public dragging: boolean = false;
 	public draggingPos: Datagrid.DragSelect = {};
@@ -138,30 +138,26 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		private dgSvc: DataGridService,
 		private ref: ChangeDetectorRef
 	) {
+		// Default props get stripped out by the compiler for some reason
+		this.gridProps = {};
+		this.scrollProps = { scrollTop: 0, scrollLeft: 0 };
+		this.appReady = false;
+		this.dragging = false;
+		this.draggingPos = {};
+		this.keysPressed = {};
+		this.subscriptions = [];
+		this.stateDefault = {
+			groups: [],
+			sorts: [],
+			filters: [],
+		}
 	}
 
-
-	ngOnInit() {
-    
-		this.ref.detach();
-        // On window resize, fire change detection
-		window.onresize = (event) => {
-			this.updateGridProps();
-            // Update columns that go to the DOM
-			this.columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
-			// Updated rows to go to the DOM
-			this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
-		};
-        /*
-		this.scrollDebounce$.debounceTime(10).subscribe(scrollProps => {
-			this.scrollProps = { ...scrollProps };
-			this.rowsExternal = this.getVisibleRows(this.rowsInternal);
-		});
-        */
-	}
+   
+	ngOnInit() {}
 
 	ngOnChanges(model) {
-		console.warn('ngOnChanges', model);
+		//console.warn('ngOnChanges', model);
 
         // If columns or rows are not available, set app ready to false to show loading screen
 		if (!this.columns || !this.rows) {
@@ -248,14 +244,14 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
     /**
     * Throttle the scroll event
     */
-	public onScrollThrottled = _.throttle(event => this.onScroll(event), 75, { trailing: true, leading: true });
+	public onScrollThrottled = _.throttle(event => this.onScroll(event), 10, { trailing: true, leading: true });
 
 	/**
 	* When the datatable is scrolled
 	* @param event
 	*/
 	private onScroll(event) {
-        console.log('Scrolling')
+		//console.log('onScroll')
         // Manual change detection
 		this.ref.detach();
 		let scrollProps = {
@@ -275,11 +271,11 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
      * @param state
      */
     public viewCreate(state: Datagrid.State = this.state) {
-		console.warn('createView');
+		// console.warn('createView');
+		// console.time('Creating View');
         // Set manual change detection
 		this.ref.detach();
-		//console.time('Creating View');
-		 
+		
 		let newRows = [...this.rows]; 
 		//console.log('Total Rows', newRows.length)
         // If global filter option is set filter 
@@ -290,12 +286,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		// If custom filters are specified
 		if (this.state.filters.length) {
 			newRows = this.dgSvc.filterArray(newRows, this.state.filters);
-		}
-
-        // Add a row index for all rows, this determines the vertical positioning for virtual scroll
-		for (let i = 0; i < newRows.length; i++) {
-			newRows[i].$$rowIndex = i;
-			newRows[i].$$hidden = false
 		}
         
 		// If grouped
@@ -310,17 +300,30 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			this.groups = null;
             // If sorts
 			if (this.state.sorts.length) {
-				newRows = this.dgSvc.sortArray(newRows, this.state.sorts[0].prop, this.state.sorts[0].dir);
+
+				// Sort rows and use memoize function to cache results
+				this.dgSvc.uniqueId = this.state.sorts[0].prop + '-' + this.state.sorts[0].dir;
+				newRows = this.dgSvc.cache.sortArray(newRows, this.state.sorts[0].prop, this.state.sorts[0].dir);
+                // Non memoized
+                //newRows = this.dgSvc.sortArray(newRows, this.state.sorts[0].prop, this.state.sorts[0].dir);
 			}
 		}
-
+        
 		
-		this.updateGridProps();
 		
 		this.createRowClasses();
 		this.createRowStyles();
 		//this.columnCalculations();
         //this.calculateHeight();
+
+		// Add a row index for all rows, this determines the vertical positioning for virtual scroll
+        // TODO: Very ineffecient to do this on every state update
+		for (let i = 0; i < newRows.length; i++) {
+			newRows[i].$$rowIndex = i;
+			newRows[i].$$hidden = false
+		}
+        // HACK: Grid props needed to build visible rows and columns but visible rows and columns needed to update grid props
+		this.updateGridProps();
 
         // Update internal modified rows
 		this.rowsInternal = newRows;
@@ -329,7 +332,9 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
         // Updated rows to go to the DOM
 		this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
 
-		console.log('Rows', newRows.length, this.rowsExternal.length)
+        // HACK: Grid props needed to build visible rows and columns but visible rows and columns needed to update grid props
+		this.updateGridProps();
+        
         // Update DOM
 		//this.rowsInternal = newRows;
 
@@ -339,6 +344,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		
 		this.status = this.dgSvc.createStatuses(this.state, this.columnsInternal);
 		this.state = { ...state };
+		
         // Turn change detection back on
 		this.ref.reattach();
 		//console.timeEnd('Creating View');
@@ -349,7 +355,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
      * @param stateChange
      */
 	public onStateUpdated(stateChange:Datagrid.StateChange):void{
-		//console.warn('changeState ', this.state, stateChange);
+		console.warn('changeState ', this.state, stateChange);
 		let newState: Datagrid.State = this.state;
 		let newRows = [...this.rows];
 		
@@ -507,18 +513,18 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 
         // Get height of grid
 		if (this.options.heightMax) {
-			this.gridProps.heightTotal = <number>this.options.heightMax
+			gridProps.heightTotal = <number>this.options.heightMax
 		} else if (this.options.heightFullscreen) {
 			let height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 			let offset = this.datagrid.nativeElement.getBoundingClientRect().top;
 			let newHeight = height - offset - 18 - 24;// Add offsets for table header and bottom scrollbar
-			this.gridProps.heightTotal = newHeight;
+			gridProps.heightTotal = newHeight;
 		}
 
-		this.gridProps.rowsVisible = Math.ceil(this.gridProps.heightTotal / this.rowHeight); // Get max visible rows
-		this.gridProps.rowsTotal = this.rows.length;    // Hold total rows
-		this.gridProps.widthBody = this.datagrid.nativeElement.getBoundingClientRect().width;
-		this.gridProps = { ...this.gridProps, ...gridProps };
+		gridProps.rowsVisible = Math.ceil(gridProps.heightTotal / this.rowHeight); // Get max visible rows
+		gridProps.heightBody = this.rowsInternal && this.rowsInternal.length ? this.rowsInternal.length * this.rowHeight : this.rows.length * this.rowHeight;    // Get height of body
+		gridProps.widthBody = this.datagrid.nativeElement.getBoundingClientRect().width;
+		this.gridProps = { ...this.gridProps, ...gridProps }; 
 	}
 
 
@@ -961,12 +967,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 					});
 				}
 
-				if (this.options.virtualScroll && this.virtualScrollPositions) {
-					for (let key in this.virtualScrollPositions.rows) {
-						rowStyles[key] = Object.assign(rowStyles[key], { 'transform': 'translate3d(0px, ' + this.virtualScrollPositions.rows[key]+'px, 0px)'})
-					}
-				}
-
 				// If no models
 				if (stylesNoModels.length) {
 					// Loop through all rows
@@ -991,7 +991,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
                 // Update row styles
 				this.rowStyles = rowStyles;
                 // Tell DOM to updated after observable is done udpated
-				this.ref.markForCheck();
+				this.ref.detectChanges();
 			});
 			this.subscriptions.push(subscription);
 		}
@@ -1064,35 +1064,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
         }
     }
 
-   
-
-
-	public virtualScroll(scrollTop: number) {
-		console.warn('OnScroll ', scrollTop);
-        // transform: translate3d(0px, 74px, 0px);
-		let rowHeight = this.options.rowHeight + 1;
-		let tableHeight = this.tableContainerHeight - 24;
-		let rowsVisibleCount = Math.floor(tableHeight / rowHeight);
-        // Order of operations for vScroll
-        // 1. Generate Z-indexes of rows and group headers (for transform property)
-        // 2. Determine visible scrollbox area, figure out which rows and headers fall within that
-
-
-
-		let i = 0;
-		this.rowsInternal.forEach((row, index:number) => {
-			let vPos = index * rowHeight;
-			if (vPos <= scrollTop && vPos + rowHeight < rowsVisibleCount * rowHeight){
-				i++;
-			}
-
-
-            //console.warn(vPos)
-		});
-		console.warn('i',i)
-		//console.warn('OnScroll-Container Height ', rowsVisibleCount);
-	}
-
     /**
      * 
      * @param data
@@ -1120,6 +1091,20 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
         }
         this.emitColumns(this.columnsInternal);
 		this.onStateUpdated({ action: Actions.reset, data:null});
+	}
+
+	/**
+	* On window resize
+	* @param event
+	*/
+	private onResizeEvent(event) {
+		this.ref.detach();
+		// Update columns that go to the DOM
+		this.columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
+		// Updated rows to go to the DOM
+		this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
+		this.updateGridProps();
+		this.ref.reattach();
 	}
     
 	ngOnDestroy() {

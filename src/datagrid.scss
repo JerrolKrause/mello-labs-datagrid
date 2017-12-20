@@ -25,16 +25,16 @@ $border-color: #ccc;
     }
 
     #drag-select{width:20px;height:20px;background:red;position:fixed;opacity:0.3;z-index:1000;}
-    .datagrid-container{margin:0;background-color:#fff;overflow: hidden;
-        .datagrid-header-container{overflow:hidden;height:24px;}
+    .datagrid-container{margin:0;background-color:#fff;overflow: hidden;min-height: 200px;
+        .datagrid-header-container{height:24px;position:relative;z-index:4;}
         .datagrid-header{
             .datagrid-header-row{background-color: #f1f1f1;display: flex;flex-flow: row;}
-            .datagrid-header-pinned{position:sticky;left:0;z-index:7!important;background-color: #f1f1f1;display: flex;flex-flow: row;}
+            .datagrid-header-pinned{left:0;z-index:7!important;background-color: #f1f1f1;display: flex;flex-flow: row;}
             .datagrid-header-main{display: flex;flex-flow: row;}
             .datagrid-header-cell{
                 line-height: 20px;font-weight: bold;display:inline-block;cursor:default;background-color: #f1f1f1;background-image: linear-gradient(to top, #dadada 0%, #f1f1f1 100%);
                 white-space: nowrap;padding:0;outline: 1px solid $border-color; top:0; position:absolute;z-index:6;border: 0;box-shadow: 5px 1px 5px rgba(0, 0, 0, 0.3);
-                &.pinned{position:sticky;z-index:7!important;background-color: #f1f1f1;}
+                &.pinned{z-index:7!important;background-color: #f1f1f1;}
                 &.reorderable .header-content{cursor:grab;cursor:-webkit-grab;}
                 & > div{padding-right: 8px;}
                 .resize-handle{display:block;position: absolute;background:#f6ac38;top: 0;bottom: 0;right: -2px;width: 5px; z-index: 8;cursor:ew-resize;}
@@ -74,14 +74,14 @@ $border-color: #ccc;
             
         } 
 
-        .datagrid-body-container{overflow:scroll;position:relative;}/** <- Autogen this*/
+        .datagrid-body-container{overflow:scroll;position:relative;z-index:3;}
         .datagrid-body{
             .datagrid-body-row{display: flex;flex-flow: row;backface-visibility: hidden;position:absolute;}
-            .datagrid-body-pinned{position:sticky;left:0;box-shadow: 2px 5px 5px rgba(0, 0, 0, 0.3);background-color:#fff;z-index: 4;}
+            .datagrid-body-pinned{left:0;box-shadow: 2px 5px 5px rgba(0, 0, 0, 0.3);background-color:#fff;z-index: 4;}
         
            .datagrid-info-row{background-color: #ededed;overflow:initial;
-               .datagrid-info-cell{background-color: #ededed;box-shadow: 5px 1px 5px rgba(0, 0, 0, 0.3);overflow:initial;position:sticky;z-index: 5;left:15px;top:24px;}
-               .sticky{position:sticky;left:15px;display: inline-block;}
+               .datagrid-info-cell{background-color: #ededed;box-shadow: 5px 1px 5px rgba(0, 0, 0, 0.3);overflow:initial;z-index: 5;left:15px;top:24px;}
+              
             }
             .datagrid-row{position:relative;display: flex;flex-flow: row;border-bottom: 1px solid #b3b3b3;height: 24px;
                 &.selected{
@@ -91,7 +91,7 @@ $border-color: #ccc;
                 &.selected-state .datagrid-cell{background:#F0DADA;}
                 .datagrid-cell{position:absolute;height: 24px;}
                 .datagrid-cell-data{line-height:24px;position:relative;z-index: 3;padding:0;display: inline-block;white-space: nowrap;text-overflow: ellipsis; min-height: 24px;
-                    &.pinned{position:sticky;box-shadow: 2px 5px 5px rgba(0, 0, 0, 0.3);background-color:#fff;z-index: 4;}
+                    &.pinned{box-shadow: 2px 5px 5px rgba(0, 0, 0, 0.3);background-color:#fff;z-index: 4;}
                     .cell{height:22px;padding: 3px 8px;}
                     .cell2{}
                     .cell3{}
@@ -101,9 +101,9 @@ $border-color: #ccc;
             }
             // Groups
             .datagrid-group-header{height:32px;
-                .datagrid-group-header-cell{padding:0;position: sticky;z-index: 4;left:0;}
+                .datagrid-group-header-cell{padding:0;z-index: 4;left:0;}
                 a{background-image: linear-gradient(to top, #fcfeff 0%, #cbdce6 100%);padding: .15rem;font-size:1.1rem;padding-left: 1rem;display:block;border-bottom: 1px solid #c2d1da;
-                    & > span{position:sticky;left:16px;}
+                    & > span{left:16px;}
                     & > span:before{ font-family: FontAwesome; content: "\f0da";transition: .1s ease-out;display:inline-block;margin-right: 5px;}
                     &.active span:before{ transform: rotate(90deg);transition: .1s ease-out;}
                 }

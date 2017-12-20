@@ -1,4 +1,4 @@
-<div class="datagrid-body" [ngStyle]="{'width' : gridProps.widthTotal + 'px', 'height' : gridProps.rowsTotal * 24 + 'px' }">
+<div class="datagrid-body" [ngStyle]="{'width' : gridProps.widthTotal + 'px', 'height' : gridProps.heightBody + 'px' }">
     
     <div class="datagrid-body-row"
         *ngFor="let row of rowsInternal; let rowIndex = index; trackBy:options.trackRow;"
