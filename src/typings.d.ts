@@ -13,6 +13,7 @@ declare namespace Datagrid {
 		rowsVisible?: number;
 		heightBody?: number;
 		widthBody?: number;
+		widthFixed?: boolean;
 	}
 	 
 	export interface ScrollProps {

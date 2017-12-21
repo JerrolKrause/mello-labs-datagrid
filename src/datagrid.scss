@@ -3,6 +3,7 @@ $border-color: #ccc;
 #datagrid{
     font-size:12px;border-top: 1px solid $border-color;position:relative;
     &.maxHeight{overflow-y: scroll;overflow-x: hidden;}
+    &.fullscreen{position:absolute;top:0;bottom:0;left:0;right:0;}
     &.scrollH{overflow-x:scroll;}
     &.noWrap tbody{white-space: nowrap;}
     &.selectable{user-select: none;
@@ -26,7 +27,7 @@ $border-color: #ccc;
 
     #drag-select{width:20px;height:20px;background:red;position:fixed;opacity:0.3;z-index:1000;}
     .datagrid-container{margin:0;background-color:#fff;overflow: hidden;min-height: 200px;
-        .datagrid-header-container{height:24px;position:relative;z-index:4;}
+        .datagrid-header-container{height:24px;position:relative;z-index:4;background-image: linear-gradient(to top, #dadada 0%, #f1f1f1 100%);}
         .datagrid-header{
             .datagrid-header-row{background-color: #f1f1f1;display: flex;flex-flow: row;}
             .datagrid-header-pinned{left:0;z-index:7!important;background-color: #f1f1f1;display: flex;flex-flow: row;}
@@ -74,7 +75,10 @@ $border-color: #ccc;
             
         } 
 
-        .datagrid-body-container{overflow:scroll;position:relative;z-index:3;}
+        .datagrid-body-container{
+            overflow:scroll;position:relative;z-index:3;
+            &.widthFixed{overflow-x: hidden;}
+        }
         .datagrid-body{
             .datagrid-body-row{display: flex;flex-flow: row;backface-visibility: hidden;position:absolute;}
             .datagrid-body-pinned{left:0;box-shadow: 2px 5px 5px rgba(0, 0, 0, 0.3);background-color:#fff;z-index: 4;}

@@ -159,8 +159,9 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	ngOnChanges(model) {
 		//console.warn('ngOnChanges', model);
 
-        // Clear all memoized caches
+        // Clear all memoized caches anytime new data is loaded into the grid
 		this.dgSvc.cache.sortArray.cache.clear();
+		this.dgSvc.cache.groupRows.cache.clear();
 
         // If columns or rows are not available, set app ready to false to show loading screen
 		if (!this.columns || !this.rows) {
@@ -218,7 +219,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 				this.state.filters = this.state.filters && this.state.filters.length && this.options.controlsMap ? this.dgSvc.mapPropertiesDown(this.state.filters, this.options.controlsMap) : [];
 
 			} else {
-				this.state = Object.assign({}, this.stateDefault);
+				this.state = { ...this.stateDefault }
 			}
             // Create the list of default filterable terms for string columns
 			this.filterTerms = this.dgSvc.getDefaultTermsList([...this.rows], this.columns);
@@ -243,13 +244,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	}
     
 	ngAfterViewInit() {
-        // Update grid props body width, for some reason it is not available if called in datagrid on initial load
+        // Update grid props body width, for some reason it is not available if called in datagrid on initial load OR if within a function call
 		this.gridProps.widthBody = Math.floor(this.datagrid.nativeElement.getBoundingClientRect().width);
-        /*
-		if (this.columns) {
-			this.updateGridProps();
-		}
-        */
 	}
 
 	ngAfterViewChecked() {}
@@ -304,13 +300,13 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		// If grouped
 		if (this.state && this.state.groups.length) {
 			// Create groups
-			this.dgSvc.uniqueId = this.state.groups[0].prop + '-' + this.state.groups[0].dir + newRows.length;
+			this.dgSvc.uniqueId = this.state.groups[0].prop + '-' + this.state.groups[0].dir + newRows.length + this.columns.length;
 			let groupings = this.dgSvc.cache.groupRows(newRows, this.columns, this.state.groups, this.state.sorts);
-
+            // Non memoized
 			//let groupings = this.dgSvc.groupRows(newRows, this.columns, this.state.groups, this.state.sorts);
 			newRows = groupings.rows;
 			this.groups = groupings.groups;
-		}
+		} 
         // If NOT grouped
 		else {
 			this.groups = null;
@@ -353,6 +349,9 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		if (this.gridProps.widthTotal < this.gridProps.widthBody) {
 			this.columnsInternal = this.dgSvc.columnsResize(this.columnsInternal, this.gridProps);
 			this.columnsInternal = this.dgSvc.columnCalculations(this.columnsInternal);
+			this.gridProps.widthFixed = true;
+		} else {
+			this.gridProps.widthFixed = false;
 		}
 
         // Update internal modified rows
@@ -571,7 +570,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		}
         
 		this.gridProps = { ...this.gridProps, ...gridProps };
-		//console.log(this.gridProps);
+		console.log(this.gridProps);
 	}
 
     
@@ -881,6 +880,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		return this.tableContainerHeight;
 	}
      */
+    
 	/**
 	 * Create row css classes based on callback function in options
 	 * @param row - Table row
@@ -1109,13 +1109,17 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	* @param event
 	*/
 	private onResizeEvent(event) {
-		this.ref.detach();
-		// Update columns that go to the DOM
-		this.columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
-		// Updated rows to go to the DOM
-		this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
-		this.updateGridProps();
-		this.ref.reattach();
+		if (this.columnsInternal && this.columnsInternal.length && this.rowsInternal && this.rowsInternal.length){
+			this.ref.detach();
+			this.columnsInternal = this.dgSvc.columnsResize(this.columnsInternal, this.gridProps);
+			this.columnsInternal = this.dgSvc.columnCalculations(this.columnsInternal);
+			// Update columns that go to the DOM
+			this.columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
+			// Updated rows to go to the DOM
+			this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
+			this.updateGridProps();
+			this.ref.reattach();
+		}
 	}
     
 	ngOnDestroy() {

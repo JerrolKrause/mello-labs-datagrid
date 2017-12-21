@@ -1,12 +1,10 @@
-<div id="datagrid" class="datagrid" #dataGrid data-qa="datagrid"
+<div id="datagrid" class="datagrid" #dataGrid
     [ngClass]="{
     'noWrap' : options.noWrap, 
     'selectable' : options.selectionType,
     'truncatable' : options.columnsTruncate,
-    'virtualScroll' : options.virtualScroll}">
-    <!-- 'scrollH' : options.scrollbarH,
-    'maxHeight' : options.heightMax, 
-    [ngStyle]="{'height': gridProps.heightTotal + 'px'}"-->
+    'virtualScroll' : options.virtualScroll,
+    'fullscreen' : options.heightFullscreen }">
 
     <div *ngIf="!appReady" class="container-fluid pt-3" style="font-size:1rem;"><i class="fa fa-spinner fa-spin"></i> Loading View...</div>
 
@@ -28,7 +26,10 @@
         </datagrid-header>
         
         <!-- Body -->
-        <div class="datagrid-body-container" id="dataGridBody" #dataGridBody [ngStyle]="{'height': gridProps.heightTotal + 'px'}" (scroll)="onScrollThrottled($event)">
+        <div class="datagrid-body-container" id="dataGridBody" #dataGridBody
+            [ngStyle]="{'height': gridProps.heightTotal + 'px'}"
+            [ngClass]="{ 'widthFixed' : gridProps.widthFixed }"
+            (scroll)="onScrollThrottled($event)">
             <datagrid-body [columnsInternal]="columnsExternal"
                            [columnsPinned]="columnsPinned"
                            [rowsInternal]="rowsExternal"

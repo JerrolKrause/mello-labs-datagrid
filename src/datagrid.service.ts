@@ -11,10 +11,17 @@ export class DataGridService {
 	public cache = {
 		sortArray: _.memoize(this.sortArray, () => this.uniqueId),
 		groupRows: _.memoize(this.groupRows, () => this.uniqueId),
+		filterArray: _.memoize(this.filterArray, () => this.uniqueId)
 	}
     
 	constructor(
 	) {
+		this.cache = {
+			sortArray: _.memoize(this.sortArray, () => this.uniqueId),
+			groupRows: _.memoize(this.groupRows, () => this.uniqueId),
+			filterArray: _.memoize(this.filterArray, () => this.uniqueId)
+		}
+
 	}
 
     /**
@@ -523,13 +530,19 @@ export class DataGridService {
      * @param gridProps
      */
 	public columnsResize(columns: Datagrid.Column[], gridProps: Datagrid.Props) {
+		let widthTotal = gridProps.widthTotal// - 7;
 		return columns.map(column => {
-			//console.log(column.width);
-			column.width = column.width * gridProps.widthBody / gridProps.widthTotal
+			column.width = Math.ceil(column.width * gridProps.widthBody / widthTotal) + 1;
 			return column;
 		});
 	}
 
+    /**
+     * /
+     * @param rows
+     * @param groups
+     * @param options
+    
 	public virtualScrollPositioning2(rows: any[], groups: Datagrid.Group, options: Datagrid.Options) {
 		//console.warn('virtualScrollPositioning', rows, groups);
 		let zIndexes = {
@@ -560,5 +573,5 @@ export class DataGridService {
 		return zIndexes;
 
 	}
-
+     */
 }
