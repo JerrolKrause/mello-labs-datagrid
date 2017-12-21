@@ -157,7 +157,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	ngOnInit() {}
 
 	ngOnChanges(model) {
-		console.warn('ngOnChanges', model);
+		//console.warn('ngOnChanges', model);
+
+        // Clear all memoized caches
+		this.dgSvc.cache.sortArray.cache.clear();
 
         // If columns or rows are not available, set app ready to false to show loading screen
 		if (!this.columns || !this.rows) {
@@ -192,22 +195,22 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 
 			// Get pinned columns
 			let columnsPinned = this.columns.filter(column => column.pinnedLeft ? true : false);
-			this.columnCalculations(columnsPinned);
+			columnsPinned = this.dgSvc.columnCalculations(columnsPinned);
 			this.columnsPinned = columnsPinned;
 
             // Get un-pinned columns
 			let columnsInternal = columns.filter(column => !column.pinnedLeft ? true : false);
-			this.columnCalculations(columnsInternal);
+			columnsInternal = this.dgSvc.columnCalculations(columnsInternal);
 			this.columnsInternal = columnsInternal;
 
             // If show info is set, create a column map
             if (this.options.showInfo) {
                 this.columnsMapped = this.dgSvc.mapColumns(this.columns);
 			}
-			console.log('Columns ready');
 		}
 		
 		if (this.columns && this.rows) {
+        
 			//console.warn(this.columns, this.rows)
 			if (this.state) {
 				this.state.groups = this.state.groups && this.state.groups.length && this.options.controlsMap ? this.dgSvc.mapPropertiesDown(this.state.groups, this.options.controlsMap) : [];
@@ -242,9 +245,11 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	ngAfterViewInit() {
         // Update grid props body width, for some reason it is not available if called in datagrid on initial load
 		this.gridProps.widthBody = Math.floor(this.datagrid.nativeElement.getBoundingClientRect().width);
+        /*
 		if (this.columns) {
 			this.updateGridProps();
 		}
+        */
 	}
 
 	ngAfterViewChecked() {}
@@ -280,7 +285,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
      */
     public viewCreate(state: Datagrid.State = this.state) {
 		// console.warn('createView');
-		// console.time('Creating View');
+		 console.time('Creating View');
         // Set manual change detection
 		this.ref.detach();
 		
@@ -299,7 +304,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		// If grouped
 		if (this.state && this.state.groups.length) {
 			// Create groups
-			let groupings = this.dgSvc.groupRows(newRows, this.columns, this.state.groups, this.state.sorts);
+			this.dgSvc.uniqueId = this.state.groups[0].prop + '-' + this.state.groups[0].dir + newRows.length;
+			let groupings = this.dgSvc.cache.groupRows(newRows, this.columns, this.state.groups, this.state.sorts);
+
+			//let groupings = this.dgSvc.groupRows(newRows, this.columns, this.state.groups, this.state.sorts);
 			newRows = groupings.rows;
 			this.groups = groupings.groups;
 		}
@@ -308,22 +316,22 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			this.groups = null;
             // If sorts
 			if (this.state.sorts.length) {
-
 				// Sort rows and use memoize function to cache results
-				this.dgSvc.uniqueId = this.state.sorts[0].prop + '-' + this.state.sorts[0].dir;
+				this.dgSvc.uniqueId = this.state.sorts[0].prop + this.state.sorts[0].dir + newRows.length;
 				newRows = this.dgSvc.cache.sortArray(newRows, this.state.sorts[0].prop, this.state.sorts[0].dir);
+
                 // Non memoized
                 //newRows = this.dgSvc.sortArray(newRows, this.state.sorts[0].prop, this.state.sorts[0].dir);
 			}
 		}
         
-		this.createRowClasses();
-		this.createRowStyles();
+		//this.createRowClasses();
+		//this.createRowStyles();
+
 		//this.columnCalculations();
         //this.calculateHeight();
 
 		// Add a row index for all rows, this determines the vertical positioning for virtual scroll
-        // TODO: Very ineffecient to do this on every state update
 		let y = 0;
 		for (let i = 0; i < newRows.length; i++) {
 			newRows[i].$$rowIndex = y;
@@ -336,9 +344,16 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			}
 
 		}
-
+        
         // HACK: Grid props needed to build visible rows and columns but visible rows and columns needed to update grid props
 		this.updateGridProps();
+
+        // If the total width of the columns is less than the viewport, resize columns to fit
+        // TODO: This is very inefficient to call on every view change, memoize?
+		if (this.gridProps.widthTotal < this.gridProps.widthBody) {
+			this.columnsInternal = this.dgSvc.columnsResize(this.columnsInternal, this.gridProps);
+			this.columnsInternal = this.dgSvc.columnCalculations(this.columnsInternal);
+		}
 
         // Update internal modified rows
 		this.rowsInternal = newRows;
@@ -365,7 +380,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		
         // Turn change detection back on
 		this.ref.reattach();
-		//console.timeEnd('Creating View');
+		console.timeEnd('Creating View');
 	}
 
     /**
@@ -373,7 +388,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
      * @param stateChange
      */
 	public onStateUpdated(stateChange:Datagrid.StateChange):void{
-		console.warn('changeState ', this.state, stateChange);
+		//console.warn('changeState ', this.state, stateChange);
 		let newState: Datagrid.State = this.state;
 		let newRows = [...this.rows];
 		
@@ -549,15 +564,17 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			gridProps.heightBody = 300;
 		}
 
-		if (this.datagrid && this.datagrid.nativeElement.getBoundingClientRect().width){
-			Math.floor(gridProps.widthBody = this.datagrid.nativeElement.getBoundingClientRect().width);
+		if (this.datagrid && this.datagrid.nativeElement.getBoundingClientRect().width) {
+			gridProps.widthBody = Math.floor(this.datagrid.nativeElement.getBoundingClientRect().width);
+		} else {
+			gridProps.widthBody = this.gridProps.widthBody;
 		}
         
 		this.gridProps = { ...this.gridProps, ...gridProps };
-		console.log(this.gridProps);
+		//console.log(this.gridProps);
 	}
 
-
+    
     /**
      * On a global mouse down event
      * @param event
@@ -885,42 +902,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		}
 	}
     
-	/**
-     * Get the left offsets needed by column pinning
-     * This method adds up the values of all widths of previous columns
-     */
-	public columnCalculations(columns: Datagrid.Column[]): void {
-		let leftOffset = 0;
-		columns.forEach((column, index) => {
-            // If no width, set default to 150
-			column.width ? column.width : 150;
-            // Ensure min width of 44
-			if (column.width < 44) {
-				column.width = 44
-			}
-            // Ensure all column widths are divisible by 4, fixes a blurry text bug in chrome
-			column.width = Math.floor(column.width / 4) * 4
-
-			column.$$leftOffset = leftOffset;
-			leftOffset += column.width;
-		});
-		
-    /**
-     * 
-    
-		let offset = 0;
-		let newOffsets = [];
-        this.columnsInternal.forEach((column, index) => {
-        
-            if (column.pinnedLeft) {
-                newOffsets[index] = offset;
-            }
-            
-            offset += column.width;
-            
-		});
-        this.leftOffsets = newOffsets; */
-	}
 
 	/**
      * Create a dictionary of row css classes based on inputs from options.rowClass

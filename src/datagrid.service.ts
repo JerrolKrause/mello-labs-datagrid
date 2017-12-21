@@ -10,7 +10,7 @@ export class DataGridService {
 
 	public cache = {
 		sortArray: _.memoize(this.sortArray, () => this.uniqueId),
-		
+		groupRows: _.memoize(this.groupRows, () => this.uniqueId),
 	}
     
 	constructor(
@@ -283,7 +283,7 @@ export class DataGridService {
 	* @param sortType
 	*/
 	public sortArray(array: any[], prop: string, sortType: string): any[] {
-		console.warn('sortRows', prop, sortType);
+		//console.warn('sortRows', prop, sortType);
 		//console.warn('sortRows', array);
 		let mapProp = (prop) => {
 			// If string, make lower case and remove special characters
@@ -363,7 +363,6 @@ export class DataGridService {
 		let groupsFinal: Datagrid.Groupings = {};
         // Sort the rows within the group
 		grouped.forEach((group: Datagrid.Group, index: number) => {
-			console.log(group);
 			if (sorts.length){
 				this.sortArray(group.rows, sorts[0].prop, sorts[0].dir);
 			}
@@ -497,8 +496,41 @@ export class DataGridService {
 		//this.termsList = termsList;
 	}
 
+    /**
+     * Determine the horizontal position of grid cells
+     */
+	public columnCalculations(columns: Datagrid.Column[]) {
+		let leftOffset = 0;
+		return columns.map((column, index) => {
+			// If no width, set default to 150
+			column.width ? column.width : 150;
+			// Ensure min width of 44
+			if (column.width < 44) {
+				column.width = 44
+			}
+			// Ensure all column widths are divisible by 4, fixes a blurry text bug in chrome
+			column.width = Math.floor(column.width / 4) * 4
 
-	public virtualScrollPositioning(rows: any[], groups: Datagrid.Group, options: Datagrid.Options) {
+			column.$$leftOffset = leftOffset;
+			leftOffset += column.width;
+			return column;
+		});
+	}
+
+    /**
+     * If total combined width of grid cells is less than viewport, resize widths to match
+     * @param columns
+     * @param gridProps
+     */
+	public columnsResize(columns: Datagrid.Column[], gridProps: Datagrid.Props) {
+		return columns.map(column => {
+			//console.log(column.width);
+			column.width = column.width * gridProps.widthBody / gridProps.widthTotal
+			return column;
+		});
+	}
+
+	public virtualScrollPositioning2(rows: any[], groups: Datagrid.Group, options: Datagrid.Options) {
 		//console.warn('virtualScrollPositioning', rows, groups);
 		let zIndexes = {
 			tableHeight: null,

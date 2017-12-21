@@ -81,7 +81,6 @@ $border-color: #ccc;
         
            .datagrid-info-row{background-color: #ededed;overflow:initial;
                .datagrid-info-cell{background-color: #ededed;box-shadow: 5px 1px 5px rgba(0, 0, 0, 0.3);overflow:initial;z-index: 5;left:15px;top:24px;}
-              
             }
             .datagrid-row{position:relative;display: flex;flex-flow: row;border-bottom: 1px solid #b3b3b3;height: 24px;
                 &.selected{
