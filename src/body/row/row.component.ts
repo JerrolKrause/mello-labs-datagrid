@@ -17,15 +17,11 @@ export class RowComponent implements OnInit, OnChanges  {
 	constructor(public elementRef: ElementRef
     ) { }
 
-	ngOnInit() {
-	}
+	ngOnInit() {}
 
 	ngOnChanges(model) {
-		//console.log('Changing Row', model)
+		//console.log('RowComponent', model)
 	}
-
-
-
 
 	/**
     * Return a unique ID to ngfor to improve performance

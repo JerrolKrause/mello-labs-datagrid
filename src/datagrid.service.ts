@@ -340,7 +340,8 @@ export class DataGridService {
 					columnProp: group.prop,
 					columnLabel: null,
                     label: row[group.prop] || 'No Value',
-                    visible: true
+					visible: true,
+                    type: 'group'
                 }
                 let label = columns.filter(column => column.prop == group.prop);
                 newGroups[newProp].columnLabel = label && label[0] ? label[0].label : 'No Value';
@@ -362,13 +363,14 @@ export class DataGridService {
 		let groupsFinal: Datagrid.Groupings = {};
         // Sort the rows within the group
 		grouped.forEach((group: Datagrid.Group, index: number) => {
+			console.log(group);
 			if (sorts.length){
 				this.sortArray(group.rows, sorts[0].prop, sorts[0].dir);
 			}
 			
 			let currentLoc = newRows.length;
 			groupsFinal[currentLoc] = group;
-			newRows = [...newRows, ...group.rows];
+			newRows = [...newRows, group, ...group.rows];
 		});
 		
 		return { rows: newRows, groups: groupsFinal };

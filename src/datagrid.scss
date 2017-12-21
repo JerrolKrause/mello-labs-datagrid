@@ -47,7 +47,7 @@ $border-color: #ccc;
 
             .dropdown{
                 .active{color: red;}
-                .dropdown-item{padding: 3px .75rem;font-size: 0.8rem; padding-left: 32px;}
+                .dropdown-item{padding: 3px .75rem;font-size: 0.8rem; }
                 .dropdown-item:hover{background-color: #f7f7f9;}
                 .disabled:hover{background-color:transparent;}
                 & > .dropdown-menu{top: 20px!important;min-width:200px;font-size: 0.8rem;padding: .5rem 0;}
@@ -90,7 +90,7 @@ $border-color: #ccc;
                 }
                 &.selected-state .datagrid-cell{background:#F0DADA;}
                 .datagrid-cell{position:absolute;height: 24px;}
-                .datagrid-cell-data{line-height:24px;position:relative;z-index: 3;padding:0;display: inline-block;white-space: nowrap;text-overflow: ellipsis; min-height: 24px;
+                .datagrid-cell-data{line-height:24px;position:relative;z-index: 3;padding: 0px 5px;display: inline-block;white-space: nowrap;text-overflow: ellipsis; min-height: 24px;overflow: hidden;
                     &.pinned{box-shadow: 2px 5px 5px rgba(0, 0, 0, 0.3);background-color:#fff;z-index: 4;}
                     .cell{height:22px;padding: 3px 8px;}
                     .cell2{}

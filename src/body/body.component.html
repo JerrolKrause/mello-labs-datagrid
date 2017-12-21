@@ -2,23 +2,29 @@
     
     <div class="datagrid-body-row"
         *ngFor="let row of rowsInternal; let rowIndex = index; trackBy:options.trackRow;"
-        [ngStyle]="{'transform' : 'translate3d(0px, ' + row.$$rowIndex * 24 + 'px, 0px)'}">
+        [ngStyle]="{'transform' : 'translate3d(0px, ' + row.$$rowIndex + 'px, 0px)'}">
+       
+        <ng-container *ngIf="row.type == 'group' ">
+            <group-header [group]="row" [options]="options" [width]="gridProps.widthTotal"></group-header>
+        </ng-container>
 
-        <div class="datagrid-body-pinned" style="display:inline-block" [ngStyle]="{'width' : gridProps.widthPinned + 'px' }">
+        <ng-container *ngIf="row.type != 'group' ">
+            <div class="datagrid-body-pinned" style="display:inline-block" [ngStyle]="{'width' : gridProps.widthPinned + 'px' }">
+                <!-- Main Row -->
+                <datagrid-row [columns]="columnsPinned"
+                              [row]="row"
+                              [options]="options">
+                </datagrid-row>
+            </div>
+
             <!-- Main Row -->
-            <datagrid-row [columns]="columnsPinned"
-                          [row]="row"
-                          [options]="options">
-            </datagrid-row>
-        </div>
-
-        <!-- Main Row -->
-        <div class="datagrid-body-main" style="display:inline-block" [ngStyle]="{'width' : gridProps.widthMain + 'px' }">
-            <datagrid-row [columns]="columnsInternal"
-                          [row]="row"
-                          [options]="options">
-            </datagrid-row>
-        </div>
+            <div class="datagrid-body-main" style="display:inline-block" [ngStyle]="{'width' : gridProps.widthMain + 'px' }">
+                <datagrid-row [columns]="columnsInternal"
+                              [row]="row"
+                              [options]="options">
+                </datagrid-row>
+            </div>
+        </ng-container>
 
     </div>
 </div>

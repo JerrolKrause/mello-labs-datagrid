@@ -7,7 +7,7 @@ import { Datagrid } from '../../typings';
 
 
 @Component({
-    selector: '[group-header]',
+    selector: 'group-header',
     templateUrl: './group-header.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })

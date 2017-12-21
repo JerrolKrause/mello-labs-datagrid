@@ -157,7 +157,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	ngOnInit() {}
 
 	ngOnChanges(model) {
-		//console.warn('ngOnChanges', model);
+		console.warn('ngOnChanges', model);
 
         // If columns or rows are not available, set app ready to false to show loading screen
 		if (!this.columns || !this.rows) {
@@ -204,6 +204,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
             if (this.options.showInfo) {
                 this.columnsMapped = this.dgSvc.mapColumns(this.columns);
 			}
+			console.log('Columns ready');
 		}
 		
 		if (this.columns && this.rows) {
@@ -238,7 +239,14 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 
 	}
     
-	ngAfterViewInit() {}
+	ngAfterViewInit() {
+        // Update grid props body width, for some reason it is not available if called in datagrid on initial load
+		this.gridProps.widthBody = Math.floor(this.datagrid.nativeElement.getBoundingClientRect().width);
+		if (this.columns) {
+			this.updateGridProps();
+		}
+	}
+
 	ngAfterViewChecked() {}
 
     /**
@@ -309,8 +317,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			}
 		}
         
-		
-		
 		this.createRowClasses();
 		this.createRowStyles();
 		//this.columnCalculations();
@@ -318,10 +324,19 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 
 		// Add a row index for all rows, this determines the vertical positioning for virtual scroll
         // TODO: Very ineffecient to do this on every state update
+		let y = 0;
 		for (let i = 0; i < newRows.length; i++) {
-			newRows[i].$$rowIndex = i;
-			newRows[i].$$hidden = false
+			newRows[i].$$rowIndex = y;
+			newRows[i].$$hidden = false;
+            // If this is a group header
+			if (newRows[i].type == 'group') {
+				y += 32;
+			} else {
+				y += this.rowHeight;
+			}
+
 		}
+
         // HACK: Grid props needed to build visible rows and columns but visible rows and columns needed to update grid props
 		this.updateGridProps();
 
@@ -334,7 +349,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 
         // HACK: Grid props needed to build visible rows and columns but visible rows and columns needed to update grid props
 		this.updateGridProps();
-        
+
+		//console.log('this.columnsExternal', this.columnsInternal, this.columnsExternal);
+		//console.log('this.gridProps', this.gridProps);
+
         // Update DOM
 		//this.rowsInternal = newRows;
 
@@ -493,6 +511,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
      * Global properties needed by grid to draw itself
      */
 	public updateGridProps() {
+		
 		let gridProps: Datagrid.Props = {};
 		// Get total grid width
 		gridProps.widthTotal = this.columns
@@ -520,11 +539,22 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			let newHeight = height - offset - 18 - 24;// Add offsets for table header and bottom scrollbar
 			gridProps.heightTotal = newHeight;
 		}
-
+        
 		gridProps.rowsVisible = Math.ceil(gridProps.heightTotal / this.rowHeight); // Get max visible rows
-		gridProps.heightBody = this.rowsInternal && this.rowsInternal.length ? this.rowsInternal.length * this.rowHeight : this.rows.length * this.rowHeight;    // Get height of body
-		gridProps.widthBody = this.datagrid.nativeElement.getBoundingClientRect().width;
-		this.gridProps = { ...this.gridProps, ...gridProps }; 
+		if (this.rowsInternal && this.rowsInternal.length) {
+			gridProps.heightBody = this.rowsInternal.length * this.rowHeight;
+		} else if (this.rows && this.rows.length) {
+			gridProps.heightBody = this.rows.length * this.rowHeight;
+		} else {
+			gridProps.heightBody = 300;
+		}
+
+		if (this.datagrid && this.datagrid.nativeElement.getBoundingClientRect().width){
+			Math.floor(gridProps.widthBody = this.datagrid.nativeElement.getBoundingClientRect().width);
+		}
+        
+		this.gridProps = { ...this.gridProps, ...gridProps };
+		console.log(this.gridProps);
 	}
 
 
