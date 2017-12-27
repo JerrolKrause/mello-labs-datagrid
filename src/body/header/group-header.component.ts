@@ -22,7 +22,9 @@ export class GroupHeaderComponent implements OnInit, OnChanges, OnDestroy{
 	private sub: Subscription;
 
 	constructor(
-	) { }
+	) { 
+		this.groupLabel = '';
+	}
 
 	ngOnChanges() {
         // Everytime new data is passed down, recreate the label

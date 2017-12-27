@@ -15,7 +15,9 @@ export class RowComponent implements OnInit, OnChanges  {
     @Output() updateDatatable: EventEmitter<any> = new EventEmitter();
 
 	constructor(public elementRef: ElementRef
-    ) { }
+    ) {
+        this.updateDatatable = new EventEmitter(); 
+    }
 
 	ngOnInit() {}
 

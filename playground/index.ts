@@ -6,18 +6,19 @@ import { NgModule } from '@angular/core';
 import { Component } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
-import {  }  from 'mello-labs-datagrid';
+//import { DataGridComponent } from '../src/datagrid.component';
+import { DatagridModule  } from '../src/';
 
 @Component({
   selector: 'app',
-  template: `<sample-component></sample-component>`
+  template: `<datagrid></datagrid>`
 })
 class AppComponent {}
 
 @NgModule({
   bootstrap: [ AppComponent ],
-  declarations: [ AppComponent ],
-  imports: [ BrowserModule ]
+  declarations: [AppComponent ],
+  imports: [BrowserModule, DatagridModule ]
 })
 class AppModule {}
 

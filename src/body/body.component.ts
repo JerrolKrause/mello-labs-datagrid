@@ -25,7 +25,11 @@ export class BodyComponent implements OnInit, OnChanges{
 	@Output() onCustomLinkEvent: EventEmitter<any> = new EventEmitter();
 
 	constructor(
-    ) { }
+    ) { 
+    	this.onColumnsUpdated = new EventEmitter();
+    	this.onStateUpdated = new EventEmitter();
+    	this.onCustomLinkEvent = new EventEmitter();
+    }
 
 	ngOnInit() {
 	}

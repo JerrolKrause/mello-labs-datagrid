@@ -11,9 +11,6 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class CellComponent implements OnInit, OnChanges, AfterViewInit {
 
-	@ViewChild('cell2') cell2: ElementRef;
-	@ViewChild('cell3') cell3: ElementRef;
-
 	@Input() column: Datagrid.Column;
 	@Input() row: any;
 	@Input() options: Datagrid.Options;
@@ -26,7 +23,11 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit {
 	private loaded: boolean = false;
 
 	constructor(
-	) { }
+	) { 
+		this.updateDatatable = new EventEmitter();
+		this.truncated$ = new BehaviorSubject(false);
+		this.loaded  = false;
+	}
 
 	ngOnInit() {
 	}
@@ -44,8 +45,8 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit {
 	}
 
     /**
-     * Check if the content is truncated
-     */
+     * Check if the content is truncated 
+    
 	public checkIfTruncated() {
 		if (this.options.columnsTruncate && this.cell3.nativeElement.offsetWidth > this.cell2.nativeElement.offsetWidth) {
 			this.truncated$.next(true);
@@ -53,7 +54,7 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit {
 			this.truncated$.next(false);
 		}
 	}
-
+	 */
     /**
     * Perform an action on the main datatable that was requested by lower component
     * @param action

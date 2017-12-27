@@ -43,7 +43,13 @@ export class HeaderComponent implements OnInit, OnChanges{
 	public columnWidth: string = '';
     
 	constructor(
-    ) { }
+    ) { 
+    	this.onColumnsUpdated = new EventEmitter();
+		this.onColumnsUpdated = new EventEmitter();
+		this.onColumnsUpdated = new EventEmitter();
+    	this.reSizing = false;
+    	this.columnWidth = '';
+    }
 
 	ngOnInit() {
 	}

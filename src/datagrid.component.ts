@@ -82,7 +82,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	/** Properties related to scrolling of the main grid */
 	public scrollProps: Datagrid.ScrollProps = { scrollTop: 0, scrollLeft: 0 };
 
-	private scrollDebounce$: BehaviorSubject<Datagrid.ScrollProps> = new BehaviorSubject(this.scrollProps);
+	//private scrollDebounce$: BehaviorSubject<Datagrid.ScrollProps> = new BehaviorSubject(this.scrollProps);
     /** A dictionary of columns based on primary key, used for lookups */
     public columnsMapped: { [key: string]: Datagrid.Column } = {};
     /** Last row that was selected */
@@ -138,19 +138,33 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		private dgSvc: DataGridService,
 		private ref: ChangeDetectorRef
 	) {
+		this.rowClasses = {};
+		this.columnsMapped = {};
+		this.rowStyles = {};
 		// Default props get stripped out by the compiler for some reason
 		this.gridProps = {};
+		this.tableContainerHeight = 300;
 		this.scrollProps = { scrollTop: 0, scrollLeft: 0 };
 		this.appReady = false;
 		this.dragging = false;
 		this.draggingPos = {};
 		this.keysPressed = {};
 		this.subscriptions = [];
+		this.rowHeight = 24;
 		this.stateDefault = {
 			groups: [],
 			sorts: [],
 			filters: [],
 		}
+
+		this.onRowsUpdated = new EventEmitter();
+		this.onColumnsUpdated = new EventEmitter();
+		this.onRowsSelected = new EventEmitter();
+		this.onStateChange = new EventEmitter();
+		this.onRightClickMenu = new EventEmitter();
+		this.action = new EventEmitter();
+		this.onCustomLinkEvent = new EventEmitter();
+		this.onElementRef = new EventEmitter();
 	}
 
    
@@ -267,6 +281,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			scrollTop: event.target.scrollTop,
 			scrollLeft: event.target.scrollLeft
 		}
+
 		//this.scrollDebounce$.next(scrollProps);
 		this.scrollProps = { ...scrollProps };
 		this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);

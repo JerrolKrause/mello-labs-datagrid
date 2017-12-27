@@ -28,7 +28,11 @@ export class ControlsComponent implements OnInit, OnDestroy{
 
 	constructor(
 		private dgSvc: DataGridService,
-	) { }
+	) { 
+		this.onStateUpdated =  new EventEmitter();
+		this.onCustomLinkEvent = new EventEmitter();
+		this.subs = [];
+	}
 
 	
 

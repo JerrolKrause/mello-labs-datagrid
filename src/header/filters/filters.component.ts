@@ -34,7 +34,12 @@ export class FiltersComponent implements OnInit, OnDestroy{
 
 	constructor(
 		private dgSvc: DataGridService,
-	) { }
+	) { 
+		this.filterTerms = {};
+		this.onFiltersUpdated = new EventEmitter();
+		this.filterTerm = new BehaviorSubject(null);
+		this.subs = [];
+	}
 
 	
 
