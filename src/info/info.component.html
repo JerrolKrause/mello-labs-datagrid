@@ -1,25 +1,23 @@
-<td [attr.colspan]="width" *ngIf="columnsMapped && state" class="datagrid-info-cell">
-    <div class="sticky">
-        <span *ngIf="state.groups.length && columnsMapped[state?.groups[0].prop]">
-            Grouped by <strong>{{columnsMapped[state?.groups[0].prop].label}}, {{state.groups[0].dir | uppercase}}</strong>
-            <a (click)="reset('groups')" *ngIf="options.controlsDropdown" title="Remove Grouping"><i class="fa fa-remove"></i></a>
-        </span>
-        <ng-container *ngIf="state.groups.length && state.sorts.length"> | </ng-container>
-        <span *ngIf="state.sorts.length && columnsMapped[state?.sorts[0].prop]">
-            Sorted by <strong>{{columnsMapped[state?.sorts[0].prop].label}}, {{state.sorts[0].dir | uppercase}}</strong>
-            <a (click)="reset('sorts')" *ngIf="options.controlsDropdown" title="Remove Sorting"><i class="fa fa-remove"></i></a>
-        </span>
-        <ng-container *ngIf="state.sorts.length && state.filters.length"> | </ng-container>
-        <span *ngIf="state.filters.length">
-            <strong>{{state.filters.length}} Filter/s Active</strong> ({{state.info.rowsVisible}}/{{state.info.rowsTotal}} Rows Visible): 
-            <small *ngFor="let filter of state.filters">
-                ({{columnsMapped[filter.prop].label}}
-                    <ng-container *ngIf="filter.operator == 'eq'">=</ng-container>
-                    <ng-container *ngIf="filter.operator == 'contains'">contains</ng-container>
-                {{filter.value}})
-            </small>
-            <a (click)="reset('filters')" *ngIf="options.controlsDropdown" title="Remove All Filters"><i class="fa fa-remove"></i></a>
-        </span>
-        <span *ngIf="options?.filterGlobal?.term"> | Global Filter: <strong>{{options.filterGlobal.term}}</strong></span>
-  	</div>
-</td>
+<div class="datagrid-info-row" *ngIf="columnsMapped && state">
+    <span *ngIf="state.groups.length && columnsMapped[state?.groups[0].prop]">
+        Grouped by <strong>{{columnsMapped[state?.groups[0].prop].label}}, {{state.groups[0].dir | uppercase}}</strong>
+        <a (click)="reset('groups')" *ngIf="options.controlsDropdown" title="Remove Grouping"><i class="fa fa-remove"></i></a>
+    </span>
+    <ng-container *ngIf="state.groups.length && state.sorts.length"> | </ng-container>
+    <span *ngIf="state.sorts.length && columnsMapped[state?.sorts[0].prop]">
+        Sorted by <strong>{{columnsMapped[state?.sorts[0].prop].label}}, {{state.sorts[0].dir | uppercase}}</strong>
+        <a (click)="reset('sorts')" *ngIf="options.controlsDropdown" title="Remove Sorting"><i class="fa fa-remove"></i></a>
+    </span>
+    <ng-container *ngIf="state.sorts.length && state.filters.length"> | </ng-container>
+    <span *ngIf="state.filters.length">
+        <strong>{{state.filters.length}} Filter/s Active</strong> {{state.info.rowsVisible}}/{{state.info.rowsTotal}} Rows Visible:
+        <small *ngFor="let filter of state.filters">
+            ({{columnsMapped[filter.prop].label}}
+            <ng-container *ngIf="filter.operator == 'eq'">=</ng-container>
+            <ng-container *ngIf="filter.operator == 'contains'">contains</ng-container>
+            {{filter.value}})
+        </small>
+        <a (click)="reset('filters')" *ngIf="options.controlsDropdown" title="Remove All Filters"><i class="fa fa-remove"></i></a>
+    </span>
+    <span *ngIf="options?.filterGlobal?.term"> | Global Filter: <strong>{{options.filterGlobal.term}}</strong></span>
+</div>

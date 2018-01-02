@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy, Input, EventEmitter, Output
 import { Datagrid } from '../typings';
 
 @Component({
-    selector: '[info]',
+    selector: 'datagrid-info',
     templateUrl: './info.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -11,7 +11,6 @@ export class InfoComponent implements OnInit  {
 	@Input() state: Datagrid.State;
 	@Input() options: Datagrid.Options;
     @Input() columnsMapped: Datagrid.Column;
-	@Input() width: number;
 	@Output() onReset: EventEmitter<any> = new EventEmitter();
 
 	constructor(

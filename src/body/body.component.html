@@ -1,5 +1,5 @@
 <div class="datagrid-body" [ngStyle]="{'width' : gridProps.widthTotal + 'px', 'height' : gridProps.heightBody + 'px' }">
-    
+
     <div class="datagrid-body-row"
         *ngFor="let row of rowsInternal; let rowIndex = index; trackBy:options.trackRow;"
         [ngStyle]="{'transform' : 'translate3d(0px, ' + row.$$rowIndex + 'px, 0px)'}">
@@ -10,15 +10,15 @@
 
         <ng-container *ngIf="row.type != 'group' ">
 
+            <!-- Pinned columns -->
             <div class="datagrid-body-pinned sticky-left" [ngStyle]="{'width' : gridProps.widthPinned + 'px' }" *ngIf="columnsPinnedLeft?.length">
-                <!-- Main Row -->
                 <datagrid-body-row [columns]="columnsPinnedLeft"
                                    [row]="row"
                                    [options]="options">
                 </datagrid-body-row>
             </div>
 
-            <!-- Main Row -->
+            <!-- Non-pinned columns -->
             <div class="datagrid-body-main" style="display: inline-block" [ngStyle]="{'width' : gridProps.widthMain + 'px' }">
                 <datagrid-body-row [columns]="columnsInternal"
                                    [row]="row"
