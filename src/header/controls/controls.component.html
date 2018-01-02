@@ -74,7 +74,14 @@
             </button>
             <div class="dropdown-menu dropdown-submenu-flyout">
             <!---->
-                <filters [column]="column" [state]="state" [status]="status" [options]="options" [filterTerms]="filterTerms" (onFiltersUpdated)="modifyFilters($event)"></filters>
+                <filters
+                    [column]="column"
+                    [state]="state"
+                    [status]="status"
+                    [options]="options"
+                    [filterTerms]="filterTerms"
+                    (onFiltersUpdated)="modifyFilters($event)">
+                </filters>
                 
                 <div class="pl-2 pt-1 pr-2 pb-0">
                     <button class="btn btn-interact-outline btn-sm mt-2 w-100" (click)="clearFilters(column.prop)" [attr.data-qa]="'controls-filter-clear'">Clear Filters</button>

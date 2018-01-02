@@ -43,7 +43,8 @@ export class FiltersComponent implements OnInit, OnDestroy{
 
 	
 
-	ngOnInit() {
+    ngOnInit() {
+
 		  // Create an subscription to debounce the user input
 		  this.filterTerm.debounceTime(300).subscribe((filter) => {
 			  if (filter) {

@@ -469,13 +469,15 @@ export class DataGridService {
      * @param columnProp
      */
 	public getDefaultTermsList(rows: any[], columns: Datagrid.Column[]) {
-		//console.time('getDefaultTermsList');
+        //console.log('getDefaultTermsList');
+        // console.time('getDefaultTermsList');
 		let termsList = {};
-		let uniques = {};
+        let uniques = {};
+
         // Loop through all the columns
-		columns.forEach(column => {
+        columns.forEach(column => {
             // If the column type is string and does not exist, create the dictionary and array
-			if (!termsList[column.prop] && column.columnType == 'string') {
+            if (!termsList[column.prop]) {// && column.columnType == 'string'
 				termsList[column.prop] = [];
 				uniques[column.prop] = {};
 			}
@@ -484,25 +486,35 @@ export class DataGridService {
 		// Find the unique values for each row
 		rows.forEach(row => {
 			for (let key in termsList) {
-				if (row[key] && uniques[key]) {
-					uniques[key][row[key]] = true;
-				}
-			}
+		        if (termsList.hasOwnProperty(key)) {
+		            if (row[key] && uniques[key]) {
+		                uniques[key][row[key]] = true;
+		            }
+		        }
+		    }
 		});
 
         // Now push the uniques to the termslist
 		for (let key in uniques) {
-			for (let key2 in uniques[key]) {
-				termsList[key].push(key2);
-			}
-		}
-        // Now sort terms in default order
+	        if (uniques.hasOwnProperty(key)) {
+	            let foo = uniques[key];
+	            for (let key2 in foo) {
+	                if (foo.hasOwnProperty(key2)) {
+	                    termsList[key].push(key2);
+	                }
+	            }
+	        }
+	    }
+	    // Now sort terms in default order
 		for (let key in termsList) {
-			termsList[key].sort();
-		}
-		//console.warn(termsList);
-		return termsList;
-		//this.termsList = termsList;
+	        if (termsList.hasOwnProperty(key)) {
+	            termsList[key].sort();
+	        }
+	    }
+        // console.warn(termsList);
+        // console.timeEnd('getDefaultTermsList');
+
+        return termsList;
 	}
 
     /**
@@ -513,7 +525,10 @@ export class DataGridService {
         let leftOffset = offset;
 		return columns.map((column, index) => {
 			// If no width, set default to 150
-			column.width ? column.width : 150;
+		    column.width = column.width ? column.width : 150;
+            // If no column type, set default of string
+            column.columnType = column.columnType ? column.columnType : 'string';
+
 			// Ensure min width of 44
 			if (column.width < 44) {
 			    column.width = 44;
@@ -521,7 +536,7 @@ export class DataGridService {
 			// Ensure all column widths are divisible by 4, fixes a blurry text bug in chrome
 		    column.width = Math.floor(column.width / 4) * 4;
 
-			column.$$leftOffset = leftOffset;
+		    column.$$leftOffset = leftOffset;
 			leftOffset += column.width;
 			return column;
 		});

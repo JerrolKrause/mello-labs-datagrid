@@ -15,6 +15,7 @@ import * as _ from 'lodash';
 
 /**
 TODOS:
+- Only generate filter terms on demand
 - Refactor DT to support 2 types of grids only: Single line grids with H scroll and full screen grids with word wrap
 - Better handling/performance of initial load. Should also have null value for rows to avoid FOUC of 'no rows found'
 - Ability to transclude templates from parent which would allow the DT to be fully componentized. Need to get rid of the templates subdirectory
@@ -209,7 +210,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			let columns = this.options.columnMap ? this.dgSvc.mapPropertiesDown([...this.columns], this.options.columnMap) : [...this.columns];
 
 			// Get pinned columns
-			let columnsPinnedLeft = this.columns.filter(column => column.pinnedLeft ? true : false);
+			let columnsPinnedLeft = columns.filter(column => column.pinnedLeft ? true : false);
             this.columnsPinnedLeft = this.dgSvc.columnCalculations(columnsPinnedLeft);
 
             // Get un-pinned columns
@@ -232,9 +233,11 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 
 			} else {
 				this.state = { ...this.stateDefault }
-			}
-            // Create the list of default filterable terms for string columns
-			this.filterTerms = this.dgSvc.getDefaultTermsList([...this.rows], this.columns);
+            }
+
+            // Generate a list of default filter terms
+		    this.filterTerms = this.dgSvc.getDefaultTermsList(this.rows, this.columns);
+		   
 			this.state.info = {
                 initial : true
 			}
@@ -243,11 +246,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			this.viewCreate();
 
             // Only on initial load, set app ready on with a settimeout. This prevents the app from hanging on a route change
-			//setTimeout(() => {
-			this.appReady = true;
-			//	this.ref.markForCheck();
-			//}, 0);
-			
+		    this.appReady = true;
 			
 			//Emit the state change to the parent component now that the first initial view has been created
 			this.emitState(this.state);
@@ -501,25 +500,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 
                 //Update non pinned columns
                 this.columnsInternal = this.columnsInternal.filter(col => col.prop != stateChange.data.prop);
-
-			    /**
-                let newCol;
-                let newColumns = [...this.columnsExternal];
-                // Get the column being pinned
-                newCol = newColumns[stateChange.data.index];
-                newCol.pinnedLeft = true;
-                newCol.pinnedIndex = stateChange.data.index;
-                // Now delete from columns without mutating
-                newColumns = newColumns.slice(0, stateChange.data.index).concat(newColumns.slice(stateChange.data.index + 1));
-
-                // Get all pinned columns only
-                let pinnedCols = newColumns.filter(column => column.pinnedLeft);
-                // Get all unpinned colunms only
-                let nonPinnedCols = newColumns.filter(column => !column.pinnedLeft);
-                this.columnsExternal = [...pinnedCols, newCol, ...nonPinnedCols];
-                //this.columnsInternal = [newCol, ...this.columnsInternal];
-                // Update left offsets now that columns have been reordered
-                */
 			}
 
             this.emitColumns(this.columnsExternal);
