@@ -25,11 +25,13 @@ $border-color: #ccc;
         .cell3{position:absolute;top: 50%;transform: translateY(-50%);}
     }
 
+    .sticky-left{position:sticky;left:0;}
+
     #drag-select{width:20px;height:20px;background:red;position:fixed;opacity:0.3;z-index:1000;}
     .datagrid-container{margin:0;background-color:#fff;overflow: hidden;min-height: 200px;
         .datagrid-header-container{height:24px;position:relative;z-index:4;background-image: linear-gradient(to top, #dadada 0%, #f1f1f1 100%);}
         .datagrid-header{
-            .datagrid-header-row{background-color: #f1f1f1;display: flex;flex-flow: row;}
+            .datagrid-header-row{background-color: #f1f1f1;display: flex;flex-flow: row;backface-visibility: hidden;}
             .datagrid-header-pinned{left:0;z-index:7!important;background-color: #f1f1f1;display: flex;flex-flow: row;}
             .datagrid-header-main{display: flex;flex-flow: row;}
             .datagrid-header-cell{
@@ -47,7 +49,7 @@ $border-color: #ccc;
             }
 
             .dropdown{
-                .active{color: red;}
+                .active{color: red;background:none;}
                 .dropdown-item{padding: 3px .75rem;font-size: 0.8rem; }
                 .dropdown-item:hover{background-color: #f7f7f9;}
                 .disabled:hover{background-color:transparent;}
@@ -81,7 +83,7 @@ $border-color: #ccc;
         }
         .datagrid-body{
             .datagrid-body-row{display: flex;flex-flow: row;backface-visibility: hidden;position:absolute;}
-            .datagrid-body-pinned{left:0;box-shadow: 2px 5px 5px rgba(0, 0, 0, 0.3);background-color:#fff;z-index: 4;}
+            .datagrid-body-pinned{left:0;box-shadow: 2px 5px 5px rgba(0, 0, 0, 0.3);background-color:#fff;z-index: 4;display:inline-block;}
         
            .datagrid-info-row{background-color: #ededed;overflow:initial;
                .datagrid-info-cell{background-color: #ededed;box-shadow: 5px 1px 5px rgba(0, 0, 0, 0.3);overflow:initial;z-index: 5;left:15px;top:24px;}
@@ -103,9 +105,9 @@ $border-color: #ccc;
                 }
             }
             // Groups
-            .datagrid-group-header{height:32px;
+            .datagrid-group-header{
                 .datagrid-group-header-cell{padding:0;z-index: 4;left:0;}
-                a{background-image: linear-gradient(to top, #fcfeff 0%, #cbdce6 100%);padding: .15rem;font-size:1.1rem;padding-left: 1rem;display:block;border-bottom: 1px solid #c2d1da;
+                a{background-image: linear-gradient(to top, #fcfeff 0%, #cbdce6 100%);padding: .15rem;padding-left: .5rem;display:block;border-bottom: 1px solid #c2d1da;
                     & > span{left:16px;}
                     & > span:before{ font-family: FontAwesome; content: "\f0da";transition: .1s ease-out;display:inline-block;margin-right: 5px;}
                     &.active span:before{ transform: rotate(90deg);transition: .1s ease-out;}

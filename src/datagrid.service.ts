@@ -325,7 +325,7 @@ export class DataGridService {
      * @param sorts
      */
     public groupRows(rows: any[], columns: Datagrid.Column[], groups: Datagrid.Sorts[], sorts: Datagrid.Sorts[]): { rows: any[], groups: Datagrid.Groupings } {
-        //console.log('groupRows', groups, sorts)
+        console.log('groupRows', groups, sorts);
 		let newGroups = {};
 		let group = groups[0];
 		
@@ -360,8 +360,10 @@ export class DataGridService {
         // Now remap the object into an array
 		let grouped = [];
 		for (let key in newGroups) {
-			grouped.push(newGroups[key]);
-		}
+            if (newGroups.hasOwnProperty(key)) {
+                grouped.push(newGroups[key]);
+            }
+        }
 
         // Sort the group
 		grouped = this.sortArray(grouped, 'label', group.dir);
@@ -369,8 +371,8 @@ export class DataGridService {
 		let newRows = [];
 		let groupsFinal: Datagrid.Groupings = {};
         // Sort the rows within the group
-		grouped.forEach((group: Datagrid.Group, index: number) => {
-			if (sorts.length){
+        grouped.forEach((group: Datagrid.Group, index: number) => {
+            if (sorts.length) {
 				this.sortArray(group.rows, sorts[0].prop, sorts[0].dir);
 			}
 			
@@ -506,17 +508,18 @@ export class DataGridService {
     /**
      * Determine the horizontal position of grid cells
      */
-	public columnCalculations(columns: Datagrid.Column[]) {
-		let leftOffset = 0;
+    public columnCalculations(columns: Datagrid.Column[], offset:number = 0) {
+        //console.log('columnCalculations', columns, offset);
+        let leftOffset = offset;
 		return columns.map((column, index) => {
 			// If no width, set default to 150
 			column.width ? column.width : 150;
 			// Ensure min width of 44
 			if (column.width < 44) {
-				column.width = 44
+			    column.width = 44;
 			}
 			// Ensure all column widths are divisible by 4, fixes a blurry text bug in chrome
-			column.width = Math.floor(column.width / 4) * 4
+		    column.width = Math.floor(column.width / 4) * 4;
 
 			column.$$leftOffset = leftOffset;
 			leftOffset += column.width;

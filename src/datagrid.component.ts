@@ -72,7 +72,9 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	/** Columns that are sent to the DOM after any modification is done */
 	public columnsExternal: Datagrid.Column[];
 	/** Columns that are pinned */
-	public columnsPinned: Datagrid.Column[];
+    public columnsPinnedLeft: Datagrid.Column[] = [];
+    /** Columns that are pinned */
+    public columnsPinnedRight: Datagrid.Column[] = [];
     /** Rows that are sent to the DOM after any modification is done */
 	public rowsInternal: any[];
 	/** Rows that are sent to the DOM after any modification is done */
@@ -92,7 +94,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
     /** Keep track of which row was hovered over last during a drag operation. Used to select all rows when a drag operation does not end on a row */
     public rowHoveredLast: number;
     /** A list of default selectable terms to filter each column by */
-    public filterTerms
+    public filterTerms:any;
     /** A dictionary that holds css CLASSES for a given row. The lookup is the primary key specified in the options. Gets its data from options.rowClass */
 	public rowClasses = {};
     /** A dictionary that holds css STYLES for a given row. The lookup is the primary key specified in the options. Gets its data from options.rowStyle */
@@ -198,9 +200,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 
         // If rows are passed, store rows
 		if (model.rows && this.rows) {
-        
-			//console.warn('Updating Rows');
-			//this.dgSvc.rows = [...this.rows];
+            //console.warn('Updating Rows', this.rows);
 		}
 
 		if (model.columns && this.columns) {
@@ -209,14 +209,12 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			let columns = this.options.columnMap ? this.dgSvc.mapPropertiesDown([...this.columns], this.options.columnMap) : [...this.columns];
 
 			// Get pinned columns
-			let columnsPinned = this.columns.filter(column => column.pinnedLeft ? true : false);
-			columnsPinned = this.dgSvc.columnCalculations(columnsPinned);
-			this.columnsPinned = columnsPinned;
+			let columnsPinnedLeft = this.columns.filter(column => column.pinnedLeft ? true : false);
+            this.columnsPinnedLeft = this.dgSvc.columnCalculations(columnsPinnedLeft);
 
             // Get un-pinned columns
 			let columnsInternal = columns.filter(column => !column.pinnedLeft ? true : false);
-			columnsInternal = this.dgSvc.columnCalculations(columnsInternal);
-			this.columnsInternal = columnsInternal;
+            this.columnsInternal = this.dgSvc.columnCalculations(columnsInternal);
 
             // If show info is set, create a column map
             if (this.options.showInfo) {
@@ -295,6 +293,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
      * @param state
      */
     public viewCreate(state: Datagrid.State = this.state) {
+        // TODO Memoization causing problems with group and sorting
 		// console.warn('createView');
 		 console.time('Creating View');
         // Set manual change detection
@@ -315,10 +314,13 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		// If grouped
 		if (this.state && this.state.groups.length) {
 			// Create groups
-			this.dgSvc.uniqueId = this.state.groups[0].prop + '-' + this.state.groups[0].dir + newRows.length + this.columns.length;
-			let groupings = this.dgSvc.cache.groupRows(newRows, this.columns, this.state.groups, this.state.sorts);
+            this.dgSvc.uniqueId = newRows.length + '-' + this.columns.length + '-' + this.state.groups[0].prop + '-' + this.state.groups[0].dir;
+		    if (this.state.sorts.length) {
+                this.dgSvc.uniqueId += '-' + this.state.sorts[0].prop + '-' + this.state.sorts[0].dir;
+            }
+		    // let groupings = this.dgSvc.cache.groupRows(newRows, this.columns, this.state.groups, this.state.sorts);
             // Non memoized
-			//let groupings = this.dgSvc.groupRows(newRows, this.columns, this.state.groups, this.state.sorts);
+			let groupings = this.dgSvc.groupRows(newRows, this.columns, this.state.groups, this.state.sorts);
 			newRows = groupings.rows;
 			this.groups = groupings.groups;
 		} 
@@ -329,19 +331,16 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			if (this.state.sorts.length) {
 				// Sort rows and use memoize function to cache results
 				this.dgSvc.uniqueId = this.state.sorts[0].prop + this.state.sorts[0].dir + newRows.length;
-				newRows = this.dgSvc.cache.sortArray(newRows, this.state.sorts[0].prop, this.state.sorts[0].dir);
+				//newRows = this.dgSvc.cache.sortArray(newRows, this.state.sorts[0].prop, this.state.sorts[0].dir);
 
                 // Non memoized
-                //newRows = this.dgSvc.sortArray(newRows, this.state.sorts[0].prop, this.state.sorts[0].dir);
+               newRows = this.dgSvc.sortArray(newRows, this.state.sorts[0].prop, this.state.sorts[0].dir);
 			}
 		}
         
 		//this.createRowClasses();
 		//this.createRowStyles();
-
-		//this.columnCalculations();
-        //this.calculateHeight();
-
+        
 		// Add a row index for all rows, this determines the vertical positioning for virtual scroll
 		let y = 0;
 		for (let i = 0; i < newRows.length; i++) {
@@ -349,7 +348,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			newRows[i].$$hidden = false;
             // If this is a group header
 			if (newRows[i].type == 'group') {
-				y += 32;
+			    y += this.rowHeight; // Can later update to different heights for headers but throws off grid calculations
 			} else {
 				y += this.rowHeight;
 			}
@@ -363,11 +362,14 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
         // TODO: This is very inefficient to call on every view change, memoize?
 		if (this.gridProps.widthTotal < this.gridProps.widthBody) {
 			this.columnsInternal = this.dgSvc.columnsResize(this.columnsInternal, this.gridProps);
-			this.columnsInternal = this.dgSvc.columnCalculations(this.columnsInternal);
 			this.gridProps.widthFixed = true;
-		} else {
+        } else {
 			this.gridProps.widthFixed = false;
-		}
+        }
+
+        this.columnsPinnedLeft = this.dgSvc.columnCalculations(this.columnsPinnedLeft);
+        this.columnsInternal = this.dgSvc.columnCalculations(this.columnsInternal);
+        
 
         // Update internal modified rows
 		this.rowsInternal = newRows;
@@ -402,7 +404,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
      * @param stateChange
      */
 	public onStateUpdated(stateChange:Datagrid.StateChange):void{
-		//console.warn('changeState ', this.state, stateChange);
+		// console.warn('changeState ', this.state, stateChange);
 		let newState: Datagrid.State = this.state;
 		let newRows = [...this.rows];
 		
@@ -482,36 +484,45 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		else if (stateChange.action == Actions.pinLeft) {
 			//console.warn('Pinning');
 			if (stateChange.data.isPinned) {
-				//console.warn('Unpinning', stateChange.data)
-				this.columnsInternal[stateChange.data.index].pinnedLeft = false;
-				// Get all pinned columns only
-				let pinnedCols = this.columnsInternal.filter(column => column.pinnedLeft);
-				// Get all unpinned colunms only
-				let nonPinnedCols = this.columnsInternal.filter(column => !column.pinnedLeft);
-				// Put pinned columns up front
-                this.columnsInternal = [...pinnedCols, ...nonPinnedCols];
+                //console.warn('Unpinning', stateChange.data);
+                // Get column being unpinned
+                let colNew = this.columnsPinnedLeft[stateChange.data.index];
+                delete colNew.pinnedLeft; // Delete pinned prop
+                // Remove from pinned array
+                this.columnsPinnedLeft = this.columnsPinnedLeft.filter((col, index) => stateChange.data.index != index);
+                // Add to main array
+                this.columnsInternal = [colNew, ...this.columnsInternal];
 			} else {
-				//console.warn('Pinning to left', stateChange.data)
+                //console.warn('Pinning to left', stateChange.data);
+                // Get pinned column
+			    let newCol = this.columnsInternal.filter(col => col.prop == stateChange.data.prop)[0];
+			    newCol.pinnedLeft = true;
+                this.columnsPinnedLeft = [...this.columnsPinnedLeft, newCol];
+
+                //Update non pinned columns
+                this.columnsInternal = this.columnsInternal.filter(col => col.prop != stateChange.data.prop);
+
+			    /**
                 let newCol;
-                let newColumns = [...this.columnsInternal];
-				// Get the column being pinned
+                let newColumns = [...this.columnsExternal];
+                // Get the column being pinned
                 newCol = newColumns[stateChange.data.index];
-				newCol.pinnedLeft = true;
+                newCol.pinnedLeft = true;
                 newCol.pinnedIndex = stateChange.data.index;
                 // Now delete from columns without mutating
                 newColumns = newColumns.slice(0, stateChange.data.index).concat(newColumns.slice(stateChange.data.index + 1));
 
-				// Get all pinned columns only
+                // Get all pinned columns only
                 let pinnedCols = newColumns.filter(column => column.pinnedLeft);
-				// Get all unpinned colunms only
+                // Get all unpinned colunms only
                 let nonPinnedCols = newColumns.filter(column => !column.pinnedLeft);
-                this.columnsInternal = [...pinnedCols, newCol, ...nonPinnedCols];
-				//this.columnsInternal = [newCol, ...this.columnsInternal];
-				// Update left offsets now that columns have been reordered
-				
-            }
+                this.columnsExternal = [...pinnedCols, newCol, ...nonPinnedCols];
+                //this.columnsInternal = [newCol, ...this.columnsInternal];
+                // Update left offsets now that columns have been reordered
+                */
+			}
 
-			this.emitColumns(this.columnsInternal);
+            this.emitColumns(this.columnsExternal);
 		}
 
 		// Now create the view and update the DOM
@@ -528,7 +539,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	public columnsUpdated(columData: { columns: Datagrid.Column[], type: 'columnsInternal' | 'columnsPinned' }) {
 		// Determine if updating pinned or regular columns
 		if (columData.type == 'columnsPinned') {
-			this.columnsPinned = [...columData.columns];
+			this.columnsPinnedLeft = [...columData.columns];
 		} else {
 			this.columnsInternal = [...columData.columns];
 		}
@@ -547,8 +558,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			.map(b => b.width)
 			.reduce((p, c) => p + c);
         // Get width of pinned columns
-		if (this.columnsPinned.length){
-			gridProps.widthPinned = this.columnsPinned
+        if (this.columnsPinnedLeft.length){
+            gridProps.widthPinned = this.columnsPinnedLeft
 				.map(b => b.width)
 				.reduce((p, c) => p + c);
 		}
@@ -585,7 +596,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		}
         
 		this.gridProps = { ...this.gridProps, ...gridProps };
-		console.log(this.gridProps);
+		// console.log(this.gridProps);
 	}
 
     
@@ -1125,8 +1136,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	*/
 	private onResizeEvent(event) {
 		if (this.columnsInternal && this.columnsInternal.length && this.rowsInternal && this.rowsInternal.length){
-			this.ref.detach();
-			this.columnsInternal = this.dgSvc.columnsResize(this.columnsInternal, this.gridProps);
+            this.ref.detach();
+		    if (this.gridProps.widthTotal < this.gridProps.widthBody) {
+		        this.columnsInternal = this.dgSvc.columnsResize(this.columnsInternal, this.gridProps);
+		    }
 			this.columnsInternal = this.dgSvc.columnCalculations(this.columnsInternal);
 			// Update columns that go to the DOM
 			this.columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);

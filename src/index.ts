@@ -9,6 +9,7 @@ import { DataGridComponent } from './datagrid.component';
 import { HeaderComponent } from './header/header.component';
 import { FiltersComponent } from './header/filters/filters.component';
 import { ControlsComponent } from './header/controls/controls.component';
+import { HeaderRowComponent } from './header/row/row.component';
  
 import { BodyComponent } from './body/body.component';
 import { GroupHeaderComponent } from './body/header/group-header.component';
@@ -16,8 +17,6 @@ import { RowComponent } from './body/row/row.component';
 import { CellComponent } from './body/cell/cell.component';
 
 import { InfoComponent } from './info/info.component';
-
-//import { Datagrid } from './typings';
 
 // 3rd party controls  
 import { DndModule } from 'ng2-dnd'; // Drag and drop
@@ -33,8 +32,8 @@ export * from './datagrid.service';
     CommonModule, NgbModule.forRoot(), FormsModule, DndModule.forRoot()//, ResizableModule  
   ],
   declarations: [
-   DataGridComponent, RowComponent, GroupHeaderComponent, HeaderComponent, ControlsComponent, FiltersComponent, BodyComponent, CellComponent, 
-   InfoComponent
+      DataGridComponent, RowComponent, GroupHeaderComponent, HeaderComponent, ControlsComponent, FiltersComponent, BodyComponent, CellComponent, 
+      InfoComponent, HeaderRowComponent
   ],
   providers:[DataGridService],
   exports: [

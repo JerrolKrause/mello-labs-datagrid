@@ -9,21 +9,23 @@
         </ng-container>
 
         <ng-container *ngIf="row.type != 'group' ">
-            <div class="datagrid-body-pinned" style="display:inline-block" [ngStyle]="{'width' : gridProps.widthPinned + 'px' }">
+
+            <div class="datagrid-body-pinned sticky-left" [ngStyle]="{'width' : gridProps.widthPinned + 'px' }" *ngIf="columnsPinnedLeft?.length">
                 <!-- Main Row -->
-                <datagrid-row [columns]="columnsPinned"
-                              [row]="row"
-                              [options]="options">
-                </datagrid-row>
+                <datagrid-body-row [columns]="columnsPinnedLeft"
+                                   [row]="row"
+                                   [options]="options">
+                </datagrid-body-row>
             </div>
 
             <!-- Main Row -->
-            <div class="datagrid-body-main" style="display:inline-block" [ngStyle]="{'width' : gridProps.widthMain + 'px' }">
-                <datagrid-row [columns]="columnsInternal"
-                              [row]="row"
-                              [options]="options">
-                </datagrid-row>
+            <div class="datagrid-body-main" style="display: inline-block" [ngStyle]="{'width' : gridProps.widthMain + 'px' }">
+                <datagrid-body-row [columns]="columnsInternal"
+                                   [row]="row"
+                                   [options]="options">
+                </datagrid-body-row>
             </div>
+
         </ng-container>
 
     </div>

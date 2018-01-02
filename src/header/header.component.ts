@@ -13,7 +13,7 @@ import { Datagrid } from '../typings';
 export class HeaderComponent implements OnInit, OnChanges{
 
 	@Input() columnsInternal: Datagrid.Column[];
-	@Input() columnsPinned: Datagrid.Column[];
+	@Input() columnsPinnedLeft: Datagrid.Column[];
 	@Input() state: Datagrid.State;
 	@Input() status: Datagrid.Status;
 	@Input() options: Datagrid.Options;
@@ -105,8 +105,8 @@ export class HeaderComponent implements OnInit, OnChanges{
 		this.reSizing = false;
 
 		if (type == 'columnsPinned') {
-			this.columnsPinned[columnIndex] = { ...column };
-			this.onColumnsUpdated.emit({ columns: this.columnsPinned, type: type });
+			this.columnsPinnedLeft[columnIndex] = { ...column };
+            this.onColumnsUpdated.emit({ columns: this.columnsPinnedLeft, type: type });
 		} else {
 			this.columnsInternal[columnIndex] = { ...column };
 			this.onColumnsUpdated.emit({ columns: this.columnsInternal, type: type });

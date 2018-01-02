@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter
 import { Datagrid } from '../../typings';
 
 @Component({
-    selector: 'datagrid-row',
+    selector: 'datagrid-body-row',
     templateUrl: './row.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })

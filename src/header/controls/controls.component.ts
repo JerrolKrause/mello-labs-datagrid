@@ -19,11 +19,14 @@ export class ControlsComponent implements OnInit, OnDestroy{
 	@Input() status: Datagrid.Status;
 	@Input() options: Datagrid.Options;
 	@Input() column: Datagrid.Column;
-	@Input() filterTerms: any;
+    @Input() filterTerms: any;
+    @Input() columnIndex: number;
+    
+
 
 	@Output() onStateUpdated: EventEmitter<any> = new EventEmitter();
 	@Output() onCustomLinkEvent: EventEmitter<any> = new EventEmitter();
-	public columnIndex;
+
 	private subs: Subscription[] = [];
 
 	constructor(
@@ -62,7 +65,7 @@ export class ControlsComponent implements OnInit, OnDestroy{
      * @param column
      * @param index
      */
-	public modifyPinned(action: Actions, column: Datagrid.Column, index?: string) {
+	public modifyPinned(action: Actions, column: Datagrid.Column, index?: number) {
 		this.modifyState(action, { prop: column.prop, index: index, isPinned: column.pinnedLeft });
 	}
 
