@@ -44,7 +44,8 @@
                            [state]="state"
                            [status]="status"
                            [options]="options"
-                           [gridProps]="gridProps">
+                           [gridProps]="gridProps"
+                           (onRowMouseEvent)="onRowMouseEvent($event)">
             </datagrid-body>
         </div>
     </div>

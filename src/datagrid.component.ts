@@ -39,8 +39,8 @@ TODOS:
 	encapsulation: ViewEncapsulation.None,
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	host: {
-		//'(document:keydown)': 'handleKeyboardEvents($event)',
-		//'(document:keyup)': 'handleKeyboardEvents($event)',
+        '(document:keydown)': 'onKeyEventThrottled($event)',
+        '(document:keyup)': 'onKeyEventThrottled($event)',
         //'(document:mousedown )': 'handleMouseDown($event)',
         //'(document:mouseup)': 'handleMouseUp($event)',
 		//'(document:mousemove)': 'handleMouseMove($event)',
@@ -167,7 +167,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		this.onRightClickMenu = new EventEmitter();
 		this.action = new EventEmitter();
 		this.onCustomLinkEvent = new EventEmitter();
-		this.onElementRef = new EventEmitter();
+        this.onElementRef = new EventEmitter();
+        
 	}
 
    
@@ -264,7 +265,12 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
     /**
     * Throttle the scroll event
     */
-	public onScrollThrottled = _.throttle(event => this.onScroll(event), 10, { trailing: true, leading: true });
+    public onScrollThrottled = _.throttle(event => this.onScroll(event), 10, { trailing: true, leading: true });
+
+    /*
+     * Throttle keyboard events. Not really necessary since repeated key events are ignored but will allow for more events down the road
+     */
+    public onKeyEventThrottled = _.throttle(event => this.handleKeyboardEvents(event), 100, { trailing: true, leading: true });
 
 	/**
 	* When the datatable is scrolled
@@ -278,8 +284,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			scrollTop: event.target.scrollTop,
 			scrollLeft: event.target.scrollLeft
 		}
-
-		//this.scrollDebounce$.next(scrollProps);
+        
 		this.scrollProps = { ...scrollProps };
 		this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
 		this.columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
@@ -342,8 +347,9 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
         
 		// Add a row index for all rows, this determines the vertical positioning for virtual scroll
 		let y = 0;
-		for (let i = 0; i < newRows.length; i++) {
-			newRows[i].$$rowIndex = y;
+        for (let i = 0; i < newRows.length; i++) {
+            newRows[i].$$rowIndex = i;
+			newRows[i].$$rowPosition = y;
 			newRows[i].$$hidden = false;
             // If this is a group header
 			if (newRows[i].type == 'group') {
@@ -579,7 +585,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		// console.log(this.gridProps);
 	}
 
-    
     /**
      * On a global mouse down event
      * @param event
@@ -587,7 +592,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
     private handleMouseDown(event: MouseEvent) {
         //console.warn('handleMouseDown', event)
         // Set the default starting position of the initial click and also get the bounding box of the datatable
-        let draggingPos = {
+        let draggingPos:Datagrid.DragSelect = {
             startX: event.pageX,
             startY: event.pageY,
 			bounding: this.datagridBody.nativeElement.getBoundingClientRect()
@@ -616,9 +621,9 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
              this.rowHoveredLast = 0;
          }
          // If a drag event ended NOT on a row, fire the onrowmouseup event with the last hovered row
-         if (this.dragging){
-             this.onRowMouseUp(this.rowHoveredLast, event);
-
+         if (this.dragging) {
+             this.onRowMouseEvent({ type: 'mouseup', rowIndex: this.rowHoveredLast, event: event });
+             //this.onRowMouseUp(this.rowHoveredLast, event);
              // Unselect all text after drag to prevent weird selection issues
              if (document.getSelection) {
                  document.getSelection().removeAllRanges();
@@ -712,26 +717,29 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	 * Handle keyboard events
 	 * @param event
 	 */
-	private handleKeyboardEvents(event: KeyboardEvent):void {
-		this.keyPressed = event.type == 'keydown' ? event.key : null;
+    private handleKeyboardEvents(event: KeyboardEvent): void {
+        // Ignore keyboard repeat events
+        if (event.repeat == false) {
+            this.keyPressed = event.type == 'keydown' ? event.key : null;
 
-        // If this is a keydown event, add it to the dictionary
-		if (event.type == 'keydown') {
-			this.keysPressed[event.key] = true;
-		}
-        // If this is a key up event, remove from dictionary
-		else if (event.type == 'keyup'){
-			delete this.keysPressed[event.key];
-		}
+            // If this is a keydown event, add it to the dictionary
+		    if (event.type == 'keydown') {
+			    this.keysPressed[event.key] = true;
+		    }
+            // If this is a key up event, remove from dictionary
+		    else if (event.type == 'keyup'){
+			    delete this.keysPressed[event.key];
+		    }
 
-        // If control + a is pressed, select all
-		if (this.keysPressed['a'] && this.keysPressed['Control']){
-            this.selectRowsAll();
-            event.preventDefault();
-            event.stopPropagation();
-		}
-        
-	}
+            // If control + a is pressed, select all
+		    if (this.keysPressed['a'] && this.keysPressed['Control']){
+                this.selectRowsAll();
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            //console.log('handleKeyboardEvents', this.keysPressed, event.repeat);
+        }
+    }
 
     /**
      * Select all rows
@@ -743,31 +751,74 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		}
 	}
 
-	/**
-	 * Manage row selection. Includes single and multiple click by pressing control and shift
-	 * @param row - The row object
-	 * @param rowIndex - The index of the currently selected row
-	 */
-	public selectRow(row, rowIndex: number, isRightClick?: boolean, elementRef?): false | void{
-        //console.warn('selectRow', row.$$selected);
-		//console.warn('selectRow', groupIndex);
+    /**
+     * When a mouse event has happend on a body row
+     * @param event
+     */
+    public onRowMouseEvent(action: { type: 'click' | 'contextmenu' | 'mousedown' | 'mouseup' | 'mouseenter', rowIndex:number, event:MouseEvent}) {
+        
+        let row = this.rowsInternal[action.rowIndex];
 
-		if (!this.options.selectionType) {// || this.reSizing
-            return false;
+        switch (action.type) {
+            case 'click':
+                this.selectRow(row, action.rowIndex, false);
+                break;
+            case 'contextmenu':
+                this.selectRow(row, action.rowIndex, true);
+                this.onRightClickMenu.emit(event); // Emit right click event up to the parent
+                break;
+            case 'mousedown':
+                this.handleMouseDown(action.event);
+                if (action.event.which == 1) {// Only function when the left mouse button is clicked
+                    this.rowClickDrag.rowIndex = action.rowIndex;
+                }
+                break;
+            case 'mouseup':
+                // Only function when the left mouse button is clicked
+                if (action.event.which == 1 && action.rowIndex != this.rowClickDrag.rowIndex) {
+
+                    // Check if the drag was top to bottom or bottom to top for ROWS. Always start at the lowest index
+                    let rowStart = this.rowClickDrag.rowIndex <= action.rowIndex ? this.rowClickDrag.rowIndex : action.rowIndex;
+                    let rowEnd = this.rowClickDrag.rowIndex >= action.rowIndex ? this.rowClickDrag.rowIndex : action.rowIndex;
+                    //console.warn('rowStart', rowStart, rowEnd);
+                    this.rowsInternal.forEach(rowNew => rowNew.$$selected = false);
+                    for (let j = rowStart; j <= rowEnd; j++) {
+                        this.rowsInternal[j].$$selected = true;
+                    }
+
+                    let selectedRows = this.rowsInternal.filter(rowNew => rowNew.$$selected);
+                    this.rowsSelectedCount = selectedRows.length;
+                    this.emitSelectedRows(selectedRows);
+                }
+                break;
+            case 'mouseenter':
+                this.rowHoveredLast = action.rowIndex;
+                break;
+            default:
+                console.warn('An unknown mouse event was passed to onRowMouseEvent');
         }
+    }
 
-		let newRows = [...this.rowsInternal];
+    /**
+     * Manage row selection. Includes single and multiple click by pressing control and shift
+     * @param row - The row object
+     * @param rowIndex - The index of the currently selected row
+     */
+	public selectRow(row, rowIndex: number, isRightClick?: boolean, elementRef?) {
+        // console.warn('selectRow', this.keysPressed);
+		// console.warn('selectRow', groupIndex);
 
 		// Only allow row selection if set
-		if (this.options.selectionType) {
+        if (this.options.selectionType) {
+            let newRows = [...this.rowsInternal];
 			// If control is pressed while clicking
-			if(this.keyPressed == 'Control' && this.options.selectionType == 'multi'){
+            if (this.keysPressed['Control'] && this.options.selectionType == 'multi'){
 				row.$$selected = row.$$selected ? false : true;
 			}
 			// If shift is pressed while clicking
-			else if(this.keyPressed == 'Shift' && this.options.selectionType == 'multi'){
+            else if (this.keysPressed['Shift'] && this.options.selectionType == 'multi'){
 				// Unset all selected flags
-				newRows.map(row => row.$$selected = false);
+                newRows.forEach(rowNew => rowNew.$$selected = false);
 				// Figure out if the selection goes top to bottom or bottom to top
 				let startIndex = rowIndex > this.rowSelectedLast ? this.rowSelectedLast : rowIndex;
 				let endIndex = rowIndex < this.rowSelectedLast ? this.rowSelectedLast : rowIndex;
@@ -781,21 +832,21 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			// If just regular click
 			else if (!row.$$selected && !isRightClick) {
 				// Disable all other selected flags
-				newRows.map(row => row.$$selected = false);
+                newRows.forEach(rowNew => rowNew.$$selected = false);
 				row.$$selected = true;
 				//this.rowsSelected = row;
             } else {
 				// If this is a right click row, don't do anything special
                 if (isRightClick) {
 					if (!row.$$selected){
-						newRows.map(row => row.$$selected = false);
+                        newRows.forEach(rowNew => rowNew.$$selected = false);
 						row.$$selected = true;
 					}
 				} 
 				// If multiple rows are already selected
 				else if (this.rowsSelectedCount > 1) {
 					// Reset all and set current row to selected
-					newRows.map(row => row.$$selected = false);
+                    newRows.forEach(rowNew => rowNew.$$selected = false);
 					row.$$selected = true;
                 }
 				else {
@@ -803,7 +854,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 					row.$$selected = false;
 				}
 			}
-			let selectedRows = newRows.filter(row => row.$$selected);
+            let selectedRows = newRows.filter(rowNew => rowNew.$$selected);
 			this.rowSelectedLast = rowIndex;
 			this.rowsSelectedCount = selectedRows.length;
 			this.emitSelectedRows(selectedRows);
@@ -816,19 +867,20 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	 * @param row 
 	 * @param rowIndex 
 	 * @param contextMenuEvent 
-	 */
+	
 	public onRightClick(row, rowIndex: number, event?: MouseEvent) {
         this.selectRow(row, rowIndex, true);
 
 		this.onRightClickMenu.emit(event); // Emit right click event up to the parent
 	}
+     */
 
     /**
      * On mouse down on a row
      * @param rowIndex
      * @param groupIndex
      * @param event
-     */
+     
 	public onRowMouseDown(rowIndex: number | false, event) {
 
         this.handleMouseDown(event);
@@ -838,13 +890,13 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			this.rowClickDrag.rowIndex = rowIndex;
 		}
     }
-
+*/
     /**
      * On mouse up on a row
      * @param rowIndex
      * @param groupIndex
      * @param event
-     */
+     
 	public onRowMouseUp(rowIndex: number, event): false | void {
 		//console.warn('onRowMouseUp', rowIndex, this.rowClickDrag.rowIndex);
         
@@ -869,7 +921,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			this.emitSelectedRows(selectedRows);
 		}
 	}
-
+*/
 	/**
 	 * Calculate the height of the datatable
 	
@@ -898,12 +950,14 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 
 		let classes = '';
 		let results = this.options.rowClass(row);
-		for(let key in results){
-			if(results[key]){
-				classes += key + ' ';
-			}
-		}
-		if(classes != ''){
+		for(let key in results) {
+	        if (results.hasOwnProperty(key)) {
+	            if (results[key]) {
+	                classes += key + ' ';
+	            }
+	        }
+	    }
+	    if(classes != ''){
 			return classes;
 		}
 	}

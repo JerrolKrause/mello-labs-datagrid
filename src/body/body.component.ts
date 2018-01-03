@@ -20,10 +20,18 @@ export class BodyComponent implements OnInit, OnChanges{
 	@Input() options: Datagrid.Options;
 	@Input() gridProps: Datagrid.Props;
 
-	@Output() onColumnsUpdated: EventEmitter<any[]> = new EventEmitter();
+	@Output() onColumnsUpdated: EventEmitter<any> = new EventEmitter();
 	@Output() onStateUpdated: EventEmitter<any> = new EventEmitter();
-	@Output() onCustomLinkEvent: EventEmitter<any> = new EventEmitter();
+    @Output() onCustomLinkEvent: EventEmitter<any> = new EventEmitter();
 
+    @Output() onRowMouseEvent: EventEmitter<any> = new EventEmitter();
+
+    @Output() onRightClick: EventEmitter<any> = new EventEmitter();
+    @Output() onRowMouseDown: EventEmitter<any> = new EventEmitter();
+    @Output() onRowMouseUp: EventEmitter<any> = new EventEmitter();
+    
+    
+    
 	constructor(
     ) { 
     	this.onColumnsUpdated = new EventEmitter();
@@ -31,21 +39,47 @@ export class BodyComponent implements OnInit, OnChanges{
     	this.onCustomLinkEvent = new EventEmitter();
     }
 
-	ngOnInit() {
-	}
+	ngOnInit() {}
 
-	ngOnChanges(model) {
-		//console.log('BodyComponent',model)
-	}
+	ngOnChanges() {}
+
+    /**
+     * Communicate mouse events on the body row up to the parent. Used mainly for selection
+     * @param type
+     * @param rowIndex
+     * @param event
+     */
+    public onMouseEvent(type: 'click' | 'contextmenu' | 'mousedown' | 'mouseup' | 'mouseover', rowIndex: number, event?: MouseEvent) {
+        this.onRowMouseEvent.emit({ type: type, rowIndex: rowIndex, event: event });
+    }
+
+    /**
+	 * Manage right click functionality. If right clicking and row is unselected, select it, otherwise do nothing
+	 * @param row 
+	 * @param rowIndex 
+	 * @param contextMenuEvent 
+	
+    public rightClick(row, rowIndex: number, event?: MouseEvent) {
+        this.onRightClick.emit({ row: row, rowIndex: rowIndex, event: event}); 
+    }
+
+    public rowMouseDown(rowIndex, $event) {
+        this.onRowMouseDown.emit({ rowIndex: rowIndex, event: event }); 
+    }
+
+    public rowMouseUp(rowIndex, $event) {
+        this.onRowMouseUp.emit({ rowIndex: rowIndex, event: event }); 
+    }
+     */
 
     /**
      * Return a unique ID to ngfor to improve performance
      * @param index - Number in array
      * @param item - The column
-     */
+    
 	public trackColumn(index: number, item: Datagrid.Column) {
 		return item.prop;
 	}
-	
+	 */
     
 }

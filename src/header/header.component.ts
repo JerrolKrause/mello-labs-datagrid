@@ -63,7 +63,11 @@ export class HeaderComponent implements OnInit, OnChanges{
      */
 	public stateUpdated(event) {
 		this.onStateUpdated.emit(event);
-	}
+    }
+
+    public columnsUpdated(event) {
+        console.log('Columns Updated');
+    }
 
     /**
      * Return a unique ID to ngfor to improve performance

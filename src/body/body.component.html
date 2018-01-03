@@ -1,13 +1,31 @@
 <div class="datagrid-body" [ngStyle]="{'width' : gridProps.widthTotal + 'px', 'height' : gridProps.heightBody + 'px' }">
+<!--(click)="selectRow(row, rowIndex, null, false, rowElement.elementRef)"
+(contextmenu)="rightClick(row, rowIndex, $event)"
+(mousedown)="rowMouseDown(rowIndex, $event)"
+(mouseup)="rowMouseUp(rowIndex, $event)"
+(mouseover)="rowHoveredLast = rowIndex"-->
+
 
     <div class="datagrid-body-row"
-        *ngFor="let row of rowsInternal; let rowIndex = index; trackBy:options.trackRow;"
-        [ngStyle]="{'transform' : 'translate3d(0px, ' + row.$$rowIndex + 'px, 0px)'}">
-       
-        <ng-container *ngIf="row.type == 'group' ">
-            <group-header [group]="row" [options]="options" [width]="gridProps.widthTotal"></group-header>
-        </ng-container>
+         *ngFor="let row of rowsInternal; let rowIndex = index; trackBy:options.trackRow;"
 
+         [ngStyle]="{'transform' : 'translate3d(0px, ' + row.$$rowPosition + 'px, 0px)'}"
+         [ngClass]="{'selected': row.$$selected }"
+
+         (click)="onMouseEvent('click', row.$$rowIndex, $event)"
+         (contextmenu)="onMouseEvent('contextmenu', row.$$rowIndex, $event)"
+         (mousedown)="onMouseEvent('mousedown', row.$$rowIndex, $event)"
+         (mouseup)="onMouseEvent('mouseup', row.$$rowIndex, $event)"
+         (mouseenter)="onMouseEvent('mouseenter', row.$$rowIndex, $event)">
+
+        <!-- Group header. Treated as a row -->
+        <group-header *ngIf="row.type == 'group' "
+                      [group]="row"
+                      [options]="options"
+                      [width]="gridProps.widthTotal">
+        </group-header>
+
+        <!-- Normal Row -->
         <ng-container *ngIf="row.type != 'group' ">
 
             <!-- Pinned columns -->

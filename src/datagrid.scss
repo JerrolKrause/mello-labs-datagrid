@@ -74,7 +74,6 @@ $border-color: #ccc;
                     .box{padding: 0 1rem;}
                 }
             }
-            
         } 
 
         .datagrid-body-container{
@@ -85,20 +84,16 @@ $border-color: #ccc;
         .datagrid-info-row{background-color: #ededed;overflow:initial;line-height: 24px;padding-left: 0.5rem;background-color: #ededed;box-shadow: 5px 1px 5px rgba(0, 0, 0, 0.3);overflow:initial;z-index: 5;left:15px;top:24px; }
 
         .datagrid-body{
-            .datagrid-body-row{display: flex;flex-flow: row;backface-visibility: hidden;position:absolute;}
+            .datagrid-body-row{display: flex;flex-flow: row;backface-visibility: hidden;position:absolute;border-bottom: 1px solid #b3b3b3;}
+            .datagrid-body-row.selected{outline: 2px solid red;outline-offset: -2px;background-color: rgba(0,0,0,0.075);}
             .datagrid-body-pinned{left:0;box-shadow: 2px 5px 5px rgba(0, 0, 0, 0.3);background-color:#fff;z-index: 4;display:inline-block;}
-            .datagrid-row{position:relative;display: flex;flex-flow: row;border-bottom: 1px solid #b3b3b3;height: 24px;
-                &.selected{
-                   // outline:1px solid rgba(0, 0, 0, .8);box-shadow: inset 0px -2px 15px rgba(0,0,0,.8);
-                    .datagrid-cell{background-image:url('/assets/img/datatable-selected.png');background-repeat:repeat-x;background-size: contain;}
-                }
+            .datagrid-row{position:relative;display: flex;flex-flow: row;height: 24px;
                 &.selected-state .datagrid-cell{background:#F0DADA;}
                 .datagrid-cell{position:absolute;height: 24px;}
                 .datagrid-cell-data{line-height:24px;position:relative;z-index: 3;padding: 0px 5px;display: inline-block;white-space: nowrap;text-overflow: ellipsis; min-height: 24px;overflow: hidden;
-                    &.pinned{box-shadow: 2px 5px 5px rgba(0, 0, 0, 0.3);background-color:#fff;z-index: 4;}
+                    //transform: translate(48%, 41%) scale(2);zoom: .5;// This prevents blurry text in chrome
+                &.pinned{box-shadow: 2px 5px 5px rgba(0, 0, 0, 0.3);background-color:#fff;z-index: 4;}
                     .cell{height:22px;padding: 3px 8px;}
-                    .cell2{}
-                    .cell3{}
                     .cell-tooltip{position:absolute;left:0;right:0;top:0;bottom:0;}
                     .truncated{position:absolute;right:0;bottom:0;background-image:url('/assets/img/datatable-truncated.png');width:5px;height:5px;}
                 }
