@@ -203,6 +203,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
         // If rows are passed, store rows
 		if (model.rows && this.rows) {
             //console.warn('Updating Rows', this.rows);
+
 		}
 
 		if (model.columns && this.columns) {
@@ -343,20 +344,20 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		}
         
 		//this.createRowClasses();
-		//this.createRowStyles();
+		this.createRowStyles();
         
-		// Add a row index for all rows, this determines the vertical positioning for virtual scroll
+		// Add information for row positioning and indexing. Use for virtual scroll and row selection
 		let y = 0;
         for (let i = 0; i < newRows.length; i++) {
             newRows[i].$$rowIndex = i;
 			newRows[i].$$rowPosition = y;
-			newRows[i].$$hidden = false;
+            newRows[i].$$hidden = false;
+
+            y += this.rowHeight + 1;
             // If this is a group header
-			if (newRows[i].type == 'group') {
-			    y += this.rowHeight; // Can later update to different heights for headers but throws off grid calculations
-			} else {
-				y += this.rowHeight;
-			}
+			//if (newRows[i].type == 'group') {
+			//    y += this.rowHeight + 1; // Can later update to different heights for headers but throws off grid calculations
+			//}
 
 		}
         
@@ -997,13 +998,14 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			return false;
 		}
 
+        /*
         // If row height is set in options, set it in row styles
         if (this.options.rowHeight) {
 			this.rows.forEach((row, index) => {
 				rowStyles[row[this.options.primaryKey]] = Object.assign(rowStyles[row[this.options.primaryKey]] || {},{'line-height': this.options.rowHeight + 'px'});
 			});
 		}
-
+        */
 		let stylesWithModels = [];
 		let stylesNoModels = [];
 
@@ -1031,13 +1033,14 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
                 // Row styles needs to be complete refreshed everytime an observable changes
 				rowStyles = {};
 
+                /*
 				// If row height is set in options, set it in row styles
 				if (this.options.rowHeight) {
 					this.rows.forEach((row, index) => {
 						rowStyles[row[this.options.primaryKey]] = Object.assign(rowStyles[row[this.options.primaryKey]] || {}, {'line-height': this.options.rowHeight + 'px'});
 					});
 				}
-
+                */
 				// If no models
 				if (stylesNoModels.length) {
 					// Loop through all rows
@@ -1060,15 +1063,13 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 					});
 				});
                 // Update row styles
-				this.rowStyles = rowStyles;
+                this.rowStyles = rowStyles;
                 // Tell DOM to updated after observable is done udpated
 				this.ref.detectChanges();
 			});
 			this.subscriptions.push(subscription);
 		}
 
-		
-		//console.warn('rowStyles', rowStyles);
 		this.rowStyles = rowStyles;
 	}
 

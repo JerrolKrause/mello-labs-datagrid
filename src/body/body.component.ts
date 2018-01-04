@@ -14,7 +14,8 @@ export class BodyComponent implements OnInit, OnChanges{
 
 	@Input() columnsInternal: Datagrid.Column[];
     @Input() columnsPinnedLeft: Datagrid.Column[];
-	@Input() rowsInternal: any[];
+    @Input() rowsInternal: any[];
+    @Input() rowStyles;
 	@Input() state: Datagrid.State;
 	@Input() status: Datagrid.Status;
 	@Input() options: Datagrid.Options;
@@ -29,8 +30,6 @@ export class BodyComponent implements OnInit, OnChanges{
     @Output() onRightClick: EventEmitter<any> = new EventEmitter();
     @Output() onRowMouseDown: EventEmitter<any> = new EventEmitter();
     @Output() onRowMouseUp: EventEmitter<any> = new EventEmitter();
-    
-    
     
 	constructor(
     ) { 
@@ -53,33 +52,4 @@ export class BodyComponent implements OnInit, OnChanges{
         this.onRowMouseEvent.emit({ type: type, rowIndex: rowIndex, event: event });
     }
 
-    /**
-	 * Manage right click functionality. If right clicking and row is unselected, select it, otherwise do nothing
-	 * @param row 
-	 * @param rowIndex 
-	 * @param contextMenuEvent 
-	
-    public rightClick(row, rowIndex: number, event?: MouseEvent) {
-        this.onRightClick.emit({ row: row, rowIndex: rowIndex, event: event}); 
-    }
-
-    public rowMouseDown(rowIndex, $event) {
-        this.onRowMouseDown.emit({ rowIndex: rowIndex, event: event }); 
-    }
-
-    public rowMouseUp(rowIndex, $event) {
-        this.onRowMouseUp.emit({ rowIndex: rowIndex, event: event }); 
-    }
-     */
-
-    /**
-     * Return a unique ID to ngfor to improve performance
-     * @param index - Number in array
-     * @param item - The column
-    
-	public trackColumn(index: number, item: Datagrid.Column) {
-		return item.prop;
-	}
-	 */
-    
 }

@@ -16,8 +16,8 @@
                                      (onStateUpdated)="stateUpdated($event)">
                 </datagrid-header-row>
             </div>
-
-            <div class="datagrid-header-main" [ngStyle]="{ 'transform' : 'translate3d(' + -scrollProps.scrollLeft + 'px, 0px, 0px)' }">
+            
+            <div class="datagrid-header-main" [ngStyle]="{ 'left' : -scrollProps.scrollLeft + 'px' }">
                 <datagrid-header-row [columns]="columnsInternal"
                                      [state]="state"
                                      [status]="status"

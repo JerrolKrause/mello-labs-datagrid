@@ -2,11 +2,12 @@
 mwlResizable [enableGhostResize]="true" [resizeEdges]="{right: column.canResize || false}" (resizeEnd)="onResizeEnd($event, column, columnIndex, 'columns')"
 dnd-sortable [sortableIndex]="columnIndex" [dragEnabled]="column.canReorder && !column.pinnedLeft" (onDragSuccess)="onReorderSuccess($event)"
 dnd-sortable-handle
+[ngStyle]="{'width' : column.width + 'px', 'transform' : 'translate3d(' + column.$$leftOffset + 'px, 0px, 0px)' }"
 -->
 <div class="datagrid-header-cell" title="{{column.label}}"
      *ngFor="let column of columns; let columnIndex = index; trackBy:trackColumn"
      [ngClass]="{'reorderable': column.canReorder }"
-     [ngStyle]="{'width' : column.width + 'px', 'transform' : 'translate3d(' + column.$$leftOffset + 'px, 0px, 0px)' }">
+     [ngStyle]="{'width' : column.width + 'px', 'left' : column.$$leftOffset + 'px' }">
     <span class="datagrid-header-cell-label">
         {{column.label}}
     </span>

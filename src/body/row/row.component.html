@@ -1,19 +1,17 @@
 <div class="datagrid-row">
-
     <ng-container *ngFor="let column of columns; let columnIndex = index; trackBy:trackColumn">
-        
-            <!-- [ngStyle]="{'transform' : 'translate3d(' + TEMP + 'px, 0px, 0px)'}" -->
-            <datagrid-cell class="datagrid-cell" [ngStyle]="{'transform' : 'translate3d(' + column.$$leftOffset + 'px, 0px, 0px)'}"
-                           [column]="column"
-                           [row]="row"
-                           [options]="options">
-            </datagrid-cell>
-       
+
+        <datagrid-cell class="datagrid-cell"
+                       [ngStyle]="{'left' : column.$$leftOffset + 'px' }"
+                       [column]="column"
+                       [row]="row"
+                       [options]="options">
+        </datagrid-cell>
+
     </ng-container>
 </div>
-
 <!--
-    
+
  [ngStyle]="{'width' : gridProps.width + 'px' }"
 
 <td class="datagrid-cell datagrid-cell-{{column.prop}}" *ngFor="let column of columns; let columnIndex = index; trackBy:trackColumn" [attr.data-qa]="'cell cell-index-'+ columnIndex + ' cell-prop-' + column.prop"
