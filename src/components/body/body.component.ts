@@ -1,8 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter, OnChanges} from '@angular/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subject } from 'rxjs/Subject';
-import { Actions } from '../datagrid.props';
-import { Datagrid } from '../typings';
+import { Datagrid } from '../../typings';
 
 @Component({
     selector: 'datagrid-body',

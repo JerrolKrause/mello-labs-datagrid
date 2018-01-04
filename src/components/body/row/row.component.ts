@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter, ElementRef, OnChanges } from '@angular/core';
-import { Datagrid } from '../../typings';
+import { Datagrid } from '../../../typings';
 
 @Component({
     selector: 'datagrid-body-row',

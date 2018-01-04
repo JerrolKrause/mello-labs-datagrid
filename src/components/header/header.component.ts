@@ -1,18 +1,16 @@
 import { Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter, OnChanges} from '@angular/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subject } from 'rxjs/Subject';
-import { Actions } from '../../datagrid.props';
 import { Datagrid } from '../../typings';
 
 @Component({
-    selector: 'datagrid-header-row',
-    templateUrl: './row.component.html',
+    selector: 'datagrid-header',
+    templateUrl: './header.component.html',
     styles: [],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class HeaderRowComponent implements OnInit, OnChanges{
+export class HeaderComponent implements OnInit, OnChanges{
 
-	@Input() columns: Datagrid.Column[];
+	@Input() columnsInternal: Datagrid.Column[];
+	@Input() columnsPinnedLeft: Datagrid.Column[];
 	@Input() state: Datagrid.State;
 	@Input() status: Datagrid.Status;
 	@Input() options: Datagrid.Options;
@@ -27,6 +25,18 @@ export class HeaderRowComponent implements OnInit, OnChanges{
 	/** During a resize, disable some stuff */
 	public reSizing: boolean = false;
 
+    /*
+	@Input() column: Datagrid.Column;
+	@Input() options: Datagrid.Options;
+	@Input() state: Datagrid.State;
+	@Input() status: Datagrid.Status;
+	@Input() columnIndex: number;
+	@Input() filterTerms: any;
+	@Input() columnsCount:number;
+    
+	@Output() onStateUpdated: EventEmitter<any> = new EventEmitter();
+	@Output() onCustomLinkEvent: EventEmitter<any> = new EventEmitter();
+    */
 	public columnWidth: string = '';
     
 	constructor(
@@ -38,9 +48,11 @@ export class HeaderRowComponent implements OnInit, OnChanges{
     	this.columnWidth = '';
     }
 
-	ngOnInit() {}
+	ngOnInit() {
+	}
 
-	ngOnChanges() {}
+	ngOnChanges() {
+	}
 
     /**
      * Pass state changes up from controls component
@@ -48,7 +60,11 @@ export class HeaderRowComponent implements OnInit, OnChanges{
      */
 	public stateUpdated(event) {
 		this.onStateUpdated.emit(event);
-	}
+    }
+
+    public columnsUpdated(event) {
+        console.log('Columns Updated');
+    }
 
     /**
      * Return a unique ID to ngfor to improve performance
@@ -64,15 +80,15 @@ export class HeaderRowComponent implements OnInit, OnChanges{
 	public onReorderSuccess() {
 		// If columns are being dragged before a pinned column, set that column to pinned
 		let isPinned = false;
-        for (let i = this.columns.length - 1; i >= 0; i--) {
-            let column = this.columns[i];
+		for (let i = this.columnsInternal.length - 1; i >= 0; i--) {
+			let column = this.columnsInternal[i];
 			if (column.pinnedLeft) {
 				isPinned = true;
 			}
 			column.locked = isPinned;
 			column.pinnedLeft = isPinned;
 		}
-        this.onColumnsUpdated.emit(this.columns);
+		this.onColumnsUpdated.emit(this.columnsInternal);
 	}
 
     /**
@@ -89,11 +105,11 @@ export class HeaderRowComponent implements OnInit, OnChanges{
 		this.reSizing = false;
 
 		if (type == 'columnsPinned') {
-			//this.columnsPinnedLeft[columnIndex] = { ...column };
-            //this.onColumnsUpdated.emit({ columns: this.columnsPinnedLeft, type: type });
+			this.columnsPinnedLeft[columnIndex] = { ...column };
+            this.onColumnsUpdated.emit({ columns: this.columnsPinnedLeft, type: type });
 		} else {
-			//this.columnsInternal[columnIndex] = { ...column };
-			//this.onColumnsUpdated.emit({ columns: this.columnsInternal, type: type });
+			this.columnsInternal[columnIndex] = { ...column };
+			this.onColumnsUpdated.emit({ columns: this.columnsInternal, type: type });
         }
 
 		

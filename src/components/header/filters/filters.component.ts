@@ -1,10 +1,8 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
-import { Actions } from '../../datagrid.props';
-import { DataGridService } from '../../datagrid.service';
-import { Datagrid } from '../../typings';
+import { DataGridService } from '../../../datagrid.service';
+import { Datagrid } from '../../../typings';
 import { Subscription } from 'rxjs';
 
 

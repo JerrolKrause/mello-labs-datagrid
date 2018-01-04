@@ -1,14 +1,14 @@
-import {Component, OnInit, OnDestroy, OnChanges, Input, Output, ViewChild, ChangeDetectionStrategy, EventEmitter, ChangeDetectorRef, HostListener, ViewEncapsulation,
-	AfterViewInit, AfterViewChecked, TemplateRef, ContentChild, ElementRef, Renderer2
+import {Component, OnInit, OnDestroy, OnChanges, Input, Output, ViewChild, ChangeDetectionStrategy, EventEmitter, ChangeDetectorRef, ViewEncapsulation,
+	AfterViewInit, AfterViewChecked, ElementRef, ContentChildren
 } from '@angular/core';
 import 'rxjs/add/observable/fromEvent';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Subscription } from 'rxjs/Subscription';
 
-import { DataGridService } from './datagrid.service';
-import { Actions, Operators } from './datagrid.props';
-import { Datagrid } from './typings';
-import { debounce } from 'rxjs/operator/debounce';
+import { ColumnDirective } from '../directives/column.directive';
+import { DataGridService } from '../datagrid.service';
+import { Actions } from '../datagrid.props';
+import { Datagrid } from '../typings';
 
 import * as _ from 'lodash';
 
@@ -35,7 +35,7 @@ TODOS:
 @Component({
 	selector: 'datagrid',
 	templateUrl: './datagrid.component.html',
-	styleUrls: ['./datagrid.scss'],
+	styleUrls: ['../datagrid.scss'],
 	encapsulation: ViewEncapsulation.None,
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	host: {
@@ -170,6 +170,21 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
         this.onElementRef = new EventEmitter();
         
 	}
+
+    /**
+   * Column templates gathered from `ContentChildren`
+   * if described in your markup.
+   */
+    @ContentChildren('[datagrid-column]')
+    set columnTemplates(val: any) {
+        console.log('Templates', val);
+        if (val) {
+            const arr = val.toArray();
+            if (arr.length) {
+                //this._internalColumns = translateTemplates(arr);
+            }
+        }
+    }
 
    
 	ngOnInit() {}
