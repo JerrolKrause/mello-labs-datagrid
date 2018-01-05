@@ -203,7 +203,7 @@ declare namespace Datagrid {
         /**  CSS classes for the table cell */
         cellClass?: string;
         /**  Use this custom html template for the table cell, corresponds to the switch statement in cell-templates */
-        templateCell?: string;
+        templateCell?: any;
         /**  Use this custom html template for the droprow, corresponds to the switch statement in cell-templates */
         templateDropRow?: string;
         /**  Fix the column to the LEFT side of the screen */

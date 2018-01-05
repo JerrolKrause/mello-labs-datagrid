@@ -36,7 +36,8 @@
             <div class="datagrid-body-pinned sticky-left" [ngStyle]="{'width' : gridProps.widthPinned + 'px' }" *ngIf="columnsPinnedLeft?.length">
                 <datagrid-body-row [columns]="columnsPinnedLeft"
                                    [row]="row"
-                                   [options]="options">
+                                   [options]="options"
+                                   [templatesCell]="templatesCell">
                 </datagrid-body-row>
             </div>
 
@@ -44,7 +45,8 @@
             <div class="datagrid-body-main" style="display: inline-block" [ngStyle]="{'width' : gridProps.widthMain + 'px' }">
                 <datagrid-body-row [columns]="columnsInternal"
                                    [row]="row"
-                                   [options]="options">
+                                   [options]="options"
+                                   [templatesCell]="templatesCell">
                 </datagrid-body-row>
             </div>
 

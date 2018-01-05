@@ -4,23 +4,27 @@ dnd-sortable [sortableIndex]="columnIndex" [dragEnabled]="column.canReorder && !
 dnd-sortable-handle
 [ngStyle]="{'width' : column.width + 'px', 'transform' : 'translate3d(' + column.$$leftOffset + 'px, 0px, 0px)' }"
 -->
-<div class="datagrid-header-cell" title="{{column.label}}"
-     *ngFor="let column of columns; let columnIndex = index; trackBy:trackColumn"
-     [ngClass]="{'reorderable': column.canReorder }"
-     [ngStyle]="{'width' : column.width + 'px', 'left' : column.$$leftOffset + 'px' }">
-    <span class="datagrid-header-cell-label">
-        {{column.label}}
-    </span>
-    <!-- Controls Dropdown -->
-    <datagrid-controls *ngIf="options.controlsDropdown"
-                       [options]="options"
-                       [status]="status"
-                       [column]="column"
-                       [columnIndex]="columnIndex"
-                       [filterTerms]="filterTerms"
-                       (onStateUpdated)="stateUpdated($event)">
-    </datagrid-controls>
-    <!-- Resize Handle
-    <a class="resize-handle" mwlResizeHandle [resizeEdges]="{right: true}" *ngIf="column.canResize" (mousedown)="reSizing = true"></a>
-    -->
+<div dnd-sortable-container [sortableData]="columns">
+    <div class="datagrid-header-cell" title="{{column.label}}"
+         *ngFor="let column of columns; let columnIndex = index; trackBy:trackColumn"
+         [ngClass]="{'reorderable': column.canReorder }"
+         [ngStyle]="{'width' : column.width + 'px', 'left' : column.$$leftOffset + 'px' }"
+         mwlResizable [enableGhostResize]="true" [resizeEdges]="{right: column.canResize || false}" (resizeEnd)="onResizeEnd($event, columnIndex, columnType)"
+         dnd-sortable [sortableIndex]="columnIndex" [dragEnabled]="column.canReorder && !column.pinnedLeft" (onDragSuccess)="onReorderSuccess($event, columnType)">
+        <span class="datagrid-header-cell-label" dnd-sortable-handle>
+            {{column.label}}
+        </span>
+        <!-- Controls Dropdown -->
+        <datagrid-controls *ngIf="options.controlsDropdown"
+                           [options]="options"
+                           [status]="status"
+                           [column]="column"
+                           [columnIndex]="columnIndex"
+                           [filterTerms]="filterTerms"
+                           (onStateUpdated)="stateUpdated($event)">
+        </datagrid-controls>
+        <!-- Resize Handle -->
+        <a class="resize-handle" mwlResizeHandle [resizeEdges]="{right: true}" *ngIf="column.canResize" (mousedown)="reSizing = true"></a>
+
+    </div>
 </div>

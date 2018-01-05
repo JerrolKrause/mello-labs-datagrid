@@ -1,14 +1,16 @@
-import { Directive, TemplateRef, ContentChild, Input } from '@angular/core';
+import { Directive, TemplateRef, ContentChild, Input, ContentChildren, ElementRef, QueryList } from '@angular/core';
 
 
-@Directive({ selector: '[datagrid-column]' })
-export class ColumnDirective {
+@Directive({ selector: '[templates]' })
+export class Templates {
 
     
-    @Input() prop: string;
+    //@Input() prop: string;
+
+    //@ContentChildren(ColumnDirective, { descendants: true, read: ElementRef }) template2: QueryList<ColumnDirective>;
 
     constructor() {
-        console.log(this.prop);
+      
     }
 
     /*

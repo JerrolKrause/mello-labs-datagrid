@@ -13,9 +13,10 @@ export class HeaderRowComponent implements OnInit, OnChanges{
 	@Input() state: Datagrid.State;
 	@Input() status: Datagrid.Status;
 	@Input() options: Datagrid.Options;
-	@Input() gridProps: Datagrid.Props;
 	@Input() scrollProps: Datagrid.ScrollProps;
-	@Input() filterTerms: any;
+    @Input() filterTerms: any;
+    @Input() columnType: 'pinnedLeft' | 'main';
+    
 	
 	@Output() onColumnsUpdated: EventEmitter<any> = new EventEmitter();
 	@Output() onStateUpdated: EventEmitter<any> = new EventEmitter();
@@ -28,11 +29,6 @@ export class HeaderRowComponent implements OnInit, OnChanges{
     
 	constructor(
     ) { 
-    	this.onColumnsUpdated = new EventEmitter();
-		this.onColumnsUpdated = new EventEmitter();
-		this.onColumnsUpdated = new EventEmitter();
-    	this.reSizing = false;
-    	this.columnWidth = '';
     }
 
 	ngOnInit() {}
@@ -58,7 +54,7 @@ export class HeaderRowComponent implements OnInit, OnChanges{
 	/**
 	* On a successfull drag reorder of the column headers
 	*/
-	public onReorderSuccess() {
+    public onReorderSuccess(event, type: 'pinnedLeft' | 'main') {
 		// If columns are being dragged before a pinned column, set that column to pinned
 		let isPinned = false;
         for (let i = this.columns.length - 1; i >= 0; i--) {
@@ -69,33 +65,24 @@ export class HeaderRowComponent implements OnInit, OnChanges{
 			column.locked = isPinned;
 			column.pinnedLeft = isPinned;
 		}
-        this.onColumnsUpdated.emit(this.columns);
+        this.onColumnsUpdated.emit({ action: 'reorder', columns: this.columns, type: type });
 	}
 
     /**
-     * If the column was resized
-     * @param event
-     */
-	public onResizeEnd(event, column: Datagrid.Column, columnIndex: number, type: 'columnsInternal' | 'columnsPinned') {
-		//console.warn('onResizeEnd', column, event)
-		column.width = Math.floor(event.rectangle.width);
-
-		if (column.width < 45) {
-			column.width = 45;
-		}
-		this.reSizing = false;
-
-		if (type == 'columnsPinned') {
-			//this.columnsPinnedLeft[columnIndex] = { ...column };
-            //this.onColumnsUpdated.emit({ columns: this.columnsPinnedLeft, type: type });
-		} else {
-			//this.columnsInternal[columnIndex] = { ...column };
-			//this.onColumnsUpdated.emit({ columns: this.columnsInternal, type: type });
+      * If the column was resized
+      * @param event
+      */
+    public onResizeEnd(event, columnIndex: number, type: 'pinnedLeft' | 'main') {
+        //console.warn('onResizeEnd', columnIndex, type, Math.floor(event.rectangle.width / 2) * 2)
+        
+        let width = Math.floor(event.rectangle.width / 2) * 2; // Round to nearest 2 pixels to prevent rendering issues in chrome
+        // Min column size 44 px
+        if (width < 44) {
+            width = 44;
         }
+        this.reSizing = false;
 
-		
-		
-		
-	}
+        this.onColumnsUpdated.emit({ action: 'resize', columnIndex: columnIndex, type: type, width: width });
+    }
     
 }

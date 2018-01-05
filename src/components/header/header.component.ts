@@ -41,11 +41,6 @@ export class HeaderComponent implements OnInit, OnChanges{
     
 	constructor(
     ) { 
-    	this.onColumnsUpdated = new EventEmitter();
-		this.onColumnsUpdated = new EventEmitter();
-		this.onColumnsUpdated = new EventEmitter();
-    	this.reSizing = false;
-    	this.columnWidth = '';
     }
 
 	ngOnInit() {
@@ -62,8 +57,12 @@ export class HeaderComponent implements OnInit, OnChanges{
 		this.onStateUpdated.emit(event);
     }
 
+    /**
+     * Pass column changes up to the main datagrid
+     * @param event
+     */
     public columnsUpdated(event) {
-        console.log('Columns Updated');
+        this.onColumnsUpdated.emit(event);
     }
 
     /**
@@ -91,30 +90,4 @@ export class HeaderComponent implements OnInit, OnChanges{
 		this.onColumnsUpdated.emit(this.columnsInternal);
 	}
 
-    /**
-     * If the column was resized
-     * @param event
-     */
-	public onResizeEnd(event, column: Datagrid.Column, columnIndex: number, type: 'columnsInternal' | 'columnsPinned') {
-		//console.warn('onResizeEnd', column, event)
-		column.width = Math.floor(event.rectangle.width);
-
-		if (column.width < 45) {
-			column.width = 45;
-		}
-		this.reSizing = false;
-
-		if (type == 'columnsPinned') {
-			this.columnsPinnedLeft[columnIndex] = { ...column };
-            this.onColumnsUpdated.emit({ columns: this.columnsPinnedLeft, type: type });
-		} else {
-			this.columnsInternal[columnIndex] = { ...column };
-			this.onColumnsUpdated.emit({ columns: this.columnsInternal, type: type });
-        }
-
-		
-		
-		
-	}
-    
 }

@@ -1,6 +1,7 @@
-import { Component, OnInit, ChangeDetectionStrategy, Input, ViewContainerRef, ViewChild, Output, EventEmitter, ElementRef, AfterViewInit, OnChanges } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, Input, ViewContainerRef, ViewChild, Output, EventEmitter, ElementRef, AfterViewInit, OnChanges, ContentChild, TemplateRef, forwardRef, QueryList, ContentChildren } from '@angular/core';
 import { Datagrid } from '../../../typings';
 import { BehaviorSubject } from 'rxjs';
+import { Templates } from '@mello-labs/datagrid/directives/column.directive';
 
 
 @Component({
@@ -13,33 +14,44 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit {
 
 	@Input() column: Datagrid.Column;
 	@Input() row: any;
-	@Input() options: Datagrid.Options;
+    @Input() options: Datagrid.Options;
+
+    @Input() @ContentChild('', { read: TemplateRef }) templatesCell: TemplateRef<any>;
+    //@Input() @ContentChildren('cell') templatesCell: QueryList<ElementRef>;
 
 	@Output() updateDatatable: EventEmitter<any> = new EventEmitter();
+    @ViewChild('test') test;
+    public cellContext;
 
     /** Is the content truncated, IE is the content inside the cell wider than the parent container */
 	public truncated$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
 	private loaded: boolean = false;
 
-	constructor(
+    constructor(
 	) { 
 		this.updateDatatable = new EventEmitter();
 		this.truncated$ = new BehaviorSubject(false);
 		this.loaded  = false;
 	}
 
-	ngOnInit() {
-	}
+    ngOnInit() {
+    }
 
-	ngOnChanges() {
+    ngOnChanges() {
+         
 		//console.log(this.row, this.column);
 		//if (this.loaded) {
 		//	this.checkIfTruncated();
 		//}
 	}
 
-	ngAfterViewInit() {
+    ngAfterViewInit() {
+        setTimeout(() => {
+            if (this.templatesCell) {
+                //console.log('Cell Template', this.column.prop, this.templatesCell, this.test);
+            }
+        }, 200)
 		//this.checkIfTruncated();
 		//this.loaded = true;
 	}

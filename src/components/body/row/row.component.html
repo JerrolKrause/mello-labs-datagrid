@@ -5,7 +5,8 @@
                        [ngStyle]="{'left' : column.$$leftOffset + 'px' }"
                        [column]="column"
                        [row]="row"
-                       [options]="options">
+                       [options]="options"
+                       [templatesCell]="templatesCell[column.prop]">
         </datagrid-cell>
 
     </ng-container>

@@ -20,7 +20,7 @@ import { InfoComponent } from './components/info/info.component';
 
 
 // Directives
-import { ColumnDirective } from './directives/column.directive';
+import { Templates } from './directives/column.directive';
 
 
 // Services
@@ -28,7 +28,7 @@ import { DataGridService } from './datagrid.service';
 
 // 3rd party controls  
 import { DndModule } from 'ng2-dnd'; // Drag and drop
-//import { ResizableModule } from '../../../angular-resizable-element';
+import { ResizableModule } from '../../angular-resizable-element';
 
 
 export * from './typings';
@@ -36,13 +36,13 @@ export * from './datagrid.service';
  
 @NgModule({
   imports: [
-    CommonModule, NgbModule.forRoot(), FormsModule, DndModule.forRoot()//, ResizableModule  
+    CommonModule, NgbModule.forRoot(), FormsModule, DndModule.forRoot(), ResizableModule
   ],
   declarations: [
       DataGridComponent, RowComponent, GroupHeaderComponent, HeaderComponent, ControlsComponent, FiltersComponent, BodyComponent, CellComponent, 
       InfoComponent, HeaderRowComponent,
 
-      ColumnDirective
+      Templates
   ],
   providers:[DataGridService],
   exports: [

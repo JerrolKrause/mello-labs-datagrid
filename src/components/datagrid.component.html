@@ -1,3 +1,7 @@
+<ng-content></ng-content>
+<hr/>
+
+
 <div id="datagrid" class="datagrid" #dataGrid
     [ngClass]="{
     'noWrap' : options.noWrap, 
@@ -46,6 +50,7 @@
                            [status]="status"
                            [options]="options"
                            [gridProps]="gridProps"
+                           [templatesCell]="templatesCell"
                            (onRowMouseEvent)="onRowMouseEvent($event)">
             </datagrid-body>
         </div>

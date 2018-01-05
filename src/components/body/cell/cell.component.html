@@ -1,7 +1,16 @@
 <div class="datagrid-cell-data"
      [ngStyle]="{'width' : column.width + 'px'}"
      title="{{row[column.prop]}}">
-    <span [ngSwitch]="column.columnType">
+   
+    <!--
+    <ng-template #cellTemplate
+                 *ngIf="column.templatesCell"
+                 [ngTemplateOutlet]="test"
+                 [ngTemplateOutletContext]="cellContext">
+    </ng-template>
+    -->
+
+    <span [ngSwitch]="column.columnType" *ngIf="!templatesCell">
         <!-- Date Time-->
         <ng-container *ngSwitchCase="'dateTime'">
             {{row[column.prop] | date: 'MM/dd/yyyy - h:mm a' }}
@@ -21,6 +30,7 @@
             {{row[column.prop]}}
         </ng-container>
     </span>
+
 </div>
 <!--
 <div class="cell">

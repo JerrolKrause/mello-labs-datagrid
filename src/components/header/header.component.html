@@ -6,11 +6,11 @@
 
             <div class="datagrid-header-pinned sticky-left" *ngIf="columnsPinnedLeft?.length" [ngStyle]="{'width' : gridProps.widthPinned + 'px' }">
                 <datagrid-header-row [columns]="columnsPinnedLeft"
+                                     [columnType]="'pinnedLeft'"
                                      [state]="state"
                                      [status]="status"
                                      [options]="options"
                                      [scrollProps]="scrollProps"
-                                     [gridProps]="gridProps"
                                      [filterTerms]="filterTerms"
                                      (onColumnsUpdated)="columnsUpdated($event)"
                                      (onStateUpdated)="stateUpdated($event)">
@@ -19,11 +19,11 @@
             
             <div class="datagrid-header-main" [ngStyle]="{ 'left' : -scrollProps.scrollLeft + 'px' }">
                 <datagrid-header-row [columns]="columnsInternal"
+                                     [columnType]="'main'"
                                      [state]="state"
                                      [status]="status"
                                      [options]="options"
                                      [scrollProps]="scrollProps"
-                                     [gridProps]="gridProps"
                                      [filterTerms]="filterTerms"
                                      (onColumnsUpdated)="columnsUpdated($event)"
                                      (onStateUpdated)="stateUpdated($event)">

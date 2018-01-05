@@ -10,7 +10,8 @@ export class RowComponent implements OnInit, OnChanges  {
 
 	@Input() columns: Datagrid.Column[];
 	@Input() options: Datagrid.Options;
-	@Input() row: any[];
+    @Input() row: any[];
+    @Input() templatesCell;
 
     @Output() updateDatatable: EventEmitter<any> = new EventEmitter();
 

@@ -1,11 +1,11 @@
 import {Component, OnInit, OnDestroy, OnChanges, Input, Output, ViewChild, ChangeDetectionStrategy, EventEmitter, ChangeDetectorRef, ViewEncapsulation,
-	AfterViewInit, AfterViewChecked, ElementRef, ContentChildren
+    AfterViewInit, AfterViewChecked, ElementRef, ContentChildren, ContentChild, QueryList, forwardRef, TemplateRef
 } from '@angular/core';
 import 'rxjs/add/observable/fromEvent';
 import { Observable } from 'rxjs';
 import { Subscription } from 'rxjs/Subscription';
 
-import { ColumnDirective } from '../directives/column.directive';
+import { Templates } from '../directives/column.directive';
 import { DataGridService } from '../datagrid.service';
 import { Actions } from '../datagrid.props';
 import { Datagrid } from '../typings';
@@ -84,8 +84,9 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	public gridProps: Datagrid.Props = {};
 	/** Properties related to scrolling of the main grid */
 	public scrollProps: Datagrid.ScrollProps = { scrollTop: 0, scrollLeft: 0 };
-
-	//private scrollDebounce$: BehaviorSubject<Datagrid.ScrollProps> = new BehaviorSubject(this.scrollProps);
+    /** Holds custom templates for cells */
+    public templatesCell: { [key:string]: ElementRef} = {};
+    //private scrollDebounce$: BehaviorSubject<Datagrid.ScrollProps> = new BehaviorSubject(this.scrollProps);
     /** A dictionary of columns based on primary key, used for lookups */
     public columnsMapped: { [key: string]: Datagrid.Column } = {};
     /** Last row that was selected */
@@ -168,24 +169,38 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		this.action = new EventEmitter();
 		this.onCustomLinkEvent = new EventEmitter();
         this.onElementRef = new EventEmitter();
-        
 	}
 
-    /**
-   * Column templates gathered from `ContentChildren`
-   * if described in your markup.
-   */
-    @ContentChildren('[datagrid-column]')
-    set columnTemplates(val: any) {
-        console.log('Templates', val);
-        if (val) {
-            const arr = val.toArray();
-            if (arr.length) {
-                //this._internalColumns = translateTemplates(arr);
-            }
-        }
+
+
+    //@ContentChildren('templates') template2: QueryList<ElementRef>;
+
+    //@ContentChildren('[templates]', { descendants: true, read: ElementRef }) templates: QueryList<ElementRef>; // <--- Note This change 
+
+
+    ngAfterViewInit() {
+
+        //console.log(this.templates.toArray());
+        /**
+         * 
+       
+        let templatesCell = {};
+        this.template2.forEach(template => {
+            //console.log(template.nativeElement);
+            templatesCell[template.nativeElement.attributes.prop.value] = template;
+        });
+
+        //this.columns.forEach();
+        //console.log(templatesCell);
+        this.templatesCell = templatesCell;
+          */
+        
+        // Update grid props body width, for some reason it is not available if called in datagrid on initial load OR if within a function call
+        this.gridProps.widthBody = Math.floor(this.datagrid.nativeElement.getBoundingClientRect().width);
+
     }
 
+    ngAfterViewChecked() { }
    
 	ngOnInit() {}
 
@@ -271,13 +286,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 
 	}
     
-	ngAfterViewInit() {
-        // Update grid props body width, for some reason it is not available if called in datagrid on initial load OR if within a function call
-		this.gridProps.widthBody = Math.floor(this.datagrid.nativeElement.getBoundingClientRect().width);
-	}
-
-	ngAfterViewChecked() {}
-
     /**
     * Throttle the scroll event
     */
@@ -538,15 +546,29 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
      * When columns are modified from a lower component
      * @param columns
      */
-	public columnsUpdated(columData: { columns: Datagrid.Column[], type: 'columnsInternal' | 'columnsPinned' }) {
-		// Determine if updating pinned or regular columns
-		if (columData.type == 'columnsPinned') {
-			this.columnsPinnedLeft = [...columData.columns];
-		} else {
-			this.columnsInternal = [...columData.columns];
-		}
-        // Update grid props
-		this.updateGridProps();
+    public columnsUpdated(columnData: { action: 'resize' | 'reorder', columnIndex: number, type: 'pinnedLeft' | 'main', width: number, columns: Datagrid.Column[] }) {
+        //console.log('columnsUpdated', columnData);
+        // If this is a resize column event
+        if (columnData.action == 'resize') {
+            // Determine if updating pinned or regular columns
+            if (columnData.type == 'pinnedLeft') {
+                this.columnsPinnedLeft[columnData.columnIndex].width = columnData.width;
+                this.columnsPinnedLeft = [...this.columnsPinnedLeft];
+            } else {
+                this.columnsInternal[columnData.columnIndex].width = columnData.width;
+                this.columnsInternal = [...this.columnsInternal];
+            }
+        }
+        // If this is a reorder columns event
+        else if (columnData.action == 'reorder') {
+            if (columnData.type == 'pinnedLeft') {
+                this.columnsPinnedLeft = [...columnData.columns];
+            } else {
+                this.columnsInternal = [...columnData.columns];
+            }
+        }
+		
+        this.viewCreate();
 	}
 
     /**
