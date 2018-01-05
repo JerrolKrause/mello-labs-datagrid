@@ -25,7 +25,7 @@ export class BodyComponent implements OnInit, OnChanges{
     @Output() onCustomLinkEvent: EventEmitter<any> = new EventEmitter();
     @Output() onRowUpdated: EventEmitter<any> = new EventEmitter();
     @Output() onRowMouseEvent: EventEmitter<any> = new EventEmitter();
-
+    @Output() onGroupToggled: EventEmitter<any> = new EventEmitter();
     @Output() onRightClick: EventEmitter<any> = new EventEmitter();
     @Output() onRowMouseDown: EventEmitter<any> = new EventEmitter();
     @Output() onRowMouseUp: EventEmitter<any> = new EventEmitter();
@@ -56,6 +56,14 @@ export class BodyComponent implements OnInit, OnChanges{
     public rowUpdated(event:Datagrid.FieldEdit, rowIndex:number) {
         event.rowIndex = rowIndex;
         this.onRowUpdated.emit(event);
+    }
+
+    /**
+     * When a group is toggled
+     * @param event
+     */
+    public groupToggled(group: Datagrid.Group) {
+        this.onGroupToggled.emit(group);
     }
 
 }

@@ -175,11 +175,13 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 
     ngAfterViewChecked() { }
    
-	ngOnInit() {}
+    ngOnInit() {
+        
+	}
 
 	ngOnChanges(model) {
 		//console.warn('ngOnChanges', model);
-
+	    
         // Clear all memoized caches anytime new data is loaded into the grid
 		this.dgSvc.cache.sortArray.cache.clear();
 		this.dgSvc.cache.groupRows.cache.clear();
@@ -227,22 +229,23 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
                 this.columnsMapped = this.dgSvc.mapColumns(this.columns);
 			}
 		}
-		
+	    
 		if (this.columns && this.rows) {
-        
+            
 			//console.warn(this.columns, this.rows)
 			if (this.state) {
-				this.state.groups = this.state.groups && this.state.groups.length && this.options.controlsMap ? this.dgSvc.mapPropertiesDown(this.state.groups, this.options.controlsMap) : [];
-				this.state.sorts = this.state.sorts && this.state.sorts.length && this.options.controlsMap ? this.dgSvc.mapPropertiesDown(this.state.sorts, this.options.controlsMap) : [];
-				this.state.filters = this.state.filters && this.state.filters.length && this.options.controlsMap ? this.dgSvc.mapPropertiesDown(this.state.filters, this.options.controlsMap) : [];
+                this.state.groups = this.state.groups && this.state.groups.length && this.options.controlsMap ? this.dgSvc.mapPropertiesDown(this.state.groups, this.options.controlsMap) : this.state.groups;
+                this.state.sorts = this.state.sorts && this.state.sorts.length && this.options.controlsMap ? this.dgSvc.mapPropertiesDown(this.state.sorts, this.options.controlsMap) : this.state.sorts;
+                this.state.filters = this.state.filters && this.state.filters.length && this.options.controlsMap ? this.dgSvc.mapPropertiesDown(this.state.filters, this.options.controlsMap) : this.state.filters;
 
 			} else {
 				this.state = { ...this.stateDefault }
             }
+            
+            this.filterTerms = this.dgSvc.getDefaultTermsList(this.rows, this.columns); // Generate a list of default filter terms
+            this.createRowStyles();// Create row styles
+            this.createRowClasses(); // Row classes
 
-            // Generate a list of default filter terms
-		    this.filterTerms = this.dgSvc.getDefaultTermsList(this.rows, this.columns);
-		   
 			this.state.info = {
                 initial : true
 			}
@@ -338,24 +341,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
                newRows = this.dgSvc.sortArray(newRows, this.state.sorts[0].prop, this.state.sorts[0].dir);
 			}
 		}
-        
-		//this.createRowClasses();
-		this.createRowStyles();
-        
-		// Add information for row positioning and indexing. Use for virtual scroll and row selection
-		let y = 0;
-        for (let i = 0; i < newRows.length; i++) {
-            newRows[i].$$rowIndex = i;
-			newRows[i].$$rowPosition = y;
-            newRows[i].$$hidden = false;
-
-            y += this.rowHeight + 1;
-            // If this is a group header
-			//if (newRows[i].type == 'group') {
-			//    y += this.rowHeight + 1; // Can later update to different heights for headers but throws off grid calculations
-			//}
-
-		}
+      
+        newRows = this.dgSvc.rowPositions(newRows, this.rowHeight);
         
         // HACK: Grid props needed to build visible rows and columns but visible rows and columns needed to update grid props
 		this.updateGridProps();
@@ -399,7 +386,22 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
         // Turn change detection back on
 		this.ref.reattach();
 		console.timeEnd('Creating View');
-	}
+    }
+
+    /**
+     * When a group is toggled
+     * @param event
+     */
+    public groupToggled(group: Datagrid.Group) {
+        //console.log('groupToggled', group);
+        
+        //let rowsNew = this.dgSvc.rowPositions(this.rows, this.rowHeight);
+        //console.log()
+        //this.updateGridProps();
+        this.viewCreate();
+       // this.rowsExternal = this.dgSvc.getVisibleRows(rowsNew, this.scrollProps, this.gridProps, this.rowHeight);
+        //this.updateGridProps();
+    }
 
     /**
      * When the datatable state is changed, usually via a control such as group/filter/sort etc
@@ -1002,7 +1004,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	/**
      * Create inline css styles for rows
      */
-	public createRowStyles(): void | false {
+    public createRowStyles(): void | false {
 		let rowStyles = {};
         // Only create row styles if supplied by options
 		if (!this.options.rowStyle) {

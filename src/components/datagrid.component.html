@@ -1,10 +1,9 @@
 <ng-content></ng-content>
-<hr/>
-
+<hr />
 
 <div id="datagrid" class="datagrid" #dataGrid
-    [ngClass]="{
-    'noWrap' : options.noWrap, 
+     [ngClass]="{
+    'noWrap' : options.noWrap,
     'selectable' : options.selectionType,
     'truncatable' : options.columnsTruncate,
     'virtualScroll' : options.virtualScroll,
@@ -14,8 +13,7 @@
 
     <div class="datagrid-container" *ngIf="appReady">
 
-        <!--TODO: Add readonly div --> 
-
+        <!--TODO: Add readonly div -->
         <!-- Header -->
         <datagrid-header [columnsInternal]="columnsExternal"
                          [columnsPinnedLeft]="columnsPinnedLeft"
@@ -52,10 +50,18 @@
                            [gridProps]="gridProps"
                            [templatesCell]="templatesCell"
                            (onRowMouseEvent)="onRowMouseEvent($event)"
-                           (onRowUpdated)="rowUpdated($event)">
+                           (onRowUpdated)="rowUpdated($event)"
+                           (onGroupToggled)="groupToggled($event)">
             </datagrid-body>
         </div>
     </div>
+
+    <!-- Drag select box -->
+    <div id="drag-select"
+         *ngIf="options.showDragBox && dragging && options.selectionType && draggingPos.hasMinSize"
+         [ngStyle]="{ 'top':draggingPos.top + 'px', 'left': draggingPos.left + 'px', width: draggingPos.width + 'px', height: draggingPos.height + 'px' }">
+    </div>
+
 
     <!--
     <table class="datagrid-container table table-sm" *ngIf="appReady" [ngStyle]="{height:tableHeight}">
@@ -64,7 +70,7 @@
 
                 <th header class="datagrid-head-cell" *ngFor="let column of columnsModified; let columnIndex = index; trackBy:trackColumn" [attr.data-qa]="'column column-'+column.prop" [attr.id]="'header-column-'+column.prop"
                     [column]="column" [columnIndex]="columnIndex" [columnsCount]="columnsModified.length" [state]="state$ | async" [status]="status" [options]="options" [filterTerms]="filterTerms"
-                    [ngStyle]="{'left': leftOffsets[columnIndex] || leftOffsets[columnIndex] == 0  ? leftOffsets[columnIndex] + 'px' : 'auto' }" 
+                    [ngStyle]="{'left': leftOffsets[columnIndex] || leftOffsets[columnIndex] == 0  ? leftOffsets[columnIndex] + 'px' : 'auto' }"
                     [ngClass]="{'pinned': column?.pinnedLeft, 'reorderable': column.canReorder }"
                     dnd-sortable [sortableIndex]="columnIndex" (onDragSuccess)="onDragSuccess($event)" [dragEnabled]="column.canReorder && !column.pinnedLeft"
                     mwlResizable [enableGhostResize]="true" [resizeEdges]="{right: column.canResize || false}" (resizeEnd)="onResizeEnd($event, column, columnIndex)"
@@ -78,17 +84,17 @@
                 </th>
             </tr>
         </thead>
-       
+
         <tbody class="datagrid-body" *ngIf="rows.length && columns.length">
 
-           
+
             <tr info class="datagrid-info-row" *ngIf="options.showInfo && (state?.sorts.length || state?.groups.length || state?.filters.length)"
                 (onReset)="reset($event)" [state]="state" [options]="options" [width]="columns.length" [columnsMapped]="columnsMapped"></tr>
 
-            
+
             <ng-container *ngFor="let row of rowsModified; let rowIndex = index; trackBy:options.trackRow">
 
-               
+
                 <tr group-header class="datagrid-group-header" *ngIf="groups && groups[rowIndex]?.rows.length"
                 [group]="groups[rowIndex]" [options]="options" [settings]="settings" [width]="columnsModified.length"></tr>
 
@@ -118,8 +124,6 @@
         </tbody>
     </table>
     -->
- 
-    <div id="drag-select" *ngIf="options.showDragBox && dragging && options.selectionType && draggingPos.hasMinSize"
-         [ngStyle]="{ 'top':draggingPos.top + 'px', 'left': draggingPos.left + 'px', width: draggingPos.width + 'px', height: draggingPos.height + 'px' }"></div>
 
+    
 </div>

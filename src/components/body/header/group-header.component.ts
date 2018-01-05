@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter, OnDestroy, OnChanges} from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter, OnDestroy, OnChanges, ChangeDetectorRef} from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Datagrid } from '../../../typings';
 
@@ -12,42 +12,58 @@ export class GroupHeaderComponent implements OnInit, OnChanges, OnDestroy{
 
 	@Input() width:number;
 	@Input() group: Datagrid.Group;
-	@Input() options: Datagrid.Options;
+    @Input() options: Datagrid.Options;
+
+    @Output() onGroupToggled: EventEmitter<any> = new EventEmitter();
 
 	public groupLabel: string = '';
 
 	private sub: Subscription;
 
-	constructor(
+    constructor(
+        private ref: ChangeDetectorRef
 	) { 
-		this.groupLabel = '';
 	}
 
 	ngOnChanges() {
         // Everytime new data is passed down, recreate the label
-		this.createGroupLabel();
+        this.createGroupLabel();
+       // console.log('Group')
 	}
 
-	ngOnInit() {
-      
-	}
+	ngOnInit() {}
 
     /**
      * Toggle group visibility
      * @param group
      */
-	public toggleGroup(group: Datagrid.Group) {
-		group.rows.forEach(row => {
+    public toggleGroup(group: Datagrid.Group, $event: MouseEvent) {
+
+        $event.preventDefault();
+        $event.stopPropagation();
+
+		this.group.rows.forEach(row => {
 			if (!row.$$hidden) {
 				row.$$hidden = true;
 			} else {
 				row.$$hidden = false;
 			}
-		});
-		group.visible = !group.visible;
+        });
+        //console.log(this.group.visible);
+        this.group.visible = false;
+        //console.log(this.group.visible);
+       
+
+        //this.group = { ...this.group, visible: !group.visible };
+        
+        this.ref.markForCheck();
+        this.onGroupToggled.emit(this.group);
+	    
 	}
 
-
+    /**
+     * Create the label for the group
+     */
 	private createGroupLabel() {
 		// If columnData has been supplied then the app needs to get the group header label from within that data
 		if (this.options.columnData && this.options.columnData[this.group.columnProp] && this.options.columnData[this.group.columnProp].model) {
@@ -82,9 +98,7 @@ export class GroupHeaderComponent implements OnInit, OnChanges, OnDestroy{
 	}
 
 	ngOnDestroy() {
-		if (this.sub){
-			this.sub.unsubscribe();
-		}
+		if (this.sub){this.sub.unsubscribe()}
 	}
 
 

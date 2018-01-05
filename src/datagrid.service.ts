@@ -88,10 +88,10 @@ export class DataGridService {
 	}
 
     /**
-     * 
+     * Get the rows that should be visible in the scroll port
      * @param rows
      */
-	public getVisibleRows(rows: any[], scrollProps, gridProps, rowHeight): any[] {
+    public getVisibleRows(rows: any[], scrollProps: Datagrid.ScrollProps, gridProps: Datagrid.Props, rowHeight: number): any[] {
 		//console.log('getVisibleRowsoffSetRowsFromTop', rows, this.scrollProps, this.rowHeight, this.gridProps);
 		let rowsNew = [...rows];
 		let buffer = 1;
@@ -107,7 +107,7 @@ export class DataGridService {
 		if (rowsEnd > rowsNew.length) {
 			rowsEnd = rowsNew.length;
 		}
-
+        //console.log('getVisibleRows', offSetRowsFromTop, rowsEnd);
 		//console.log('getVisibleRowsoffSetRowsFromTop', rowsEnd)
 		return rowsNew.slice(offSetRowsFromTop, rowsEnd);
 	}
@@ -556,40 +556,50 @@ export class DataGridService {
 	}
 
     /**
-     * /
+     * Calculate row properties such as visibility, y position and index
      * @param rows
-     * @param groups
-     * @param options
-    
-	public virtualScrollPositioning2(rows: any[], groups: Datagrid.Group, options: Datagrid.Options) {
-		//console.warn('virtualScrollPositioning', rows, groups);
-		let zIndexes = {
-			tableHeight: null,
-			groups: {},
-			rows: {},
-			dropRows: {} // Placeholder for when droprows are implemented
-		}
-
-        // Calculate the height of the table
-		let height = rows.length * (options.rowHeight + 1);
-		if (groups) {
-			height += Object.keys(groups).length * 32
-		}
-		height = height + 25; //Add thead
-		zIndexes.tableHeight = height + 'px';
-
-        // Calculate the positioning of the rows + group headers
-		let zIndex = 0;
-		rows.forEach(row => {
-			zIndexes.rows[row[options.primaryKey]] = zIndex;
-			zIndex += options.rowHeight;
-		});
-
-		console.warn('virtualScrollPositioning', zIndexes);
-
-
-		return zIndexes;
-
-	}
+     * @param rowHeight
+     * @param makeVisible
      */
+    public rowPositions(rows: any[], rowHeight: number, makeVisible: boolean = false) {
+        //console.log('rowPositions start', rows);
+        
+        let y = 0;
+        return rows.filter((row, i) => {
+            row.$$rowIndex = i; // Set rowIndex
+
+            // If hidden prop is not set, set default to false
+            if (typeof row.$$hidden == 'undefined' || makeVisible) {
+                row.$$hidden = false;
+            }
+            // If visible
+            if (row.$$hidden == false) {
+                row.$$rowPosition = y; // Set y position
+                y += rowHeight + 1;
+                return true;
+            } else {
+                return false;
+            }
+          
+        });
+        
+        /*
+        for (let i = 0; i < rowsNew.length; i++) {
+            rowsNew[i].$$rowIndex = i; // Set rowIndex
+
+            // If hidden prop is not set, set default to false
+            if (typeof rowsNew[i].$$hidden == 'undefined' || makeVisible) {
+                rowsNew[i].$$hidden = false;
+            }
+            // If visible
+            if (rowsNew[i].$$hidden == false) {
+                rowsNew[i].$$rowPosition = y; // Set y position
+                y += rowHeight + 1;
+            }
+            console.log('Row', i, rowsNew[i].$$rowPosition, rowsNew[i]);
+        }
+        return rowsNew;
+        */
+    }
+   
 }

@@ -5,24 +5,9 @@ $border-color: #ccc;
     &.maxHeight{overflow-y: scroll;overflow-x: hidden;}
     &.fullscreen{position:absolute;top:0;bottom:0;left:0;right:0;}
     &.scrollH{overflow-x:scroll;}
-    &.noWrap tbody{white-space: nowrap;}
     &.selectable{user-select: none;
-        .datagrid-container .datagrid-body-row{
-            &:hover .datagrid-cell{background-image:url('/assets/img/datatable-hover.png');background-repeat:repeat-x;background-size: contain;}
-            &.selected:hover .datagrid-cell{ background-image:url('/assets/img/datatable-selected-hover.png');background-repeat:repeat-x;background-size: contain;}
-        }
-    }
-    &.virtualScroll{
-        .datagrid-container .datagrid-row .datagrid-cell{padding:0px 8px;}
-    }
-    &.truncatable .datagrid-container{
-        th{padding-right:0;}
-        .datagrid-cell {overflow:hidden;
-            &.groupVisible{overflow:visible}
-        }
-        .cell{position:relative;z-index: 5;border-right: 1px solid rgba(0, 0, 0, 0.1);}
-        .cell2{position: absolute;top: 0;bottom: 0;left: 0;right: 0;padding-left: 3px;}
-        .cell3{position:absolute;top: 50%;transform: translateY(-50%);}
+        .datagrid-body-row.selected{outline: 2px solid red;outline-offset: -2px;background-color: rgba(0,0,0,0.075);}
+        .datagrid-body-row:hover{outline: 2px solid #4c4c4c;outline-offset: -2px;}
     }
 
     .sticky-left{position:sticky;left:0;}
@@ -85,7 +70,6 @@ $border-color: #ccc;
 
         .datagrid-body{
             .datagrid-body-row{display: flex;flex-flow: row;backface-visibility: hidden;position:absolute;border-bottom: 1px solid #b3b3b3;}// Filter blur fixes bottom border lines
-            .datagrid-body-row.selected{outline: 2px solid red;outline-offset: -2px;background-color: rgba(0,0,0,0.075);}
             .datagrid-body-pinned{left:0;box-shadow: 2px 5px 5px rgba(0, 0, 0, 0.3);background-color:#fff;z-index: 4;display:inline-block;}
             .datagrid-row{position:relative;display: flex;flex-flow: row;min-height: 24px;
                 &.selected-state .datagrid-cell{background:#F0DADA;}
