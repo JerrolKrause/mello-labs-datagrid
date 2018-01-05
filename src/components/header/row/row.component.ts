@@ -50,7 +50,8 @@ export class HeaderRowComponent implements OnInit, OnChanges{
      */
 	public trackColumn(index: number, item: Datagrid.Column) {
 		return item.prop;
-	}
+    }
+
 	/**
 	* On a successfull drag reorder of the column headers
 	*/

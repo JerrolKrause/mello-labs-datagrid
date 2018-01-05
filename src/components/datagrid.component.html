@@ -51,7 +51,8 @@
                            [options]="options"
                            [gridProps]="gridProps"
                            [templatesCell]="templatesCell"
-                           (onRowMouseEvent)="onRowMouseEvent($event)">
+                           (onRowMouseEvent)="onRowMouseEvent($event)"
+                           (onRowUpdated)="rowUpdated($event)">
             </datagrid-body>
         </div>
     </div>

@@ -42,7 +42,15 @@ declare namespace Datagrid {
 			rowsVisible?: number
             initial?: boolean
 		}
-	}
+    }
+
+    export interface FieldEdit {
+        valueNew?: string;
+        valueOld?: string;
+        prop?: string;
+        rowIndex?: number;
+        row: any;
+    }
 
 	export interface Status {
 		groups?: {};

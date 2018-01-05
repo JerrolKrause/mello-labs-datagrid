@@ -23,7 +23,7 @@ export class BodyComponent implements OnInit, OnChanges{
 	@Output() onColumnsUpdated: EventEmitter<any> = new EventEmitter();
 	@Output() onStateUpdated: EventEmitter<any> = new EventEmitter();
     @Output() onCustomLinkEvent: EventEmitter<any> = new EventEmitter();
-
+    @Output() onRowUpdated: EventEmitter<any> = new EventEmitter();
     @Output() onRowMouseEvent: EventEmitter<any> = new EventEmitter();
 
     @Output() onRightClick: EventEmitter<any> = new EventEmitter();
@@ -32,9 +32,7 @@ export class BodyComponent implements OnInit, OnChanges{
     
 	constructor(
     ) { 
-    	this.onColumnsUpdated = new EventEmitter();
-    	this.onStateUpdated = new EventEmitter();
-    	this.onCustomLinkEvent = new EventEmitter();
+    	
     }
 
 	ngOnInit() {}
@@ -49,6 +47,15 @@ export class BodyComponent implements OnInit, OnChanges{
      */
     public onMouseEvent(type: 'click' | 'contextmenu' | 'mousedown' | 'mouseup' | 'mouseover', rowIndex: number, event?: MouseEvent) {
         this.onRowMouseEvent.emit({ type: type, rowIndex: rowIndex, event: event });
+    }
+
+    /**
+     * Pass updated field up the component chain
+     * @param event
+     */
+    public rowUpdated(event:Datagrid.FieldEdit, rowIndex:number) {
+        event.rowIndex = rowIndex;
+        this.onRowUpdated.emit(event);
     }
 
 }

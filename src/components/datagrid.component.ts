@@ -66,7 +66,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	@Output() onRightClickMenu: EventEmitter<any> = new EventEmitter();
 	@Output() action: EventEmitter<any> = new EventEmitter();
 	@Output() onCustomLinkEvent: EventEmitter<any> = new EventEmitter();
-	@Output() onElementRef: EventEmitter<any> = new EventEmitter();
+    @Output() onElementRef: EventEmitter<any> = new EventEmitter();
+    @Output() onRowUpdated: EventEmitter<any> = new EventEmitter();
 
     /** Columns that are sent to the DOM after any modification is done */
 	public columnsInternal: Datagrid.Column[];
@@ -142,33 +143,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		private dgSvc: DataGridService,
 		private ref: ChangeDetectorRef
 	) {
-		this.rowClasses = {};
-		this.columnsMapped = {};
-		this.rowStyles = {};
-		// Default props get stripped out by the compiler for some reason
-		this.gridProps = {};
-		this.tableContainerHeight = 300;
-		this.scrollProps = { scrollTop: 0, scrollLeft: 0 };
-		this.appReady = false;
-		this.dragging = false;
-		this.draggingPos = {};
-		this.keysPressed = {};
-		this.subscriptions = [];
-		this.rowHeight = 24;
-		this.stateDefault = {
-			groups: [],
-			sorts: [],
-			filters: [],
-		}
-
-		this.onRowsUpdated = new EventEmitter();
-		this.onColumnsUpdated = new EventEmitter();
-		this.onRowsSelected = new EventEmitter();
-		this.onStateChange = new EventEmitter();
-		this.onRightClickMenu = new EventEmitter();
-		this.action = new EventEmitter();
-		this.onCustomLinkEvent = new EventEmitter();
-        this.onElementRef = new EventEmitter();
 	}
 
 
@@ -1220,7 +1194,15 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 			this.updateGridProps();
 			this.ref.reattach();
 		}
-	}
+    }
+
+    /**
+     * When a row was edited
+     * @param $event
+     */
+    public rowUpdated($event) {
+        this.onRowUpdated.emit(event);
+    }
     
 	ngOnDestroy() {
 		// Unsub from all subscriptions
