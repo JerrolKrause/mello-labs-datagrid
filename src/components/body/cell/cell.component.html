@@ -10,7 +10,10 @@
     </ng-template>
     -->
 
-    <span [ngSwitch]="column.columnType" *ngIf="!templatesCell">
+    <div class="datagrid-cell-data-content" #cellData
+         *ngIf="!templatesCell"
+         [ngSwitch]="column.columnType"
+         [ngbPopover]="fieldContent" #p="ngbPopover" triggers="manual" container="body" placement="top-left" (dblclick)="fieldEdit($event);">
         <!-- Date Time-->
         <ng-container *ngSwitchCase="'dateTime'">
             {{row[column.prop] | date: 'MM/dd/yyyy - h:mm a' }}
@@ -26,11 +29,12 @@
         </ng-container>
 
         <!-- Default -->
-        <div *ngSwitchDefault placement="top-left" [ngbPopover]="fieldContent" #p="ngbPopover" triggers="manual" container="body" (dblclick)="fieldEdit($event);">
+        <ng-container *ngSwitchDefault>
             {{row[column.prop]}}
-        </div>
-    </span>
+        </ng-container>
+    </div>
 
+    <div class="datagrid-truncated" *ngIf="truncated"></div>
 </div>
 
 <ng-template #fieldContent>

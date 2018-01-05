@@ -12,13 +12,3 @@
 
     </ng-container>
 </div>
-
-<!--
-    [ngStyle]="{'width' : gridProps.width + 'px' }"
-    <td class="datagrid-cell datagrid-cell-{{column.prop}}" *ngFor="let column of columns; let columnIndex = index; trackBy:trackColumn" [attr.data-qa]="'cell cell-index-'+ columnIndex + ' cell-prop-' + column.prop"
-        [ngClass]="{'pinned': column?.pinnedLeft }"
-        [ngStyle]="{'left': leftOffsets[columnIndex] || leftOffsets[columnIndex] == 0  ? leftOffsets[columnIndex] + 'px' : 'auto', 'background-color' : rowStyle && rowStyle['background-color'] ? rowStyle['background-color'] : null }"
-        >
-        <cell [column]="column" [rowData]="row" [options]="options" (updateDatatable)="onUpdateDatatable($event)"></cell>
-    </td>
--->

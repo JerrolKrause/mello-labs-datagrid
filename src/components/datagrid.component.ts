@@ -59,7 +59,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	@Input() state: Datagrid.State;
 
     /** Outputs */
-	@Output() onRowsUpdated: EventEmitter<any[]> = new EventEmitter();
 	@Output() onColumnsUpdated: EventEmitter<any[]> = new EventEmitter();
 	@Output() onRowsSelected: EventEmitter<any[]> = new EventEmitter();
 	@Output() onStateChange: EventEmitter<any> = new EventEmitter();
@@ -527,10 +526,12 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
             // Determine if updating pinned or regular columns
             if (columnData.type == 'pinnedLeft') {
                 this.columnsPinnedLeft[columnData.columnIndex].width = columnData.width;
-                this.columnsPinnedLeft = [...this.columnsPinnedLeft];
+                this.columnsPinnedLeft[columnData.columnIndex] = { ...this.columnsPinnedLeft[columnData.columnIndex] };
+                //this.columnsPinnedLeft = [...this.columnsPinnedLeft];
             } else {
                 this.columnsInternal[columnData.columnIndex].width = columnData.width;
-                this.columnsInternal = [...this.columnsInternal];
+                this.columnsInternal[columnData.columnIndex] = { ...this.columnsInternal[columnData.columnIndex] };
+                //this.columnsInternal = [...this.columnsInternal];
             }
         }
         // If this is a reorder columns event
@@ -1107,7 +1108,15 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		remapProps.filters = remapProps.filters && remapProps.filters.length ? this.dgSvc.mapPropertiesUp(remapProps.filters, this.options.controlsMap) : [];
 
 		this.onStateChange.emit(remapProps);
-	}
+    }
+
+    /**
+     * When a row was edited
+     * @param $event
+     */
+    public rowUpdated(event) {
+        this.onRowUpdated.emit(event);
+    }
 
     /**
      * Pass selected rows up to the parent component after cleaning up any DT2 properties
@@ -1155,7 +1164,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		this.onCustomLinkEvent.emit(data);
 	}
 
-    
     /**
      * Reset all datatable controls, filters sorts groups etc
      */
@@ -1196,13 +1204,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		}
     }
 
-    /**
-     * When a row was edited
-     * @param $event
-     */
-    public rowUpdated($event) {
-        this.onRowUpdated.emit(event);
-    }
+    
     
 	ngOnDestroy() {
 		// Unsub from all subscriptions

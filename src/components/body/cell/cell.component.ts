@@ -18,23 +18,22 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit {
     @Input() options: Datagrid.Options;
 
     @Input() @ContentChild('', { read: TemplateRef }) templatesCell: TemplateRef<any>;
-    //@Input() @ContentChildren('cell') templatesCell: QueryList<ElementRef>;
-
+    
     @Output() updateDatatable: EventEmitter<any> = new EventEmitter();
     @Output() onRowUpdated: EventEmitter<any> = new EventEmitter();
 
+    /** The popover used for inline editing */
+    @ViewChild('p') p;
+    /** The popover textarea for inline editing */
     @ViewChild('editBox') editBox;
-    @ViewChild('p') p; 
-    /** Is the content truncated, IE is the content inside the cell wider than the parent container */
-	public truncated$: BehaviorSubject<boolean> = new BehaviorSubject(false);
-
-	private loaded: boolean = false;
+    /** Reference to content inside the cell */
+    @ViewChild('cellData') cellData :ElementRef;
+    
+	/** Is the content truncated, IE is the content inside the cell wider than the parent container */
+    public truncated = false;
 
     constructor(
 	) { 
-		this.updateDatatable = new EventEmitter();
-		this.truncated$ = new BehaviorSubject(false);
-		this.loaded  = false;
 	}
 
     ngOnInit() {
@@ -42,26 +41,21 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit {
     }
 
     ngOnChanges() {
-         
-		//console.log(this.row, this.column);
-		//if (this.loaded) {
-		//	this.checkIfTruncated();
-		//}
+        this.checkTruncated();
 	}
 
     ngAfterViewInit() {
-        /**
-         * /
-         
-        setTimeout(() => {
-            if (this.templatesCell) {
-                //console.log('Cell Template', this.column.prop, this.templatesCell, this.test);
-            }
-        }, 200)
-		//this.checkIfTruncated();
-		//this.loaded = true;
-        */
-	}
+        this.checkTruncated();
+    }
+
+    /**
+     * Check if the content is truncated
+     */
+    private checkTruncated() {
+        if (this.cellData && this.cellData.nativeElement && this.cellData.nativeElement.getBoundingClientRect().width > this.column.width) {
+            this.truncated = true;
+        }
+    }
 
     /**
      * Open the edit note tooltip and set the focus
@@ -97,17 +91,6 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit {
         event.stopPropagation();
     }
 
-    /**
-     * Check if the content is truncated 
-    
-	public checkIfTruncated() {
-		if (this.options.columnsTruncate && this.cell3.nativeElement.offsetWidth > this.cell2.nativeElement.offsetWidth) {
-			this.truncated$.next(true);
-		} else {
-			this.truncated$.next(false);
-		}
-	}
-	 */
     /**
     * Perform an action on the main datatable that was requested by lower component
     * @param action

@@ -92,12 +92,13 @@ $border-color: #ccc;
                 .datagrid-cell{position:absolute;min-height: 24px;}
                 .datagrid-cell-data{line-height:24px;position:relative;z-index: 3;padding: 0px 5px;display: inline-block;white-space: nowrap;text-overflow: ellipsis; min-height: 24px;overflow: hidden;
                     //transform: translate(51%, 50%) scale(2);zoom: .5;// This prevents blurry text in chrome
+                .datagrid-cell-data-content{position:absolute;}
                 &.pinned{box-shadow: 2px 5px 5px rgba(0, 0, 0, 0.3);background-color:#fff;z-index: 4;}
                     .cell{height:22px;padding: 3px 8px;}
                     .cell-tooltip{position:absolute;left:0;right:0;top:0;bottom:0;}
-                    .truncated{position:absolute;right:0;bottom:0;background-image:url('/assets/img/datatable-truncated.png');width:5px;height:5px;}
                 }
             }
+            .datagrid-truncated{width:5px;height:5px;background:red;transform:rotate(45deg);position:absolute;top:-2px;right:-2px;overflow:hidden;}
             // Groups
             .datagrid-group-header{
                 .datagrid-group-header-cell{padding:0;z-index: 4;left:0;}
