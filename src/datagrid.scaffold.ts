@@ -1,4 +1,29 @@
 // Need to update this file
+const options = {
+    scrollbarH: true,
+    noWrap: true,
+    selectionType: 'multi',
+    rowHeight: 20,
+    heightMax: 840,
+    controlsDropdown: true,
+    showInfo: true,
+    trackRow: (index, row) => row.LNKey,
+    primaryKey: 'LNKey',
+    rowStyle: [
+        {
+            model: this.api.get('/assets/mock/rowstyles.json'),
+            rules: (row, model) => {
+                //console.log('rowStyle', row, model);
+                let styles = {};
+                if (model.rowColors.lookup && model.rowColors.lookup[row.LNKey] && model.rowColors.lookup[row.LNKey].tagDefId && model.tagDefs.lookup && model.tagDefs.lookup[model.rowColors.lookup[row.LNKey].tagDefId]) {
+                    styles['background-color'] = model.tagDefs.lookup[model.rowColors.lookup[row.LNKey].tagDefId].tagColor;
+                    styles['color'] = model.tagDefs.lookup[model.rowColors.lookup[row.LNKey].tagDefId].fontColor;
+                }
+                return styles;
+            }
+        }
+    ],
+}
 
 /*
 // Sample Options call

@@ -1,8 +1,9 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
+import { Subscription } from 'rxjs/Subscription';
+
+import { Actions } from '../../../datagrid.props';
 import { DataGridService } from '../../../datagrid.service';
 import { Datagrid } from '../../../typings';
-import { Subscription } from 'rxjs';
-import { Actions } from '../../../datagrid.props';
 
 @Component({
 	selector: 'datagrid-controls',
@@ -18,8 +19,6 @@ export class ControlsComponent implements OnInit, OnDestroy{
     @Input() filterTerms: any;
     @Input() columnIndex: number;
     
-
-
 	@Output() onStateUpdated: EventEmitter<any> = new EventEmitter();
 	@Output() onCustomLinkEvent: EventEmitter<any> = new EventEmitter();
 
@@ -28,9 +27,6 @@ export class ControlsComponent implements OnInit, OnDestroy{
 	constructor(
 		private dgSvc: DataGridService,
 	) { 
-		this.onStateUpdated =  new EventEmitter();
-		this.onCustomLinkEvent = new EventEmitter();
-		this.subs = [];
 	}
 
 	

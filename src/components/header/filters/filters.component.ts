@@ -1,9 +1,11 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
+import { Subscription } from 'rxjs/Subscription';
+
 import { DataGridService } from '../../../datagrid.service';
 import { Datagrid } from '../../../typings';
-import { Subscription } from 'rxjs';
+
 
 
 @Component({
@@ -33,10 +35,6 @@ export class FiltersComponent implements OnInit, OnDestroy{
 	constructor(
 		private dgSvc: DataGridService,
 	) { 
-		this.filterTerms = {};
-		this.onFiltersUpdated = new EventEmitter();
-		this.filterTerm = new BehaviorSubject(null);
-		this.subs = [];
 	}
 
 	

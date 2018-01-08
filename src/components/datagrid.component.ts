@@ -1,17 +1,16 @@
 import {Component, OnInit, OnDestroy, OnChanges, Input, Output, ViewChild, ChangeDetectionStrategy, EventEmitter, ChangeDetectorRef, ViewEncapsulation,
-    AfterViewInit, AfterViewChecked, ElementRef, ContentChildren, ContentChild, QueryList, forwardRef, TemplateRef
+    AfterViewInit, AfterViewChecked, ElementRef, ContentChildren, QueryList
 } from '@angular/core';
-import 'rxjs/add/observable/fromEvent';
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
-//import { Templates } from '../directives/column.directive';
 import { DataGridService } from '../datagrid.service';
+import { DataTableColumnDirective } from '../directives/column.directive';
 import { Actions } from '../datagrid.props';
 import { Datagrid } from '../typings';
 
 import * as _ from 'lodash';
-import { DataTableColumnDirective } from '@mello-labs/datagrid';
+
 
 
 /**

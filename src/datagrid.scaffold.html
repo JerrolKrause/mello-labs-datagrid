@@ -1,0 +1,21 @@
+<datagrid #datagrid
+          [rows]="rows$ | async"
+          [columns]="columns$ | async"
+          [state]="state"
+          [options]="options"
+          (onStateChange)="onStateChange($event)"
+          (onRowsSelected)="onRowsSelected($event)"
+          (onRowUpdated)="onRowUpdated($event)">
+
+    <!-- Prop corresponds to the column prop -->
+    <datagrid-column prop="LNKey">
+        <!-- Custom header templates -->
+        <ng-template let-value="value" let-column="column" let-row="row" datagrid-header-template>
+            {{column.name}}
+        </ng-template>
+        <!-- Custom cell templates -->
+        <ng-template let-value="value" let-column="column" let-row="row" datagrid-cell-template>
+            <strong>{{value}}</strong> - {{column.prop}}
+        </ng-template>
+    </datagrid-column>
+</datagrid>

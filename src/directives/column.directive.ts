@@ -1,36 +1,23 @@
 import { Directive, TemplateRef, ContentChild, Input } from '@angular/core';
-import { DataTableColumnHeaderDirective } from './cell-header.directive';
-import { DataTableColumnCellDirective } from './cell-body.directive';
-//import { TableColumnProp } from '../../types';
+import { DataGridColumnHeaderDirective } from './cell-header.directive';
+import { DataGridColumnCellDirective } from './cell-body.directive';
+
 
 @Directive({ selector: 'datagrid-column' })
 export class DataTableColumnDirective {
 
     @Input() name: string;
     @Input() prop: string;
-    @Input() frozenLeft: any;
-    @Input() frozenRight: any;
-    @Input() flexGrow: number;
-    @Input() resizeable: boolean;
-    @Input() comparator: any;
-    @Input() pipe: any;
-    @Input() sortable: boolean;
-    @Input() draggable: boolean;
-    @Input() canAutoResize: boolean;
-    @Input() minWidth: number;
-    @Input() width: number;
-    @Input() maxWidth: number;
-    @Input() checkboxable: boolean;
-    @Input() headerCheckboxable: boolean;
-    @Input() headerClass: string | ((data: any) => string | any);
-    @Input() cellClass: string | ((data: any) => string | any);
+    //Add custom props here for overrides in the cell templates
 
+    // Cell Templates
     @Input()
-    @ContentChild(DataTableColumnCellDirective, { read: TemplateRef })
+    @ContentChild(DataGridColumnCellDirective, { read: TemplateRef })
     templateCell: TemplateRef<any>;
 
+    // Header Templates
     @Input()
-    @ContentChild(DataTableColumnHeaderDirective, { read: TemplateRef })
+    @ContentChild(DataGridColumnHeaderDirective, { read: TemplateRef })
     templateHeader: TemplateRef<any>;
     
 }

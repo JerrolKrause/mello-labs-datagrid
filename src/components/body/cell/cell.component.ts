@@ -1,9 +1,5 @@
-import { Component, OnInit, ChangeDetectionStrategy, Input, ViewContainerRef, ViewChild, Output, EventEmitter, ElementRef, AfterViewInit, OnChanges, ContentChild, TemplateRef, forwardRef, QueryList, ContentChildren } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, Input, ViewChild, Output, EventEmitter, ElementRef, AfterViewInit, OnChanges } from '@angular/core';
 import { Datagrid } from '../../../typings';
-import { BehaviorSubject } from 'rxjs';
-//import { Templates } from '@mello-labs/datagrid/directives/column.directive';
-
-
 
 @Component({
     selector: 'datagrid-cell',

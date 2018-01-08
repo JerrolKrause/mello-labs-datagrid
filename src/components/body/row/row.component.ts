@@ -17,14 +17,11 @@ export class RowComponent implements OnInit, OnChanges  {
 
 	constructor(public elementRef: ElementRef
     ) {
-        this.updateDatatable = new EventEmitter(); 
     }
 
 	ngOnInit() {}
 
-	ngOnChanges(model) {
-		//console.log('RowComponent', model)
-	}
+	ngOnChanges() {}
 
 	/**
     * Return a unique ID to ngfor to improve performance

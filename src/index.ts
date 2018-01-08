@@ -21,8 +21,8 @@ import { InfoComponent } from './components/info/info.component';
 
 // Directives
 import { DataTableColumnDirective } from './directives/column.directive';
-import { DataTableColumnCellDirective  } from './directives/cell-body.directive';
-import { DataTableColumnHeaderDirective } from './directives/cell-header.directive';
+import { DataGridColumnCellDirective  } from './directives/cell-body.directive';
+import { DataGridColumnHeaderDirective } from './directives/cell-header.directive';
 
 // Services
 import { DataGridService } from './datagrid.service';
@@ -34,7 +34,6 @@ import { ResizableModule } from '../../angular-resizable-element';
 
 export * from './typings';
 export * from './datagrid.service';
-export { DataTableColumnDirective } from './directives/column.directive';
 
 @NgModule({
   imports: [
@@ -44,12 +43,12 @@ export { DataTableColumnDirective } from './directives/column.directive';
       DataGridComponent, RowComponent, GroupHeaderComponent, HeaderComponent, ControlsComponent, FiltersComponent, BodyComponent, CellComponent, 
       InfoComponent, HeaderRowComponent,
 
-      DataTableColumnDirective, DataTableColumnCellDirective, DataTableColumnHeaderDirective
+      DataTableColumnDirective, DataGridColumnCellDirective, DataGridColumnHeaderDirective
   ],
   providers:[DataGridService],
   exports: [
       DataGridComponent,
-      DataTableColumnDirective, DataTableColumnCellDirective, DataTableColumnHeaderDirective
+      DataTableColumnDirective, DataGridColumnCellDirective, DataGridColumnHeaderDirective
   ]
 })
 export class DatagridModule {
