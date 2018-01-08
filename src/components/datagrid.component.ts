@@ -585,11 +585,15 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 
         // Get height of grid
 		if (this.options.heightMax) {
-			gridProps.heightTotal = <number>this.options.heightMax
-		} else if (this.options.heightFullscreen) {
-			let height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-			let offset = this.datagrid.nativeElement.getBoundingClientRect().top;
-			let newHeight = height - offset - 18 - 24;// Add offsets for table header and bottom scrollbar
+		    gridProps.heightTotal = <number>this.options.heightMax;
+		} else if (this.options.fullScreen) {
+			let height = this.datagrid.nativeElement.getBoundingClientRect().height;
+            let newHeight = height - 18 - this.rowHeight;// Add offsets for table header and bottom scrollbar
+            // Check if the info bar is showing, deduct from total height
+            if (this.options.showInfo && (this.state.sorts.length || this.state.groups.length || this.state.filters.length)) {
+                newHeight -= this.rowHeight;
+            }
+
 			gridProps.heightTotal = newHeight;
 		}
         

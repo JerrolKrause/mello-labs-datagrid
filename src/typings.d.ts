@@ -103,8 +103,8 @@ declare namespace Datagrid {
         stickyHeader?: boolean,
         /** Max datatable height */
         heightMax?: number | string
-        /** Automatically generate the max height */
-        heightFullscreen?: boolean;
+        /** Have the datagrid fill the available space by the parent container. Parent container needs a position:relative style */
+	    fullScreen?: boolean;
         /** If using heightFullscreen, subtract this many pixels from the height to account for DOM content above the datatable. This will keep the DT on page */
         //heightFullscreenOffset?: number;
         /** Applys the nowrap attribute to the table which forces all entires to a single line */
