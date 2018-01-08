@@ -22,7 +22,7 @@ $border-color: #ccc;
 
     #drag-select{width:20px;height:20px;background:red;position:fixed;opacity:0.3;z-index:1000;}
     .datagrid-container{margin:0;background-color:#fff;overflow: hidden;min-height: 200px;
-        .datagrid-header-container{height:23px;position:relative;z-index:4;background-image: linear-gradient(to top, #dadada 0%, #f1f1f1 100%);}
+        .datagrid-header-container{height:24px;position:relative;z-index:4;background-image: linear-gradient(to top, #dadada 0%, #f1f1f1 100%);}
         .datagrid-header{
             .datagrid-header-row{background-color: #f1f1f1;display: flex;flex-flow: row;backface-visibility: hidden;}
             .datagrid-header-pinned{left:0;z-index:7!important;background-color: #f1f1f1;display: flex;flex-flow: row;}
@@ -74,11 +74,12 @@ $border-color: #ccc;
             &.widthFixed{overflow-x: hidden;}
         }
 
-        .datagrid-info-row{background-color: #ededed;overflow:initial;line-height: 23px;padding-left: 0.5rem;background-color: #ededed;box-shadow: 5px 1px 5px rgba(0, 0, 0, 0.3);overflow:initial; }
+        .datagrid-info-row{background-color: #ededed;overflow:initial;line-height: 23px;padding-left: 0.5rem;border-bottom: 1px solid $border-color;background-color: #ededed;box-shadow: 5px 1px 5px rgba(0, 0, 0, 0.3);overflow:initial; }
 
         .datagrid-body{
-            .datagrid-body-row{display: flex;flex-flow: row;backface-visibility: hidden;position:absolute;border-bottom: 1px solid #b3b3b3;}// Filter blur fixes bottom border lines
+            .datagrid-body-row{display: flex;flex-flow: row;backface-visibility: hidden;position:absolute;border-bottom: 1px solid #b3b3b3;height:24px;}// Filter blur fixes bottom border lines
             .datagrid-body-pinned{left:0;background-color:#fff;z-index: 4;display:inline-block;border-right: 1px solid #ccc;}
+            .datagrid-body-main{min-height: 23.5px;}
             .datagrid-row{position:relative;display: flex;flex-flow: row;min-height: 23px;
                 &.selected-state .datagrid-cell{background:#F0DADA;}
                 .datagrid-cell{position:absolute;min-height: 23px;}
@@ -92,7 +93,7 @@ $border-color: #ccc;
             }
             .datagrid-truncated{width:5px;height:5px;background:red;transform:rotate(45deg);position:absolute;top:-2px;right:-2px;overflow:hidden;}
             // Groups
-            .datagrid-group-header{
+            .datagrid-group-header{min-height: 24px;
                 .datagrid-group-header-cell{padding:0;z-index: 4;left:0;}
                 a{background-image: linear-gradient(to top, #fcfeff 0%, #cbdce6 100%);padding: .15rem;padding-left: .5rem;display:block;border-bottom: 1px solid #c2d1da;
                     & > span{left:16px;}

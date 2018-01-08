@@ -519,7 +519,7 @@ export class DataGridService {
      * Determine the horizontal position of grid cells
      */
     public columnCalculations(columns: Datagrid.Column[], offset:number = 0) {
-        //console.log('columnCalculations', columns, offset);
+        // console.log('columnCalculations', columns, offset);
         let leftOffset = offset;
 		return columns.map((column, index) => {
 			// If no width, set default to 150
@@ -545,8 +545,9 @@ export class DataGridService {
      * @param columns
      * @param gridProps
      */
-	public columnsResize(columns: Datagrid.Column[], gridProps: Datagrid.Props) {
-		let widthTotal = gridProps.widthTotal// - 7;
+    public columnsResize(columns: Datagrid.Column[], gridProps: Datagrid.Props) {
+        console.log('Resizing columns');
+        let widthTotal = gridProps.widthTotal;
 		return columns.map(column => {
 			column.width = Math.ceil(column.width * gridProps.widthBody / widthTotal) + 1;
 			return column;

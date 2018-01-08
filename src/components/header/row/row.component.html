@@ -9,7 +9,7 @@ dnd-sortable-handle
          *ngFor="let column of columns; let columnIndex = index; trackBy:trackColumn"
          [ngClass]="{'reorderable': column.canReorder }"
          [ngStyle]="{'width' : column.width + 'px', 'left' : column.$$leftOffset + 'px' }"
-         mwlResizable [enableGhostResize]="true" [resizeEdges]="{right: column.canResize || false}" (resizeEnd)="onResizeEnd($event, columnIndex, columnType)"
+         mwlResizable [enableGhostResize]="true" [resizeEdges]="{right: column.canResize || false}" (resizeEnd)="onResizeEnd($event, column.$$index, columnType)"
          dnd-sortable [sortableIndex]="columnIndex" [dragEnabled]="column.canReorder && !column.pinnedLeft" (onDragSuccess)="onReorderSuccess($event, columnType)">
         <span class="datagrid-header-cell-label" dnd-sortable-handle>
             {{column.label}}

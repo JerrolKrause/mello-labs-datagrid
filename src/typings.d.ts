@@ -227,7 +227,8 @@ declare namespace Datagrid {
         filters?: Filter[]
         /** Holds the X position of this cell, used to determine absolute position for left offsets */
 		$$leftOffset?: number;
-
+        /** Holds the index of the column in the master columns array */
+        $$index?:number;
         //TEMP
         isDefault?: any;
         locked?: any;

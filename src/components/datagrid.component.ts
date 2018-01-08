@@ -14,11 +14,10 @@ import * as _ from 'lodash';
 
 /**
 TODOS:
+- Allow configurable options for resize: Min column width, max column width
+- Move row height calculations from the SCSS file into inline so custom row heights will be supported
 - Only generate filter terms on demand
 - Better handling/performance of initial load. Should also have null value for rows to avoid FOUC of 'no rows found'
-- Only refresh datatable when changing tags or row colors if grouped/sorted/filtered by tags or row colors
-- Add observable throttling for mouse move events
-- Getter/setters for input props that return immutable references
 - Datatable is not properly cleaning up after itself when emitting data up to parent. Need to remove props added by DT, either directly or by mapping. Look in dgSvc map props up
 - Update scaffolding
 - Add css classes where appropriate for more control over styling
@@ -38,7 +37,7 @@ TODOS:
         //'(document:mousedown )': 'handleMouseDown($event)',
         //'(document:mouseup)': 'handleMouseUp($event)',
 		//'(document:mousemove)': 'handleMouseMove($event)',
-		'(window:resize)': 'onResizeEvent($event)'
+        '(window:resize)': 'onWindowResizeThrottled($event)'
 	}
 })
 export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy  {
@@ -196,11 +195,12 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
             // If columnMap object is supplied, remap column props to what the datatable needs
 			let columns = this.options.columnMap ? this.dgSvc.mapPropertiesDown([...this.columns], this.options.columnMap) : [...this.columns];
 
-            // If custom cell templates were supplied, attach them to their appropriate column
-            if (Object.keys(this.columnTemplates).length) {
-                // Loop through columns
-                columns.forEach((column: Datagrid.Column) => {
-                    // Check if the column prop matches the template prop
+            // Loop through columns on intake
+            for (let i = 0; i < columns.length; i++) {
+                columns[i].$$index = i; // Set index
+                // If custom cell templates were supplied, attach them to their appropriate column
+                if (Object.keys(this.columnTemplates).length) {
+                    let column = columns[i];
                     if (this.columnTemplates[column.prop]) {
                         // Cell Templates
                         if (this.columnTemplates[column.prop].templateCell) {
@@ -211,16 +211,15 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
                             column.templateHeader = this.columnTemplates[column.prop].templateHeader;
                         }
                     }
-                });
+                }
             }
-            
-			// Get pinned columns
+
 			let columnsPinnedLeft = columns.filter(column => column.pinnedLeft ? true : false);
-            this.columnsPinnedLeft = this.dgSvc.columnCalculations(columnsPinnedLeft);
+            this.columnsPinnedLeft = columns.length ? this.dgSvc.columnCalculations(columnsPinnedLeft) : [];
 
             // Get un-pinned columns
 			let columnsInternal = columns.filter(column => !column.pinnedLeft ? true : false);
-            this.columnsInternal = this.dgSvc.columnCalculations(columnsInternal);
+            this.columnsInternal = columns.length ? this.dgSvc.columnCalculations(columnsInternal) : [];
 
             // If show info is set, create a column map
             if (this.options.showInfo) {
@@ -265,6 +264,11 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     */
     public onScrollThrottled = _.throttle(event => this.onScroll(event), 10, { trailing: true, leading: true });
 
+    /**
+    * Throttle the window resize event
+    */
+    public onWindowResizeThrottled = _.throttle(event => this.onWindowResize(event), 300, { trailing: true, leading: true });
+
     /*
      * Throttle keyboard events. Not really necessary since repeated key events are ignored but will allow for more events down the road
      */
@@ -299,8 +303,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		// console.warn('createView');
 		// console.time('Creating View');
         // Set manual change detection
-		this.ref.detach();
-		
+        this.ref.detach();
+
 		let newRows = [...this.rows]; 
 		//console.log('Total Rows', newRows.length)
         // If global filter option is set filter 
@@ -353,10 +357,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
         } else {
 			this.gridProps.widthFixed = false;
         }
-
-        this.columnsPinnedLeft = this.dgSvc.columnCalculations(this.columnsPinnedLeft);
-        this.columnsInternal = this.dgSvc.columnCalculations(this.columnsInternal);
         
+        this.columnsPinnedLeft = this.columnsPinnedLeft.length ? this.dgSvc.columnCalculations(this.columnsPinnedLeft) : [];
+        this.columnsInternal = this.columnsInternal.length ? this.dgSvc.columnCalculations(this.columnsInternal) : [];
+
         // Update internal modified rows
 		this.rowsInternal = newRows;
 
@@ -516,30 +520,31 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
      * @param columns
      */
     public columnsUpdated(columnData: { action: 'resize' | 'reorder', columnIndex: number, type: 'pinnedLeft' | 'main', width: number, columns: Datagrid.Column[] }) {
-        //console.log('columnsUpdated', columnData);
+        // console.log('columnsUpdated', columnData);
         // If this is a resize column event
         if (columnData.action == 'resize') {
             // Determine if updating pinned or regular columns
             if (columnData.type == 'pinnedLeft') {
                 this.columnsPinnedLeft[columnData.columnIndex].width = columnData.width;
                 this.columnsPinnedLeft[columnData.columnIndex] = { ...this.columnsPinnedLeft[columnData.columnIndex] };
-                this.columnsPinnedLeft = [...this.columnsPinnedLeft];
+                //this.columnsPinnedLeft = [...this.columnsPinnedLeft];
             } else {
                 this.columnsInternal[columnData.columnIndex].width = columnData.width;
                 this.columnsInternal[columnData.columnIndex] = { ...this.columnsInternal[columnData.columnIndex] };
-                this.columnsInternal = [...this.columnsInternal];
+                //this.columnsInternal = [...this.columnsInternal];
             }
-            this.columnsExternal = [...this.columnsExternal];
         }
         // If this is a reorder columns event
         else if (columnData.action == 'reorder') {
             if (columnData.type == 'pinnedLeft') {
                 this.columnsPinnedLeft = [...columnData.columns];
+                this.columnsPinnedLeft.forEach((column, i) => column.$$index = i);
             } else {
                 this.columnsInternal = [...columnData.columns];
+                this.columnsInternal.forEach((column, i) => column.$$index = i);
             }
         }
-		
+        
         this.viewCreate();
 	}
 
@@ -570,7 +575,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		if (this.options.heightMax) {
 		    gridProps.heightTotal = <number>this.options.heightMax;
 		} else if (this.options.fullScreen) {
-			let height = this.datagrid.nativeElement.getBoundingClientRect().height;
+            let height = this.datagrid.nativeElement.getBoundingClientRect().height;
             let newHeight = height - 18 - this.rowHeight;// Add offsets for table header and bottom scrollbar
             // Check if the info bar is showing, deduct from total height
             if (this.options.showInfo && (this.state.sorts.length || this.state.groups.length || this.state.filters.length)) {
@@ -1158,7 +1163,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     }
 
     /**
-     * 
+     * Emit a custom link event response up to the parent component
      * @param data
      */
 	public customLinkEvent(data: { link: Datagrid.ControlsCustomLinksGroup, column: Datagrid.Column }) {
@@ -1188,23 +1193,14 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	/**
 	* On window resize
 	* @param event
-	*/
-	private onResizeEvent(event) {
-		if (this.columnsInternal && this.columnsInternal.length && this.rowsInternal && this.rowsInternal.length){
-            this.ref.detach();
-		    if (this.gridProps.widthTotal < this.gridProps.widthBody) {
-		        this.columnsInternal = this.dgSvc.columnsResize(this.columnsInternal, this.gridProps);
-		    }
-			this.columnsInternal = this.dgSvc.columnCalculations(this.columnsInternal);
-			// Update columns that go to the DOM
-			this.columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
-			// Updated rows to go to the DOM
-			this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
-			this.updateGridProps();
-			this.ref.reattach();
-		}
+	 */
+    private onWindowResize(event) {
+        if (this.columnsInternal && this.columnsInternal.length && this.rowsInternal && this.rowsInternal.length) {
+            console.log('Window Resizing')
+            this.viewCreate();
+        }
     }
-
+   
     
     
 	ngOnDestroy() {
