@@ -1,5 +1,5 @@
 import {Component, OnInit, OnDestroy, OnChanges, Input, Output, ViewChild, ChangeDetectionStrategy, EventEmitter, ChangeDetectorRef, ViewEncapsulation,
-    AfterViewInit, AfterViewChecked, ElementRef, ContentChildren, QueryList
+    AfterViewInit, ElementRef, ContentChildren, QueryList
 } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -12,22 +12,16 @@ import { Datagrid } from '../typings';
 import * as _ from 'lodash';
 
 
-
 /**
 TODOS:
 - Only generate filter terms on demand
-- Refactor DT to support 2 types of grids only: Single line grids with H scroll and full screen grids with word wrap
 - Better handling/performance of initial load. Should also have null value for rows to avoid FOUC of 'no rows found'
-- Ability to transclude templates from parent which would allow the DT to be fully componentized. Need to get rid of the templates subdirectory
 - Only refresh datatable when changing tags or row colors if grouped/sorted/filtered by tags or row colors
-- Implement virtual scroll. This will require moving away from a table structure which makes column width calculation on load required
-- Related to virtual scroll, need to perform width calculations for tables
 - Add observable throttling for mouse move events
 - Getter/setters for input props that return immutable references
 - Datatable is not properly cleaning up after itself when emitting data up to parent. Need to remove props added by DT, either directly or by mapping. Look in dgSvc map props up
 - Update scaffolding
 - Add css classes where appropriate for more control over styling
-- Some calculations are being done with assumptions on css styling (IE Padding)
 - Drag select box works wonky inside modal windows, only seems to work well for fullsize datatables
 */
 
@@ -47,7 +41,7 @@ TODOS:
 		'(window:resize)': 'onResizeEvent($event)'
 	}
 })
-export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, AfterViewChecked, OnDestroy  {
+export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy  {
     /** Self reference */
 	@ViewChild('dataGrid') datagrid: ElementRef;
 	@ViewChild('dataGridBody') datagridBody: ElementRef;
@@ -59,8 +53,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	@Input() state: Datagrid.State;
 
     /** Outputs */
-	@Output() onColumnsUpdated: EventEmitter<any[]> = new EventEmitter();
-	@Output() onRowsSelected: EventEmitter<any[]> = new EventEmitter();
+	@Output() onColumnsUpdated: EventEmitter<any> = new EventEmitter();
+	@Output() onRowsSelected: EventEmitter<any> = new EventEmitter();
 	@Output() onStateChange: EventEmitter<any> = new EventEmitter();
 	@Output() onRightClickMenu: EventEmitter<any> = new EventEmitter();
 	@Output() action: EventEmitter<any> = new EventEmitter();
@@ -113,7 +107,19 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	public dragging: boolean = false;
     public draggingPos: Datagrid.DragSelect = {};
 
+    /** Holds custom DOM templates passed from parent */
     private _columnTemplates;
+    @ContentChildren(DataTableColumnDirective)
+    set columnTemplates(val: QueryList<DataTableColumnDirective>) {
+        const arr = val.toArray();
+        if (arr.length) {
+            this._columnTemplates = this.dgSvc.columnMapTemplates(arr);
+        }
+    }
+
+    get columnTemplates(): QueryList<DataTableColumnDirective> {
+        return this._columnTemplates;
+    }
 
 	/** Currently pressed key */
 	private keyPressed: string;
@@ -125,7 +131,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
         groupIndex: 0
 	}
     /** The height of the row and cell. Necessary for virtual scroll calculation */
-	private rowHeight: number = 24;
+	private rowHeight: number = 23;
     
     /** Hold subs for future unsub */
     private subscriptions: Subscription[] = [];
@@ -145,31 +151,13 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		private ref: ChangeDetectorRef
 	) {
     }
-
-
-    @ContentChildren(DataTableColumnDirective)
-    set columnTemplates(val: QueryList<DataTableColumnDirective>) {
-        const arr = val.toArray();
-        if (arr.length) {
-            this._columnTemplates = this.dgSvc.columnMapTemplates(arr);
-        }
-    }
-
-    get columnTemplates(): QueryList<DataTableColumnDirective> {
-        return this._columnTemplates;
-    }
     
-
     ngAfterViewInit() {
-        
         // Update grid props body width, for some reason it is not available if called in datagrid on initial load OR if within a function call
         this.gridProps.widthBody = Math.floor(this.datagrid.nativeElement.getBoundingClientRect().width);
     }
 
-    ngAfterViewChecked() {}
-   
-    ngOnInit() {
-    }
+    ngOnInit() {}
 
 	ngOnChanges(model) {
 		//console.warn('ngOnChanges', model);
@@ -535,12 +523,13 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
             if (columnData.type == 'pinnedLeft') {
                 this.columnsPinnedLeft[columnData.columnIndex].width = columnData.width;
                 this.columnsPinnedLeft[columnData.columnIndex] = { ...this.columnsPinnedLeft[columnData.columnIndex] };
-                //this.columnsPinnedLeft = [...this.columnsPinnedLeft];
+                this.columnsPinnedLeft = [...this.columnsPinnedLeft];
             } else {
                 this.columnsInternal[columnData.columnIndex].width = columnData.width;
                 this.columnsInternal[columnData.columnIndex] = { ...this.columnsInternal[columnData.columnIndex] };
-                //this.columnsInternal = [...this.columnsInternal];
+                this.columnsInternal = [...this.columnsInternal];
             }
+            this.columnsExternal = [...this.columnsExternal];
         }
         // If this is a reorder columns event
         else if (columnData.action == 'reorder') {

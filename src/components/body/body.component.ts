@@ -9,9 +9,9 @@ import { Datagrid } from '../../typings';
 })
 export class BodyComponent implements OnInit, OnChanges{
 
-	@Input() columnsInternal: Datagrid.Column[];
+    @Input() columns: Datagrid.Column[];
     @Input() columnsPinnedLeft: Datagrid.Column[];
-    @Input() rowsInternal: any[];
+    @Input() rows: any[];
     @Input() rowStyles;
 	@Input() state: Datagrid.State;
 	@Input() status: Datagrid.Status;

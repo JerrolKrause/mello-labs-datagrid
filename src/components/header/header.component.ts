@@ -9,7 +9,7 @@ import { Datagrid } from '../../typings';
 })
 export class HeaderComponent implements OnInit, OnChanges{
 
-	@Input() columnsInternal: Datagrid.Column[];
+    @Input() columns: Datagrid.Column[];
 	@Input() columnsPinnedLeft: Datagrid.Column[];
 	@Input() state: Datagrid.State;
 	@Input() status: Datagrid.Status;
@@ -72,22 +72,23 @@ export class HeaderComponent implements OnInit, OnChanges{
      */
 	public trackColumn(index: number, item: Datagrid.Column) {
 		return item.prop;
-	}
+    }
+
 	/**
 	* On a successfull drag reorder of the column headers
 	*/
 	public onReorderSuccess() {
 		// If columns are being dragged before a pinned column, set that column to pinned
 		let isPinned = false;
-		for (let i = this.columnsInternal.length - 1; i >= 0; i--) {
-			let column = this.columnsInternal[i];
+        for (let i = this.columns.length - 1; i >= 0; i--) {
+            let column = this.columns[i];
 			if (column.pinnedLeft) {
 				isPinned = true;
 			}
 			column.locked = isPinned;
 			column.pinnedLeft = isPinned;
 		}
-		this.onColumnsUpdated.emit(this.columnsInternal);
+        this.onColumnsUpdated.emit(this.columns);
 	}
 
 }

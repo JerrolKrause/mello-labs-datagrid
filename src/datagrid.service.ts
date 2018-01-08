@@ -53,7 +53,7 @@ export class DataGridService {
 	public mapPropertiesUp(array: any[], mapObj: any): any[] {
 	    // TODO: Cleaning up old properties isn't working for some reason, it deletes the wrong property even though the key is correct
 
-        console.warn('mapProperties', array, mapObj);
+        // console.warn('mapProperties', array, mapObj);
 	    
 		return JSON.parse(JSON.stringify(array)).map(element => {
 			//console.warn(element);

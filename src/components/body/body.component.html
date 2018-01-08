@@ -7,11 +7,10 @@
     (mouseover)="rowHoveredLast = rowIndex"
     [ngStyle]="rowStyles[row[options.primaryKey]]"
     -->
-    <ng-container *ngFor="let row of rowsInternal; let rowIndex = index; trackBy:options.trackRow;">
+    <ng-container *ngFor="let row of rows; let rowIndex = index; trackBy:options.trackRow;">
 
         <div class="datagrid-body-row" *ngIf="!row.$$hidden"
              [style.top]="row.$$rowPosition + 'px'"
-             [ngStyle]="rowStyles[row[options.primaryKey]]"
              [ngClass]="{'selected': row.$$selected }">
 
             <!-- Group header. Treated as a row -->
@@ -27,7 +26,8 @@
 
                 <!-- Pinned columns -->
                 <div class="datagrid-body-pinned sticky-left" *ngIf="columnsPinnedLeft?.length"
-                     [ngStyle]="{'width' : gridProps.widthPinned + 'px' }"
+                     [style.width]="gridProps.widthPinned + 'px'"
+                     [ngStyle]="rowStyles[row[options.primaryKey]]"
                      (click)="onMouseEvent('click', row.$$rowIndex, $event)"
                      (contextmenu)="onMouseEvent('contextmenu', row.$$rowIndex, $event)"
                      (mousedown)="onMouseEvent('mousedown', row.$$rowIndex, $event)"
@@ -42,13 +42,14 @@
 
                 <!-- Non-pinned columns -->
                 <div class="datagrid-body-main" style="display: inline-block"
-                     [ngStyle]="{'width' : gridProps.widthMain + 'px' }"
+                     [style.width]="gridProps.widthMain + 'px'"
+                     [ngStyle]="rowStyles[row[options.primaryKey]]"
                      (click)="onMouseEvent('click', row.$$rowIndex, $event)"
                      (contextmenu)="onMouseEvent('contextmenu', row.$$rowIndex, $event)"
                      (mousedown)="onMouseEvent('mousedown', row.$$rowIndex, $event)"
                      (mouseup)="onMouseEvent('mouseup', row.$$rowIndex, $event)"
                      (mouseenter)="onMouseEvent('mouseenter', row.$$rowIndex, $event)">
-                    <datagrid-body-row [columns]="columnsInternal"
+                    <datagrid-body-row [columns]="columns"
                                        [row]="row"
                                        [options]="options"
                                        (onRowUpdated)="rowUpdated($event, row.$$rowIndex)">

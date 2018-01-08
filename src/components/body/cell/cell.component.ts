@@ -54,13 +54,16 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit {
      * Check if the content is truncated
      */
     private checkTruncated() {
-        if (this.cellData &&
-            this.cellData.nativeElement &&
-            this.cellData.nativeElement.getBoundingClientRect().width > this.column.width) {
-            this.truncated = true;
-        } else {
-            this.truncated = false;
-        }
+        // This is a slightly costly operation since so many cells are present, wrap in setTimeout to release the DOM
+        setTimeout(() => {
+            if (this.cellData &&
+                this.cellData.nativeElement &&
+                this.cellData.nativeElement.getBoundingClientRect().width > this.column.width) {
+                this.truncated = true;
+            } else {
+                this.truncated = false;
+            }
+        },10);
     }
 
     /**

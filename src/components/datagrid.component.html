@@ -12,9 +12,9 @@
 
         <!--TODO: Add readonly div -->
         <!-- Header -->
-        <datagrid-header [columnsInternal]="columnsExternal"
+        <datagrid-header [columns]="columnsExternal"
                          [columnsPinnedLeft]="columnsPinnedLeft"
-                         [state]="state$ | async"
+                         [state]="state"
                          [status]="status"
                          [options]="options"
                          [scrollProps]="scrollProps"
@@ -37,9 +37,9 @@
              [ngStyle]="{'height': gridProps.heightTotal + 'px'}"
              [ngClass]="{ 'widthFixed' : gridProps.widthFixed }"
              (scroll)="onScrollThrottled($event)">
-            <datagrid-body [columnsInternal]="columnsExternal"
+            <datagrid-body [columns]="columnsExternal"
                            [columnsPinnedLeft]="columnsPinnedLeft"
-                           [rowsInternal]="rowsExternal"
+                           [rows]="rowsExternal"
                            [rowStyles]="rowStyles"
                            [state]="state"
                            [status]="status"

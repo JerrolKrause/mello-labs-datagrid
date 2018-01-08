@@ -6,15 +6,23 @@ $border-color: #ccc;
     &.fullscreen{position:absolute;top:0;bottom:0;left:0;right:0;}
     &.scrollH{overflow-x:scroll;}
     &.selectable{user-select: none;
-        .datagrid-body-row.selected{outline: 2px solid red;outline-offset: -2px;background-color: rgba(0,0,0,0.075);}
-        .datagrid-body-row:hover{outline: 2px solid #4c4c4c;outline-offset: -2px;}
+        .datagrid-body-row.selected{background-color: #ececec;
+            .datagrid-body-pinned{background-color: #ececec;}
+             &:before{content:"";display:block;position:absolute;top:-1px;height:2px;z-index:999;left:0;right:0;background: red;}
+             &:after{content:"";display:block;position:absolute;bottom:-2px;height:2px;z-index:999;left:0;right:0;background: red;}
+             & + .datagrid-body-row.selected:before{display:none!important;}
+        }
+        .datagrid-body-row:hover{
+            &:before{content:"";display:block;position:absolute;top:-1px;height:2px;z-index:999;left:0;right:0;background: #000;}
+            &:after{content:"";display:block;position:absolute;bottom:-2px;height:2px;z-index:999;left:0;right:0;background: #000;}
+        }
     }
-
+   
     .sticky-left{position:sticky;left:0;}
 
     #drag-select{width:20px;height:20px;background:red;position:fixed;opacity:0.3;z-index:1000;}
     .datagrid-container{margin:0;background-color:#fff;overflow: hidden;min-height: 200px;
-        .datagrid-header-container{height:24px;position:relative;z-index:4;background-image: linear-gradient(to top, #dadada 0%, #f1f1f1 100%);}
+        .datagrid-header-container{height:23px;position:relative;z-index:4;background-image: linear-gradient(to top, #dadada 0%, #f1f1f1 100%);}
         .datagrid-header{
             .datagrid-header-row{background-color: #f1f1f1;display: flex;flex-flow: row;backface-visibility: hidden;}
             .datagrid-header-pinned{left:0;z-index:7!important;background-color: #f1f1f1;display: flex;flex-flow: row;}
@@ -66,15 +74,15 @@ $border-color: #ccc;
             &.widthFixed{overflow-x: hidden;}
         }
 
-        .datagrid-info-row{background-color: #ededed;overflow:initial;line-height: 24px;padding-left: 0.5rem;background-color: #ededed;box-shadow: 5px 1px 5px rgba(0, 0, 0, 0.3);overflow:initial;z-index: 5;left:15px;top:24px; }
+        .datagrid-info-row{background-color: #ededed;overflow:initial;line-height: 23px;padding-left: 0.5rem;background-color: #ededed;box-shadow: 5px 1px 5px rgba(0, 0, 0, 0.3);overflow:initial; }
 
         .datagrid-body{
             .datagrid-body-row{display: flex;flex-flow: row;backface-visibility: hidden;position:absolute;border-bottom: 1px solid #b3b3b3;}// Filter blur fixes bottom border lines
-            .datagrid-body-pinned{left:0;box-shadow: 2px 5px 5px rgba(0, 0, 0, 0.3);background-color:#fff;z-index: 4;display:inline-block;}
-            .datagrid-row{position:relative;display: flex;flex-flow: row;min-height: 24px;
+            .datagrid-body-pinned{left:0;background-color:#fff;z-index: 4;display:inline-block;border-right: 1px solid #ccc;}
+            .datagrid-row{position:relative;display: flex;flex-flow: row;min-height: 23px;
                 &.selected-state .datagrid-cell{background:#F0DADA;}
-                .datagrid-cell{position:absolute;min-height: 24px;}
-                .datagrid-cell-data{line-height:24px;position:relative;z-index: 3;padding: 0px 5px;display: inline-block;white-space: nowrap;text-overflow: ellipsis; min-height: 24px;overflow: hidden;
+                .datagrid-cell{position:absolute;min-height: 23px;}
+                .datagrid-cell-data{line-height:23px;position:relative;z-index: 3;padding: 0px 5px;display: inline-block;white-space: nowrap;text-overflow: ellipsis; min-height: 23px;overflow: hidden;
                     //transform: translate(51%, 50%) scale(2);zoom: .5;// This prevents blurry text in chrome
                 .datagrid-cell-data-content{position:absolute;}
                 &.pinned{box-shadow: 2px 5px 5px rgba(0, 0, 0, 0.3);background-color:#fff;z-index: 4;}
