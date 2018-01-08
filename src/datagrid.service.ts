@@ -16,12 +16,6 @@ export class DataGridService {
     
 	constructor(
 	) {
-		this.cache = {
-			sortArray: _.memoize(this.sortArray, () => this.uniqueId),
-			groupRows: _.memoize(this.groupRows, () => this.uniqueId),
-			filterArray: _.memoize(this.filterArray, () => this.uniqueId)
-		}
-
 	}
 
     /**
@@ -35,15 +29,17 @@ export class DataGridService {
 		
 		array.forEach(element => {
 			for (let key in mapObj) {
-                // If the default property needed by the DT is NOT found in the object
-                // This avoids issues where the correct property is actually being passed in even though it is mapped
-				if (!element[key]) {
-					// If mapping data, any column references will be camel case instead of title case. Remap to camel case
-					//console.warn('mapProperties', key)
-					element[key] = element[mapObj[key]];
-					//delete element[mapObj[key]];
-				}
-			}
+		        if (mapObj.hasOwnProperty(key)) {
+		            // If the default property needed by the DT is NOT found in the object
+		            // This avoids issues where the correct property is actually being passed in even though it is mapped
+		            if (!element[key]) {
+		                // If mapping data, any column references will be camel case instead of title case. Remap to camel case
+		                //console.warn('mapProperties', key)
+		                element[key] = element[mapObj[key]];
+		                //delete element[mapObj[key]];
+		            }
+		        }
+		    }
 		});
 		//console.warn(JSON.parse(JSON.stringify(array)));
 		return array;
@@ -55,25 +51,27 @@ export class DataGridService {
      * @param mapObj
      */
 	public mapPropertiesUp(array: any[], mapObj: any): any[] {
-		//let newArray = JSON.parse(JSON.stringify(array));
+	    // TODO: Cleaning up old properties isn't working for some reason, it deletes the wrong property even though the key is correct
 
-		//console.warn('mapProperties', newArray, mapObj);
-
+        console.warn('mapProperties', array, mapObj);
+	    
 		return JSON.parse(JSON.stringify(array)).map(element => {
 			//console.warn(element);
 			for (let key in mapObj) {
-				// If the default property needed by the DT is NOT found in the object
-				// This avoids issues where the correct property is actually being passed in even though it is mapped
-				//if (!element[mapObj[key]]) {
-					//console.warn('Current State: Key:', key, '- element[key]', element[key], '- mapObj[key]:', mapObj[key]);
-					element[mapObj[key]] = element[key];
-					//console.warn(element);
-				//}
-				//console.warn('mapProperties', JSON.parse(JSON.stringify(element)));
-				//delete element[key];  // TODO: Cleaning up old properties isn't working for some reason, it deletes the wrong property even though the key is correct
-                // Possible related to mapping a property down
-			}
-			return element;
+		        if (mapObj.hasOwnProperty(key)) {
+		            // If the default property needed by the DT is NOT found in the object
+		            // This avoids issues where the correct property is actually being passed in even though it is mapped
+		            //if (!element[mapObj[key]]) {
+		            //console.warn('Current State: Key:', key, '- element[key]', element[key], '- mapObj[key]:', mapObj[key]);
+		            element[mapObj[key]] = element[key];
+		            //console.warn(element);
+		            //}
+		            //console.warn('mapProperties', JSON.parse(JSON.stringify(element)));
+		            //delete element[key];  
+		            // Possible related to mapping a property down
+		        }
+		    }
+		    return element;
 		});
     }
 
@@ -82,7 +80,7 @@ export class DataGridService {
      * @param columns
      */
     public mapColumns(columns: Datagrid.Column[]) {
-        let columnMap = {};
+        const columnMap = {};
         columns.forEach(column => columnMap[column.prop] = column);
         return columnMap;
 	}
@@ -318,14 +316,14 @@ export class DataGridService {
 	}
 
     /**
-     * 
+     * Group rows by property. Grouping is essentially a multilevel sort
      * @param rows
      * @param columns
      * @param prop
      * @param sorts
      */
     public groupRows(rows: any[], columns: Datagrid.Column[], groups: Datagrid.Sorts[], sorts: Datagrid.Sorts[]): { rows: any[], groups: Datagrid.Groupings } {
-        console.log('groupRows', groups, sorts);
+        // console.log('groupRows', groups, sorts);
 		let newGroups = {};
 		let group = groups[0];
 		

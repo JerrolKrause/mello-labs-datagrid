@@ -205,29 +205,27 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 
         if (model.columns && this.columns) {
 
-            console.log('Column Templates', this.columnTemplates);
-            
             // If columnMap object is supplied, remap column props to what the datatable needs
 			let columns = this.options.columnMap ? this.dgSvc.mapPropertiesDown([...this.columns], this.options.columnMap) : [...this.columns];
 
-            // If custom cell templates were supplied
+            // If custom cell templates were supplied, attach them to their appropriate column
             if (Object.keys(this.columnTemplates).length) {
                 // Loop through columns
                 columns.forEach((column: Datagrid.Column) => {
                     // Check if the column prop matches the template prop
                     if (this.columnTemplates[column.prop]) {
+                        // Cell Templates
                         if (this.columnTemplates[column.prop].templateCell) {
                             column.templateCell = this.columnTemplates[column.prop].templateCell;
                         }
+                        // Header Templates
                         if (this.columnTemplates[column.prop].templateCell) {
                             column.templateHeader = this.columnTemplates[column.prop].templateHeader;
                         }
-                        console.log(column);
                     }
                 });
             }
             
-
 			// Get pinned columns
 			let columnsPinnedLeft = columns.filter(column => column.pinnedLeft ? true : false);
             this.columnsPinnedLeft = this.dgSvc.columnCalculations(columnsPinnedLeft);
@@ -311,7 +309,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
     public viewCreate(state: Datagrid.State = this.state) {
         // TODO Memoization causing problems with group and sorting
 		// console.warn('createView');
-		 console.time('Creating View');
+		// console.time('Creating View');
         // Set manual change detection
 		this.ref.detach();
 		
@@ -356,7 +354,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
       
         newRows = this.dgSvc.rowPositions(newRows, this.rowHeight);
         
-        // HACK: Grid props needed to build visible rows and columns but visible rows and columns needed to update grid props
+        // TODO: Grid props needed to build visible rows and columns but visible rows and columns needed to update grid props
 		this.updateGridProps();
 
         // If the total width of the columns is less than the viewport, resize columns to fit
@@ -371,7 +369,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
         this.columnsPinnedLeft = this.dgSvc.columnCalculations(this.columnsPinnedLeft);
         this.columnsInternal = this.dgSvc.columnCalculations(this.columnsInternal);
         
-
         // Update internal modified rows
 		this.rowsInternal = newRows;
 
@@ -379,12 +376,9 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
         // Updated rows to go to the DOM
 		this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
 
-        // HACK: Grid props needed to build visible rows and columns but visible rows and columns needed to update grid props
+        // TODO: Grid props needed to build visible rows and columns but visible rows and columns needed to update grid props
 		this.updateGridProps();
-
-		//console.log('this.columnsExternal', this.columnsInternal, this.columnsExternal);
-		//console.log('this.gridProps', this.gridProps);
-
+        
         // Update DOM
 		//this.rowsInternal = newRows;
 
@@ -397,7 +391,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		
         // Turn change detection back on
 		this.ref.reattach();
-		console.timeEnd('Creating View');
+		// console.timeEnd('Creating View');
     }
 
     /**
@@ -1107,11 +1101,11 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
     /**
      * Emit changed columns up to the parent component
      */
-	public emitColumns(columns: Datagrid.Column[]) {
-		let remapColumns = this.dgSvc.mapPropertiesUp([...columns], this.options.columnMap);
+    public emitColumns(columns: Datagrid.Column[]) {
+        // TODO: Mapping properties back up isn't seamless and needs work, commenting out for now
+		// let remapColumns = this.dgSvc.mapPropertiesUp([...columns], this.options.columnMap);
         // Remap data back up
-		//console.warn('emitColumns', remapColumns);
-		this.onColumnsUpdated.emit(remapColumns);
+        this.onColumnsUpdated.emit(columns);
 	}
 
     /**
