@@ -338,18 +338,22 @@ export class DataGridService {
             if (!newProp || newProp == '') {
 				newProp = 'No Value';
 			}
+            // Get current column
+            let column = columns.filter(columnNew => columnNew.prop == group.prop);
 
 			if (!newGroups[newProp]) {
 				newGroups[newProp] = <Datagrid.Group>{
-					rows: [],
+                    rows: [],
+                    column: column && column[0] ? column[0] : null,
 					columnProp: group.prop,
 					columnLabel: null,
                     label: row[group.prop] || 'No Value',
 					visible: true,
                     type: 'group'
                 }
-                let label = columns.filter(column => column.prop == group.prop);
-                newGroups[newProp].columnLabel = label && label[0] ? label[0].label : 'No Value';
+                
+                //let label = columns.filter(column => column.prop == group.prop);
+                newGroups[newProp].columnLabel = column && column[0] ? column[0].label : 'No Value';
 			}
             
             newGroups[newProp].rows.push(row);

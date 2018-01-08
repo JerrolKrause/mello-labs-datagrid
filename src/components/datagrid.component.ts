@@ -115,7 +115,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
             this._columnTemplates = this.dgSvc.columnMapTemplates(arr);
         }
     }
-
     get columnTemplates(): QueryList<DataTableColumnDirective> {
         return this._columnTemplates;
     }
@@ -129,7 +128,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		rowIndex: 0,
         groupIndex: 0
 	}
-    /** The height of the row and cell. Necessary for virtual scroll calculation */
+    /** The height of the row. Necessary for virtual scroll calculation. Needs to be an odd number to prevent partial pixel problems. Has 1px border added*/
 	private rowHeight: number = 23;
     
     /** Hold subs for future unsub */
@@ -150,14 +149,9 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		private ref: ChangeDetectorRef
 	) {
     }
+
+    ngOnInit() { }
     
-    ngAfterViewInit() {
-        // Update grid props body width, for some reason it is not available if called in datagrid on initial load OR if within a function call
-        this.gridProps.widthBody = Math.floor(this.datagrid.nativeElement.getBoundingClientRect().width);
-    }
-
-    ngOnInit() {}
-
 	ngOnChanges(model) {
 		//console.warn('ngOnChanges', model);
 	    
@@ -258,11 +252,16 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		}
 
 	}
-    
+
+    ngAfterViewInit() {
+        // Update grid props body width, for some reason it is not available if called in datagrid on initial load OR if within a function call
+        this.gridProps.widthBody = Math.floor(this.datagrid.nativeElement.getBoundingClientRect().width);
+    }
+
     /**
     * Throttle the scroll event
     */
-    public onScrollThrottled = _.throttle(event => this.onScroll(event), 10, { trailing: true, leading: true });
+    public onScrollThrottled = _.throttle(event => this.onScroll(event), 50, { trailing: true, leading: true });
 
     /**
     * Throttle the window resize event
@@ -279,7 +278,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	* @param event
 	*/
 	private onScroll(event) {
-		//console.log('onScroll')
+	    // console.log('onScroll');
         // Manual change detection
 		this.ref.detach();
 		let scrollProps = {

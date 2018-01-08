@@ -31,7 +31,8 @@ export class GroupHeaderComponent implements OnInit, OnChanges, OnDestroy{
         this.createGroupLabel();
 	}
 
-	ngOnInit() {}
+	ngOnInit() {
+	}
 
     /**
      * Toggle group visibility
