@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter, OnDestroy, OnChanges, ChangeDetectorRef} from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter, OnDestroy, OnChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Datagrid } from '../../../typings';
 
@@ -16,19 +16,18 @@ export class GroupHeaderComponent implements OnInit, OnChanges, OnDestroy{
 
     @Output() onGroupToggled: EventEmitter<any> = new EventEmitter();
 
-	public groupLabel: string = '';
+    public groupLabel: string = '';
+    public active: boolean = true;
 
 	private sub: Subscription;
 
     constructor(
-        private ref: ChangeDetectorRef
 	) { 
 	}
 
 	ngOnChanges() {
         // Everytime new data is passed down, recreate the label
         this.createGroupLabel();
-       // console.log('Group')
 	}
 
 	ngOnInit() {}
@@ -49,14 +48,10 @@ export class GroupHeaderComponent implements OnInit, OnChanges, OnDestroy{
 				row.$$hidden = false;
 			}
         });
-        //console.log(this.group.visible);
-        this.group.visible = false;
-        //console.log(this.group.visible);
-       
 
-        //this.group = { ...this.group, visible: !group.visible };
-        
-        this.ref.markForCheck();
+        this.group.visible = !this.group.visible;
+        this.active = !this.active;
+       
         this.onGroupToggled.emit(this.group);
 	    
 	}

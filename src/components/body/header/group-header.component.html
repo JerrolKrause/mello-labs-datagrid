@@ -1,6 +1,6 @@
 <div class="datagrid-group-header">
     <div class="datagrid-group-header-cell" [ngStyle]="{'width' : width + 'px' }">
-        <a (click)="toggleGroup(group, $event)" [ngClass]="{'active': group.visible }">
+        <a (click)="toggleGroup(group, $event)" [ngClass]="{'active': active }">
             <span class="sticky-left">
                 <strong> {{groupLabel}}</strong> <small><em>({{group.rows.length}})</em></small>
             </span>
