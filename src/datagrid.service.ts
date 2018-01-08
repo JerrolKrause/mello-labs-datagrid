@@ -553,7 +553,35 @@ export class DataGridService {
 			column.width = Math.ceil(column.width * gridProps.widthBody / widthTotal) + 1;
 			return column;
 		});
-	}
+    }
+
+    /**
+     * Map custom templates to a usable object for references
+     * @param arr
+     */
+    public columnMapTemplates(arr:any[]) {
+        //const result: any[] = [];
+        const result = {};
+
+        for (const temp of arr) {
+            const col: any = {};
+
+            const props = Object.getOwnPropertyNames(temp);
+            for (const prop of props) {
+                col[prop] = temp[prop];
+            }
+
+            if (temp.headerTemplate) {
+                col.templateHeader = temp.templateHeader;
+            }
+
+            if (temp.cellTemplate) {
+                col.templateCell = temp.templateCell;
+            }
+            result[col.prop] = col;
+        }
+        return result;
+    }
 
     /**
      * Calculate row properties such as visibility, y position and index

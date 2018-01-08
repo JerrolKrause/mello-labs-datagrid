@@ -20,8 +20,9 @@ import { InfoComponent } from './components/info/info.component';
 
 
 // Directives
-import { Templates } from './directives/column.directive';
-
+import { DataTableColumnDirective } from './directives/column.directive';
+import { DataTableColumnCellDirective  } from './directives/cell-body.directive';
+import { DataTableColumnHeaderDirective } from './directives/cell-header.directive';
 
 // Services
 import { DataGridService } from './datagrid.service';
@@ -33,7 +34,8 @@ import { ResizableModule } from '../../angular-resizable-element';
 
 export * from './typings';
 export * from './datagrid.service';
- 
+export { DataTableColumnDirective } from './directives/column.directive';
+
 @NgModule({
   imports: [
     CommonModule, NgbModule.forRoot(), FormsModule, DndModule.forRoot(), ResizableModule
@@ -42,11 +44,12 @@ export * from './datagrid.service';
       DataGridComponent, RowComponent, GroupHeaderComponent, HeaderComponent, ControlsComponent, FiltersComponent, BodyComponent, CellComponent, 
       InfoComponent, HeaderRowComponent,
 
-      Templates
+      DataTableColumnDirective, DataTableColumnCellDirective, DataTableColumnHeaderDirective
   ],
   providers:[DataGridService],
   exports: [
-   DataGridComponent
+      DataGridComponent,
+      DataTableColumnDirective, DataTableColumnCellDirective, DataTableColumnHeaderDirective
   ]
 })
 export class DatagridModule {

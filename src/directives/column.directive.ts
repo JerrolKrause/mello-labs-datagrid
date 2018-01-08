@@ -1,25 +1,36 @@
-import { Directive, TemplateRef, ContentChild, Input, ContentChildren, ElementRef, QueryList } from '@angular/core';
+import { Directive, TemplateRef, ContentChild, Input } from '@angular/core';
+import { DataTableColumnHeaderDirective } from './cell-header.directive';
+import { DataTableColumnCellDirective } from './cell-body.directive';
+//import { TableColumnProp } from '../../types';
 
+@Directive({ selector: 'datagrid-column' })
+export class DataTableColumnDirective {
 
-@Directive({ selector: '[templates]' })
-export class Templates {
+    @Input() name: string;
+    @Input() prop: string;
+    @Input() frozenLeft: any;
+    @Input() frozenRight: any;
+    @Input() flexGrow: number;
+    @Input() resizeable: boolean;
+    @Input() comparator: any;
+    @Input() pipe: any;
+    @Input() sortable: boolean;
+    @Input() draggable: boolean;
+    @Input() canAutoResize: boolean;
+    @Input() minWidth: number;
+    @Input() width: number;
+    @Input() maxWidth: number;
+    @Input() checkboxable: boolean;
+    @Input() headerCheckboxable: boolean;
+    @Input() headerClass: string | ((data: any) => string | any);
+    @Input() cellClass: string | ((data: any) => string | any);
 
-    
-    //@Input() prop: string;
-
-    //@ContentChildren(ColumnDirective, { descendants: true, read: ElementRef }) template2: QueryList<ColumnDirective>;
-
-    constructor() {
-      
-    }
-
-    /*
     @Input()
     @ContentChild(DataTableColumnCellDirective, { read: TemplateRef })
-    cellTemplate: TemplateRef<any>;
+    templateCell: TemplateRef<any>;
 
     @Input()
     @ContentChild(DataTableColumnHeaderDirective, { read: TemplateRef })
-    headerTemplate: TemplateRef<any>;
-    */
+    templateHeader: TemplateRef<any>;
+    
 }

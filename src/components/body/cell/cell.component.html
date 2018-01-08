@@ -2,16 +2,16 @@
      [ngStyle]="{'width' : column.width + 'px'}"
      title="{{row[column.prop]}}">
    
-    <!--
+    <!---->
     <ng-template #cellTemplate
-                 *ngIf="column.templatesCell"
-                 [ngTemplateOutlet]="test"
+                 *ngIf="column.templateCell"
+                 [ngTemplateOutlet]="column.templateCell"
                  [ngTemplateOutletContext]="cellContext">
     </ng-template>
-    -->
+    
 
     <div class="datagrid-cell-data-content" #cellData
-         *ngIf="!templatesCell"
+         *ngIf="!column.templateCell"
          [ngSwitch]="column.columnType"
          [ngbPopover]="fieldContent" #p="ngbPopover" triggers="manual" container="body" placement="top-left" (dblclick)="fieldEdit($event);">
         <!-- Date Time-->

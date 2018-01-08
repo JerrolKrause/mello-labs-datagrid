@@ -5,12 +5,13 @@ import 'rxjs/add/observable/fromEvent';
 import { Observable } from 'rxjs';
 import { Subscription } from 'rxjs/Subscription';
 
-import { Templates } from '../directives/column.directive';
+//import { Templates } from '../directives/column.directive';
 import { DataGridService } from '../datagrid.service';
 import { Actions } from '../datagrid.props';
 import { Datagrid } from '../typings';
 
 import * as _ from 'lodash';
+import { DataTableColumnDirective } from '@mello-labs/datagrid';
 
 
 /**
@@ -111,8 +112,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 	public tableHeight: string;
     /** Is the user dragging with the mouse */
 	public dragging: boolean = false;
-	public draggingPos: Datagrid.DragSelect = {};
-    
+    public draggingPos: Datagrid.DragSelect = {};
+
+    private _columnTemplates;
+
 	/** Currently pressed key */
 	private keyPressed: string;
     /** A dictionary of currently pressed keys */
@@ -142,42 +145,32 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 		private dgSvc: DataGridService,
 		private ref: ChangeDetectorRef
 	) {
-	}
+    }
 
 
+    @ContentChildren(DataTableColumnDirective)
+    set columnTemplates(val: QueryList<DataTableColumnDirective>) {
+        const arr = val.toArray();
+        if (arr.length) {
+            this._columnTemplates = this.dgSvc.columnMapTemplates(arr);
+        }
+    }
 
-    //@ContentChildren('templates') template2: QueryList<ElementRef>;
-
-    //@ContentChildren('[templates]', { descendants: true, read: ElementRef }) templates: QueryList<ElementRef>; // <--- Note This change 
-
+    get columnTemplates(): QueryList<DataTableColumnDirective> {
+        return this._columnTemplates;
+    }
+    
 
     ngAfterViewInit() {
-
-        //console.log(this.templates.toArray());
-        /**
-         * 
-       
-        let templatesCell = {};
-        this.template2.forEach(template => {
-            //console.log(template.nativeElement);
-            templatesCell[template.nativeElement.attributes.prop.value] = template;
-        });
-
-        //this.columns.forEach();
-        //console.log(templatesCell);
-        this.templatesCell = templatesCell;
-          */
         
         // Update grid props body width, for some reason it is not available if called in datagrid on initial load OR if within a function call
         this.gridProps.widthBody = Math.floor(this.datagrid.nativeElement.getBoundingClientRect().width);
-
     }
 
-    ngAfterViewChecked() { }
+    ngAfterViewChecked() {}
    
     ngOnInit() {
-        
-	}
+    }
 
 	ngOnChanges(model) {
 		//console.warn('ngOnChanges', model);
@@ -211,10 +204,30 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, Afte
 
 		}
 
-		if (model.columns && this.columns) {
+        if (model.columns && this.columns) {
+
+            console.log('Column Templates', this.columnTemplates);
             
             // If columnMap object is supplied, remap column props to what the datatable needs
 			let columns = this.options.columnMap ? this.dgSvc.mapPropertiesDown([...this.columns], this.options.columnMap) : [...this.columns];
+
+            // If custom cell templates were supplied
+            if (Object.keys(this.columnTemplates).length) {
+                // Loop through columns
+                columns.forEach((column: Datagrid.Column) => {
+                    // Check if the column prop matches the template prop
+                    if (this.columnTemplates[column.prop]) {
+                        if (this.columnTemplates[column.prop].templateCell) {
+                            column.templateCell = this.columnTemplates[column.prop].templateCell;
+                        }
+                        if (this.columnTemplates[column.prop].templateCell) {
+                            column.templateHeader = this.columnTemplates[column.prop].templateHeader;
+                        }
+                        console.log(column);
+                    }
+                });
+            }
+            
 
 			// Get pinned columns
 			let columnsPinnedLeft = columns.filter(column => column.pinnedLeft ? true : false);

@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, Input, ViewContainerRef, ViewChild, Output, EventEmitter, ElementRef, AfterViewInit, OnChanges, ContentChild, TemplateRef, forwardRef, QueryList, ContentChildren } from '@angular/core';
 import { Datagrid } from '../../../typings';
 import { BehaviorSubject } from 'rxjs';
-import { Templates } from '@mello-labs/datagrid/directives/column.directive';
+//import { Templates } from '@mello-labs/datagrid/directives/column.directive';
 
 
 
@@ -17,8 +17,6 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit {
 	@Input() row: any;
     @Input() options: Datagrid.Options;
 
-    @Input() @ContentChild('', { read: TemplateRef }) templatesCell: TemplateRef<any>;
-    
     @Output() updateDatatable: EventEmitter<any> = new EventEmitter();
     @Output() onRowUpdated: EventEmitter<any> = new EventEmitter();
 
@@ -28,7 +26,13 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit {
     @ViewChild('editBox') editBox;
     /** Reference to content inside the cell */
     @ViewChild('cellData') cellData :ElementRef;
-    
+    /** Use to pass internal data such as columns and rows to the templates projected from the parent component */
+    public cellContext: {
+        column?: Datagrid.Column,
+        row?: any,
+        options?: Datagrid.Options,
+        value?: any
+    } = {};
 	/** Is the content truncated, IE is the content inside the cell wider than the parent container */
     public truncated = false;
 
@@ -36,13 +40,15 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit {
 	) { 
 	}
 
-    ngOnInit() {
-        
-    }
+    ngOnInit() {}
 
     ngOnChanges() {
         this.checkTruncated();
-	}
+        this.cellContext.column = this.column;
+        this.cellContext.row = this.row;
+        this.cellContext.options = this.options;
+        this.cellContext.value = this.row[this.column.prop];
+    }
 
     ngAfterViewInit() {
         this.checkTruncated();

@@ -17,7 +17,6 @@ export class BodyComponent implements OnInit, OnChanges{
 	@Input() status: Datagrid.Status;
 	@Input() options: Datagrid.Options;
     @Input() gridProps: Datagrid.Props;
-    @Input() templatesCell;
     
 
 	@Output() onColumnsUpdated: EventEmitter<any> = new EventEmitter();

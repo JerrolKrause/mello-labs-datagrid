@@ -201,19 +201,20 @@ declare namespace Datagrid {
         mapDataLabel?: string;
         /** Used in conjunction with mapData, specifies which object property to change the model to on edit operations */
         mapDataProp?: string;
-
         /** Use this pipe to manipulate the display of data */
         pipe?: string;
-
-        
         /**  Used for edit operations. If column.prop doesn't map to directly to the api service, pass this instead of column.prop. Emitted up as update.action */
         editProp?: string;
         /**  CSS classes for the table cell */
         cellClass?: string;
+
         /**  Use this custom html template for the table cell, corresponds to the switch statement in cell-templates */
         templateCell?: any;
+        /**  Use this custom html template for the table cell, corresponds to the switch statement in cell-templates */
+        templateHeader?: any;
         /**  Use this custom html template for the droprow, corresponds to the switch statement in cell-templates */
         templateDropRow?: string;
+
         /**  Fix the column to the LEFT side of the screen */
         pinnedLeft?: boolean;
         /**  Fix the column to the RIGHT side of the screen */
