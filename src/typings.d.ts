@@ -244,7 +244,8 @@ declare namespace Datagrid {
 	}
 
     export interface Group {
-		rows?: any[];
+        rows?: any[];
+        column?: Datagrid.Column;
 		columnProp?: string;
 		columnLabel?: string;
 		label?: string;

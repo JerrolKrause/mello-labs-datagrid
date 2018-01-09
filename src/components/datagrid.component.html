@@ -1,9 +1,7 @@
 <div id="datagrid" class="datagrid" #dataGrid
      [ngClass]="{
-    'noWrap' : options.noWrap,
     'selectable' : options.selectionType,
     'truncatable' : options.columnsTruncate,
-    'virtualScroll' : options.virtualScroll,
     'fullscreen' : options.fullScreen }">
 
     <div *ngIf="!appReady" class="container-fluid pt-3" style="font-size:1rem;"><i class="fa fa-spinner fa-spin"></i> Loading View...</div>
