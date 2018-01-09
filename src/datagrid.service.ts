@@ -539,7 +539,7 @@ export class DataGridService {
 			}
 			// Ensure all column widths are divisible by 4, fixes a blurry text bug in chrome
 		    column.width = Math.floor(column.width / 4) * 4;
-
+		    column.$$index = index;
 		    column.$$leftOffset = leftOffset;
 			leftOffset += column.width;
 			return column;

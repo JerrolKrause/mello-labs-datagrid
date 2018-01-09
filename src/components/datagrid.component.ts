@@ -183,7 +183,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
             //console.warn('Updating Rows', this.rows);
 
 		}
-
+        // If columns are passed
         if (model.columns && this.columns) {
 
             // If columnMap object is supplied, remap column props to what the datatable needs
@@ -234,7 +234,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
             }
             
             this.filterTerms = this.dgSvc.getDefaultTermsList(this.rows, this.columns); // Generate a list of default filter terms
-            this.createRowStyles();// Create row styles
+            this.createRowStyles(); // Create row styles
             this.createRowClasses(); // Row classes
 
 			this.state.info = {
@@ -261,7 +261,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     /**
     * Throttle the scroll event
     */
-    public onScrollThrottled = _.throttle(event => this.onScroll(event), 50, { trailing: true, leading: true });
+    public onScrollThrottled = _.throttle(event => this.onScroll(event), 20, { trailing: true, leading: true });
 
     /**
     * Throttle the window resize event
@@ -498,10 +498,9 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 			} else {
                 //console.warn('Pinning to left', stateChange.data);
                 // Get pinned column
-			    let newCol = this.columnsInternal.filter(col => col.prop == stateChange.data.prop)[0];
+                let newCol = this.columnsInternal.filter(col => col.prop == stateChange.data.prop)[0];
 			    newCol.pinnedLeft = true;
                 this.columnsPinnedLeft = [...this.columnsPinnedLeft, newCol];
-
                 //Update non pinned columns
                 this.columnsInternal = this.columnsInternal.filter(col => col.prop != stateChange.data.prop);
 			}
@@ -570,7 +569,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
             gridProps.widthPinned = this.columnsPinnedLeft
 				.map(b => b.width)
 				.reduce((p, c) => p + c);
-		}
+        }
+	    
         // Get width of internal columns
 		if (this.columnsInternal.length) {
 			gridProps.widthMain = this.columnsInternal

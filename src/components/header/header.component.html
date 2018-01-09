@@ -17,7 +17,7 @@
                 </datagrid-header-row>
             </div>
             
-            <div class="datagrid-header-main" [ngStyle]="{ 'left' : -scrollProps.scrollLeft + 'px' }">
+            <div class="datagrid-header-main" [ngStyle]="{ 'left' : (-scrollProps.scrollLeft + gridProps.widthPinned) + 'px' }">
                 <datagrid-header-row [columns]="columns"
                                      [columnType]="'main'"
                                      [state]="state"
