@@ -1,19 +1,18 @@
-<!-- Header Cell 
-mwlResizable [enableGhostResize]="true" [resizeEdges]="{right: column.canResize || false}" (resizeEnd)="onResizeEnd($event, column, columnIndex, 'columns')"
-dnd-sortable [sortableIndex]="columnIndex" [dragEnabled]="column.canReorder && !column.pinnedLeft" (onDragSuccess)="onReorderSuccess($event)"
-dnd-sortable-handle
-[ngStyle]="{'width' : column.width + 'px', 'transform' : 'translate3d(' + column.$$leftOffset + 'px, 0px, 0px)' }"
--->
 <div dnd-sortable-container [sortableData]="columns">
+
     <div class="datagrid-header-cell" title="{{column.label}}"
          *ngFor="let column of columns; let columnIndex = index; trackBy:trackColumn"
          [ngClass]="{'reorderable': column.canReorder }"
          [ngStyle]="{'width' : column.width + 'px', 'left' : column.$$leftOffset + 'px' }"
          mwlResizable [enableGhostResize]="true" [resizeEdges]="{right: column.canResize || false}" (resizeEnd)="onResizeEnd($event, column.$$index, columnType)"
-         dnd-sortable [sortableIndex]="columnIndex" [dragEnabled]="column.canReorder && !column.pinnedLeft" (onDragSuccess)="onReorderSuccess($event, columnType)">
+         dnd-sortable [sortableIndex]="columnIndex" [dragEnabled]="column.canReorder && !column.pinnedLeft"
+         (onDragSuccess)="onReorderSuccess(data, columnType)">
+
+        <!-- Column Label -->
         <span class="datagrid-header-cell-label" dnd-sortable-handle>
             {{column.label}}
         </span>
+
         <!-- Controls Dropdown -->
         <datagrid-controls *ngIf="options.controlsDropdown"
                            [options]="options"
@@ -23,6 +22,7 @@ dnd-sortable-handle
                            [filterTerms]="filterTerms"
                            (onStateUpdated)="stateUpdated($event)">
         </datagrid-controls>
+
         <!-- Resize Handle -->
         <a class="resize-handle" mwlResizeHandle [resizeEdges]="{right: true}" *ngIf="column.canResize" (mousedown)="reSizing = true"></a>
 

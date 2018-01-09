@@ -23,31 +23,17 @@ export class HeaderComponent implements OnInit, OnChanges{
 	@Output() onCustomLinkEvent: EventEmitter<any> = new EventEmitter();
 
 	/** During a resize, disable some stuff */
-	public reSizing: boolean = false;
+	//public reSizing: boolean = false;
 
-    /*
-	@Input() column: Datagrid.Column;
-	@Input() options: Datagrid.Options;
-	@Input() state: Datagrid.State;
-	@Input() status: Datagrid.Status;
-	@Input() columnIndex: number;
-	@Input() filterTerms: any;
-	@Input() columnsCount:number;
-    
-	@Output() onStateUpdated: EventEmitter<any> = new EventEmitter();
-	@Output() onCustomLinkEvent: EventEmitter<any> = new EventEmitter();
-    */
-	public columnWidth: string = '';
+	//public columnWidth: string = '';
     
 	constructor(
     ) { 
     }
 
-	ngOnInit() {
-	}
+	ngOnInit() {}
 
-	ngOnChanges() {
-	}
+	ngOnChanges() {}
 
     /**
      * Pass state changes up from controls component
@@ -67,7 +53,7 @@ export class HeaderComponent implements OnInit, OnChanges{
 
 	/**
 	* On a successfull drag reorder of the column headers
-	*/
+	
 	public onReorderSuccess() {
 		// If columns are being dragged before a pinned column, set that column to pinned
 		let isPinned = false;
@@ -81,5 +67,5 @@ export class HeaderComponent implements OnInit, OnChanges{
 		}
         this.onColumnsUpdated.emit(this.columns);
 	}
-
+    */
 }

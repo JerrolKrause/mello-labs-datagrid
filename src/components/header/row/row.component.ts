@@ -16,7 +16,8 @@ export class HeaderRowComponent implements OnInit, OnChanges{
 	@Input() scrollProps: Datagrid.ScrollProps;
     @Input() filterTerms: any;
     @Input() columnType: 'pinnedLeft' | 'main';
-    
+
+    private columnsOriginal;
 	
 	@Output() onColumnsUpdated: EventEmitter<any> = new EventEmitter();
 	@Output() onStateUpdated: EventEmitter<any> = new EventEmitter();
@@ -31,9 +32,13 @@ export class HeaderRowComponent implements OnInit, OnChanges{
     ) { 
     }
 
-	ngOnInit() {}
+	ngOnInit() {
+	    
+	}
 
-	ngOnChanges() {}
+	ngOnChanges() {
+	    this.columnsOriginal = [...this.columns];
+	}
 
     /**
      * Pass state changes up from controls component
@@ -53,20 +58,47 @@ export class HeaderRowComponent implements OnInit, OnChanges{
     }
 
 	/**
-	* On a successfull drag reorder of the column headers
+	* On a successful drag reorder of the column headers
 	*/
-    public onReorderSuccess(event, type: 'pinnedLeft' | 'main') {
+    public onReorderSuccess(event:any, type: 'pinnedLeft' | 'main') {
+        //console.log('onReorderSuccess', event);
 		// If columns are being dragged before a pinned column, set that column to pinned
-		let isPinned = false;
+        let isPinned = false;
+        let payload = { action: 'reorder', type: type, columnIndex: null, columnIndex2: null };
+
         for (let i = this.columns.length - 1; i >= 0; i--) {
             let column = this.columns[i];
 			if (column.pinnedLeft) {
 				isPinned = true;
 			}
 			column.locked = isPinned;
-			column.pinnedLeft = isPinned;
-		}
-        this.onColumnsUpdated.emit({ action: 'reorder', columns: this.columns, type: type });
+            column.pinnedLeft = isPinned;
+        }
+
+        // Get the first changed index
+        for (let i = 0; i < this.columns.length; i++) {
+            //console.log(i, this.columns[i].prop, this.columnsOriginal[i].prop);
+            if (this.columns[i].prop != this.columnsOriginal[i].prop && payload.columnIndex == null) {
+                payload.columnIndex = this.columnsOriginal[i].$$index;
+                //console.warn('col1', this.columnsOriginal[i].prop, this.columnsOriginal[i].$$index)
+                break;
+            }
+        }
+
+        // Get the last changed item
+        for (let i = this.columns.length - 1; i >= 0; i--) {
+            let column = this.columns[i];
+           
+            if (column.prop != this.columnsOriginal[i].prop && payload.columnIndex2 == null) {
+                payload.columnIndex2 = this.columnsOriginal[i].$$index;
+                //console.warn('col2', this.columnsOriginal[i].prop, this.columnsOriginal[i].$$index);
+                break;
+            }
+        }
+        
+        this.columns = [...this.columnsOriginal];
+        //console.log('Swapped', payload.col1, payload.col2);
+        this.onColumnsUpdated.emit(payload);
 	}
 
     /**

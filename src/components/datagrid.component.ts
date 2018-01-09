@@ -342,7 +342,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
                newRows = this.dgSvc.sortArray(newRows, this.state.sorts[0].prop, this.state.sorts[0].dir);
 			}
 		}
-      
+
+        // Generate row vertical positions
         newRows = this.dgSvc.rowPositions(newRows, this.rowHeight);
         
         // TODO: Grid props needed to build visible rows and columns but visible rows and columns needed to update grid props
@@ -356,13 +357,14 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
         } else {
 			this.gridProps.widthFixed = false;
         }
-        
+
+        // Set updated columns
         this.columnsPinnedLeft = this.columnsPinnedLeft.length ? this.dgSvc.columnCalculations(this.columnsPinnedLeft) : [];
         this.columnsInternal = this.columnsInternal.length ? this.dgSvc.columnCalculations(this.columnsInternal) : [];
 
         // Update internal modified rows
 		this.rowsInternal = newRows;
-
+        // Update columns to go to the DOM
 		this.columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
         // Updated rows to go to the DOM
 		this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
@@ -518,8 +520,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
      * When columns are modified from a lower component
      * @param columns
      */
-    public columnsUpdated(columnData: { action: 'resize' | 'reorder', columnIndex: number, type: 'pinnedLeft' | 'main', width: number, columns: Datagrid.Column[] }) {
-        // console.log('columnsUpdated', columnData);
+    public columnsUpdated(columnData: { action: 'resize' | 'reorder', columnIndex?: number, columnIndex2?: number, type?: 'pinnedLeft' | 'main', width?: number, columns?: Datagrid.Column[] }) {
+        console.log('columnsUpdated', columnData);
         // If this is a resize column event
         if (columnData.action == 'resize') {
             // Determine if updating pinned or regular columns
@@ -536,14 +538,20 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
         // If this is a reorder columns event
         else if (columnData.action == 'reorder') {
             if (columnData.type == 'pinnedLeft') {
-                this.columnsPinnedLeft = [...columnData.columns];
-                this.columnsPinnedLeft.forEach((column, i) => column.$$index = i);
+                // Swap the columns based on the new indexes
+                let colOld = { ...this.columnsPinnedLeft[columnData.columnIndex] };
+                let colNew = { ...this.columnsPinnedLeft[columnData.columnIndex2] };
+                this.columnsPinnedLeft[columnData.columnIndex2] = colOld;
+                this.columnsPinnedLeft[columnData.columnIndex] = colNew;
             } else {
-                this.columnsInternal = [...columnData.columns];
-                this.columnsInternal.forEach((column, i) => column.$$index = i);
+                // Swap the columns based on the new indexes
+                let colOld = { ...this.columnsInternal[columnData.columnIndex] };
+                let colNew = { ...this.columnsInternal[columnData.columnIndex2] };
+                this.columnsInternal[columnData.columnIndex2] = colOld;
+                this.columnsInternal[columnData.columnIndex] = colNew;
             }
         }
-        
+        this.emitColumns(this.columnsInternal);
         this.viewCreate();
 	}
 

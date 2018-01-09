@@ -27,7 +27,7 @@ import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 
 // Import your library
-import { Datagrid } from '@mello-labs/datagrid';
+import { DatagridModule } from '@mello-labs/datagrid';
 
 @NgModule({
   declarations: [
@@ -37,7 +37,7 @@ import { Datagrid } from '@mello-labs/datagrid';
     BrowserModule,
 
     // Specify your library as an import
-    Datagrid
+    DatagridModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]
@@ -49,10 +49,107 @@ Once your library is imported, you can use its components, directives and pipes 
 
 ```xml
 <!-- You can now use your library component in app.component.html -->
-<h1>
-  {{title}}
-</h1>
-<sampleComponent></sampleComponent>
+<datagrid #datagrid
+            [rows]="rows$ | async"
+            [columns]="columns$ | async"
+            [state]="state"
+            [options]="options"
+            (onStateChange)="onStateChange($event)"
+            (onRowsSelected)="onRowsSelected($event)"
+            (onRowUpdated)="onRowUpdated($event)">
+    <!-- Custom templates, prop corresponds to column property -->
+    <datagrid-column prop="LNKey">
+        <!-- Header template -->
+        <ng-template let-value="value" let-column="column" let-row="row" datagrid-header-template>
+            {{column.name}}
+        </ng-template>
+        <!-- Cell template -->
+        <ng-template let-value="value" let-column="column" let-row="row" datagrid-cell-template>
+            <strong>{{value}}</strong> - {{column.prop}}
+        </ng-template>
+    </datagrid-column>
+</datagrid>
+```
+
+```typescript
+// Inputs
+public options: Datagrid.Options = {
+    scrollbarH: true,
+    selectionType: 'multi',
+    fullScreen: true,
+    controlsDropdown: true,
+    showInfo: true,
+    trackRow: (index, row) => row.LNKey,
+    primaryKey: 'LNKey',
+    rowStyle: [
+    {
+            model: this.api.get('/assets/mock/rowstyles.json'),
+            rules: (row, model) => {
+                //console.log('rowStyle', row, model);
+            let styles = {};
+            if (model.rowColors.lookup && model.rowColors.lookup[row.LNKey] && model.rowColors.lookup[row.LNKey].tagDefId && model.tagDefs.lookup && model.tagDefs.lookup[model.rowColors.lookup[row.LNKey].tagDefId]) {
+                styles['background-color'] = model.tagDefs.lookup[model.rowColors.lookup[row.LNKey].tagDefId].tagColor;
+                styles['color'] = model.tagDefs.lookup[model.rowColors.lookup[row.LNKey].tagDefId].fontColor;
+            }
+            return styles;
+        }
+    }
+  ],
+}
+
+public state = { "filters": [], "sorts": [], "groups": [{ "dir": "asc", "prop": "State" }] };
+public rows$: Observable<any[]> = this.api.get('/assets/mock/pipeline-sm.json');
+public columns$: Observable<any[]> = this.api.get('/assets/mock/columns-sm.json');
+
+// Methods
+/**
+ * When the state has been changed (grouping/filtering/sorting/etc)
+ * @param event
+ */
+public onStateChange(event) {
+    console.log('onStateChange', event, JSON.stringify(event));
+}
+
+/**
+ * When rows have been selected
+ * @param event
+ */
+public onRowsSelected(event) {
+    console.log('onRowsSelected', event);
+}
+
+/**
+ * When a row has been edited
+ * @param event
+ */
+public onRowUpdated(event) {
+    console.log('onRowUpdated', event);
+}
+
+/**
+ * When columns have been updated, IE resizing/sorting etc
+ * @param event
+ */
+public onColumnsUpdated(event) {
+    console.log('onColumnsUpdated', event);
+}
+
+/**
+ * On a right click event within the datatable
+ * @param event
+ */
+public onRightClickMenu(event) {
+    console.log('onRightClickMenu', event);
+}
+
+/**
+ * When a custom link was clicked
+ * @param event
+ */
+public onCustomLinkEvent(event) {
+    console.log('onCustomLinkEvent', event);
+}
+
 ```
 
 ## Development
