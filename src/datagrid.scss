@@ -110,4 +110,7 @@ $border-color: #ccc;
         .group{position:relative;top:-1px;}
     }
 
+    .anim-fade-in{opacity:0;animation: fade .3s ease-in;animation-fill-mode:forwards; position:relative;}
+    @keyframes fade  { from { opacity:0;} to { opacity:1;} }
+
 }

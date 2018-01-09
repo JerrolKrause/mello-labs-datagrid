@@ -322,7 +322,7 @@ export class DataGridService {
      * @param prop
      * @param sorts
      */
-    public groupRows(rows: any[], columns: Datagrid.Column[], groups: Datagrid.Sorts[], sorts: Datagrid.Sorts[]): { rows: any[], groups: Datagrid.Groupings } {
+    public groupRows(rows: any[], columns: Datagrid.Column[], groups: Datagrid.Sorts[], sorts: Datagrid.Sorts[], options: Datagrid.Options): { rows: any[], groups: Datagrid.Groupings } {
         // console.log('groupRows', groups, sorts);
 		let newGroups = {};
 		let group = groups[0];
@@ -376,8 +376,10 @@ export class DataGridService {
         grouped.forEach((group: Datagrid.Group, index: number) => {
             if (sorts.length) {
 				this.sortArray(group.rows, sorts[0].prop, sorts[0].dir);
-			}
-			
+            }
+            // Create a primary key used for the trackRows method. Group headers are treated as a row and need to have the same primary key as the rest
+            group[options.primaryKey] = group.label + '-' + group.rows.length;
+
 			let currentLoc = newRows.length;
 			groupsFinal[currentLoc] = group;
 			newRows = [...newRows, group, ...group.rows];

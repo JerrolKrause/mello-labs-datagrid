@@ -325,7 +325,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
             }
 		    // let groupings = this.dgSvc.cache.groupRows(newRows, this.columns, this.state.groups, this.state.sorts);
             // Non memoized
-			let groupings = this.dgSvc.groupRows(newRows, this.columns, this.state.groups, this.state.sorts);
+			let groupings = this.dgSvc.groupRows(newRows, this.columns, this.state.groups, this.state.sorts, this.options);
 			newRows = groupings.rows;
 			this.groups = groupings.groups;
 		} 

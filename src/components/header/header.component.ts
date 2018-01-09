@@ -65,15 +65,6 @@ export class HeaderComponent implements OnInit, OnChanges{
         this.onColumnsUpdated.emit(event);
     }
 
-    /**
-     * Return a unique ID to ngfor to improve performance
-     * @param index - Number in array
-     * @param item - The column
-     */
-	public trackColumn(index: number, item: Datagrid.Column) {
-		return item.prop;
-    }
-
 	/**
 	* On a successfull drag reorder of the column headers
 	*/
