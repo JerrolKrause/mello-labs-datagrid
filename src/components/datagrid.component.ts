@@ -191,7 +191,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 
             // Loop through columns on intake
             for (let i = 0; i < columns.length; i++) {
-                columns[i].$$index = i; // Set index
                 // If custom cell templates were supplied, attach them to their appropriate column
                 if (Object.keys(this.columnTemplates).length) {
                     let column = columns[i];
@@ -298,7 +297,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
      * @param state
      */
     public viewCreate(state: Datagrid.State = this.state) {
-        // TODO Memoization causing problems with group and sorting
+        // TODO Fix issues with memoization with group and sorting
 		// console.warn('createView');
 		// console.time('Creating View');
         // Set manual change detection
@@ -487,7 +486,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		else if (stateChange.action == Actions.pinLeft) {
 			//console.warn('Pinning');
 			if (stateChange.data.isPinned) {
-                //console.warn('Unpinning', stateChange.data);
                 // Get column being unpinned
                 let colNew = this.columnsPinnedLeft[stateChange.data.index];
                 delete colNew.pinnedLeft; // Delete pinned prop
@@ -505,7 +503,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
                 this.columnsInternal = this.columnsInternal.filter(col => col.prop != stateChange.data.prop);
 			}
 
-            this.emitColumns(this.columnsExternal);
+            this.emitColumns(this.columnsInternal);
 		}
 
 		// Now create the view and update the DOM
@@ -563,21 +561,18 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		// Get total grid width
 		gridProps.widthTotal = this.columns
 			.map(b => b.width)
-			.reduce((p, c) => p + c);
-        // Get width of pinned columns
-        if (this.columnsPinnedLeft.length){
-            gridProps.widthPinned = this.columnsPinnedLeft
-				.map(b => b.width)
-				.reduce((p, c) => p + c);
-        }
-	    
-        // Get width of internal columns
-		if (this.columnsInternal.length) {
-			gridProps.widthMain = this.columnsInternal
-				.map(b => b.width)
-				.reduce((p, c) => p + c);
-		}
+            .reduce((p, c) => p + c);
 
+        // Get width of pinned columns
+        gridProps.widthPinned = this.columnsPinnedLeft.length ? this.columnsPinnedLeft
+				.map(b => b.width)
+				.reduce((p, c) => p + c) : 0;
+        
+        // Get width of internal columns
+        gridProps.widthMain = this.columnsInternal.length ? this.columnsInternal
+				.map(b => b.width)
+            .reduce((p, c) => p + c) : 0;
+	
         // Get height of grid
 		if (this.options.heightMax) {
 		    gridProps.heightTotal = <number>this.options.heightMax;
