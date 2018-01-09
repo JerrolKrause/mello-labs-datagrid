@@ -3,6 +3,7 @@ import {Component, OnInit, OnDestroy, OnChanges, Input, Output, ViewChild, Chang
 } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
+import 'rxjs/add/observable/combineLatest';
 
 import { DataGridService } from '../datagrid.service';
 import { DataTableColumnDirective } from '../directives/column.directive';

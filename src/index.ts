@@ -29,7 +29,7 @@ import { DataGridService } from './datagrid.service';
 
 // 3rd party controls  
 import { DndModule } from 'ng2-dnd'; // Drag and drop
-import { ResizableModule } from '../../angular-resizable-element';
+import { ResizableModule } from 'angular-resizable-element';
 
 
 export * from './typings';

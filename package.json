@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "build": "gulp build",
+    "build:lib": "ng-packagr",
     "build:watch": "gulp",
     "docs": "npm run docs:build",
     "docs:build": "compodoc -p tsconfig.json -n mello-labs-datagrid -d docs --hideGenerator",
@@ -31,6 +32,7 @@
   },
 	"devDependencies": {
 		"@angular/forms": "^5.0.5",
+		"ng-packagr": "2.0.0-rc.9",
 		"angular-resizable-element": "1.2.4",
 		"bootstrap": "4.0.0-alpha.6",
 		"ng2-dnd": "4.2.0",

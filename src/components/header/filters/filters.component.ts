@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, Input, Output, E
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
+import 'rxjs/add/operator/debounceTime';
 
 import { DataGridService } from '../../../datagrid.service';
 import { Datagrid } from '../../../typings';
