@@ -36,8 +36,10 @@ export class HeaderRowComponent implements OnInit, OnChanges{
 	    
 	}
 
-	ngOnChanges() {
-	    this.columnsOriginal = [...this.columns];
+    ngOnChanges() {
+        if (this.columns) {
+            this.columnsOriginal = [...this.columns];
+        }
 	}
 
     /**

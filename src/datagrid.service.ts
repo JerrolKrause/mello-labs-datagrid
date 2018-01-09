@@ -93,7 +93,7 @@ export class DataGridService {
 		//console.log('getVisibleRowsoffSetRowsFromTop', rows, this.scrollProps, this.rowHeight, this.gridProps);
 		let rowsNew = [...rows];
 		let buffer = 1;
-		let offSetRowsFromTop = Math.floor(scrollProps.scrollTop / rowHeight);
+		let offSetRowsFromTop = Math.floor(scrollProps.scrollTop / (rowHeight + 1));
 		if (offSetRowsFromTop - buffer > 0) {
 			offSetRowsFromTop -= buffer;
 		}
@@ -616,23 +616,6 @@ export class DataGridService {
           
         });
         
-        /*
-        for (let i = 0; i < rowsNew.length; i++) {
-            rowsNew[i].$$rowIndex = i; // Set rowIndex
-
-            // If hidden prop is not set, set default to false
-            if (typeof rowsNew[i].$$hidden == 'undefined' || makeVisible) {
-                rowsNew[i].$$hidden = false;
-            }
-            // If visible
-            if (rowsNew[i].$$hidden == false) {
-                rowsNew[i].$$rowPosition = y; // Set y position
-                y += rowHeight + 1;
-            }
-            console.log('Row', i, rowsNew[i].$$rowPosition, rowsNew[i]);
-        }
-        return rowsNew;
-        */
     }
    
 }

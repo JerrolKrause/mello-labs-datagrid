@@ -4,9 +4,9 @@
     'truncatable' : options.columnsTruncate,
     'fullscreen' : options.fullScreen }">
 
-    <div *ngIf="!appReady" class="container-fluid pt-3" style="font-size:1rem;"><i class="fa fa-spinner fa-spin"></i> Loading View...</div>
+    <div *ngIf="!appReady || !domReady" class="container-fluid pt-3" style="font-size:1rem;"><i class="fa fa-spinner fa-spin"></i> Loading View...</div>
 
-    <div class="datagrid-container" *ngIf="appReady">
+    <div class="datagrid-container" *ngIf="appReady && domReady">
 
         <!--TODO: Add readonly div -->
         <!-- Header -->

@@ -46,11 +46,50 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	@ViewChild('dataGrid') datagrid: ElementRef;
 	@ViewChild('dataGridBody') datagridBody: ElementRef;
 
-    /** Inputs */
-	@Input() columns: Datagrid.Column[];
-	@Input() options: Datagrid.Options;
-	@Input() rows: any[];
-	@Input() state: Datagrid.State;
+    /** Columns */
+    private _columns: Datagrid.Column[];
+	@Input()
+    set columns(columns: Datagrid.Column[]) {
+	    this._columns = columns;
+	};
+    get columns(): Datagrid.Column[] {
+        return this._columns && this._columns.length ? [...this._columns] : null;
+    }
+
+    /** Rows */
+    private _rows: any[];
+    @Input()
+    set rows(val: any[]) {
+        this._rows = val;
+    };
+    get rows(): any[] {
+        return this._rows && this._rows.length ? [...this._rows] : null;
+    }
+
+    /** State */
+    private _state: Datagrid.State;
+    @Input()
+    set state(state: Datagrid.State) {
+        // If no state passed down, set a default and empty state object
+        let stateNew: Datagrid.State = state ? state : {};
+
+        if (!stateNew.filters) {
+            stateNew.filters = [];
+        }
+        if (!stateNew.sorts) {
+            stateNew.sorts = [];
+        }
+        if (!stateNew.groups) {
+            stateNew.groups = [];
+        }
+        
+        this._state = stateNew;
+    };
+    get state(): Datagrid.State {
+        return this._state;
+    }
+	
+    @Input() options: Datagrid.Options;
 
     /** Outputs */
 	@Output() onColumnsUpdated: EventEmitter<any> = new EventEmitter();
@@ -95,14 +134,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	public rowClasses = {};
     /** A dictionary that holds css STYLES for a given row. The lookup is the primary key specified in the options. Gets its data from options.rowStyle */
 	public rowStyles = {};
-    /** Holds the left offsets used for column pinning */
-	//public leftOffsets: number[] = [];
     /** Does the datatable have the data it needs to draw the dom? */
-	public appReady: boolean = false;
-    /** Height of the containing div that has the overflow scroll */
-	public tableContainerHeight: number = 300;
-    /** Height of the actual table, used for vScroll */
-	public tableHeight: string;
+    public appReady: boolean = false;
+    /** Does the datatable have the data it needs to draw the dom? */
+    public domReady: boolean = false;
     /** Is the user dragging with the mouse */
 	public dragging: boolean = false;
     public draggingPos: Datagrid.DragSelect = {};
@@ -154,46 +189,32 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     ngOnInit() { }
     
 	ngOnChanges(model) {
-		//console.warn('ngOnChanges', model);
+		// console.warn('ngOnChanges', model);
 	    
         // Clear all memoized caches anytime new data is loaded into the grid
 		this.dgSvc.cache.sortArray.cache.clear();
 		this.dgSvc.cache.groupRows.cache.clear();
 
+	    if (this.datagrid && this.datagrid.nativeElement) {
+	        this.gridProps.widthBody = Math.floor(this.datagrid.nativeElement.getBoundingClientRect().width);
+	    }
+
         // If columns or rows are not available, set app ready to false to show loading screen
 		if (!this.columns || !this.rows) {
 			this.appReady = false;
 		}
+        
 
-		// If state is passed
-		if (model.state && this.state) {
-            //console.log(this.state)
-			if (!this.state.filters) {
-				this.state.filters = [];
-			}
-			if (!this.state.sorts) {
-				this.state.sorts = [];
-			}
-			if (!this.state.groups) {
-				this.state.groups = [];
-			}
-		}
-
-        // If rows are passed, store rows
-		if (model.rows && this.rows) {
-            //console.warn('Updating Rows', this.rows);
-
-		}
         // If columns are passed
         if (model.columns && this.columns) {
 
             // If columnMap object is supplied, remap column props to what the datatable needs
-			let columns = this.options.columnMap ? this.dgSvc.mapPropertiesDown([...this.columns], this.options.columnMap) : [...this.columns];
-
+            let columns = this.options.columnMap ? this.dgSvc.mapPropertiesDown(this.columns, this.options.columnMap) : this.columns;
+            
             // Loop through columns on intake
             for (let i = 0; i < columns.length; i++) {
                 // If custom cell templates were supplied, attach them to their appropriate column
-                if (Object.keys(this.columnTemplates).length) {
+                if (this.columnTemplates && Object.keys(this.columnTemplates).length) {
                     let column = columns[i];
                     if (this.columnTemplates[column.prop]) {
                         // Cell Templates
@@ -222,7 +243,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		}
 	    
 		if (this.columns && this.rows) {
-            
 			//console.warn(this.columns, this.rows)
 			if (this.state) {
                 this.state.groups = this.state.groups && this.state.groups.length && this.options.controlsMap ? this.dgSvc.mapPropertiesDown(this.state.groups, this.options.controlsMap) : this.state.groups;
@@ -240,22 +260,28 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 			this.state.info = {
                 initial : true
 			}
-			
-            // Create the view
-			this.viewCreate();
 
-            // Only on initial load, set app ready on with a settimeout. This prevents the app from hanging on a route change
+		    // If app and dom is ready, create the view
+		    if (this.appReady && this.domReady) {
+		        this.viewCreate();
+		    }
+
+            // Only on initial load, set app ready. This prevents the app from hanging on a route change
 		    this.appReady = true;
-			
 			//Emit the state change to the parent component now that the first initial view has been created
 			this.emitState(this.state);
-		}
-
+        }
+        
 	}
 
     ngAfterViewInit() {
         // Update grid props body width, for some reason it is not available if called in datagrid on initial load OR if within a function call
         this.gridProps.widthBody = Math.floor(this.datagrid.nativeElement.getBoundingClientRect().width);
+        this.domReady = true;
+        // If app and dom is ready, create the view
+        if (this.appReady && this.domReady) {
+            this.viewCreate();
+        }
     }
 
     /**
@@ -304,7 +330,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
         // Set manual change detection
         this.ref.detach();
 
-		let newRows = [...this.rows]; 
+		let newRows = this.rows; 
 		//console.log('Total Rows', newRows.length)
         // If global filter option is set filter 
 		if (this.options.filterGlobal && this.options.filterGlobal.term) {
@@ -393,13 +419,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
      */
     public groupToggled(group: Datagrid.Group) {
         //console.log('groupToggled', group);
-        
-        //let rowsNew = this.dgSvc.rowPositions(this.rows, this.rowHeight);
-        //console.log()
-        //this.updateGridProps();
         this.viewCreate();
-       // this.rowsExternal = this.dgSvc.getVisibleRows(rowsNew, this.scrollProps, this.gridProps, this.rowHeight);
-        //this.updateGridProps();
     }
 
     /**
@@ -604,7 +624,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		}
         
 		this.gridProps = { ...this.gridProps, ...gridProps };
-		// console.log(this.gridProps);
+        //console.log({ ...this.gridProps });
 	}
 
     /**

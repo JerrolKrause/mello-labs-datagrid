@@ -1,7 +1,5 @@
 {
 	"name": "@mello-labs/datagrid",
-	"description": "A grid for visualizing and organizing complex data sets",
-	"version": "0.1.10",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/JerrolKrause/mello-labs-datagrid"

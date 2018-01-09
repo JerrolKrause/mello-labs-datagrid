@@ -31,9 +31,8 @@ import { DataGridService } from './datagrid.service';
 import { DndModule } from 'ng2-dnd'; // Drag and drop
 import { ResizableModule } from 'angular-resizable-element';
 
-
+import { Datagrid } from './typings';
 export * from './typings';
-export * from './datagrid.service';
 
 @NgModule({
   imports: [

@@ -72,6 +72,8 @@ Once your library is imported, you can use its components, directives and pipes 
 ```
 
 ```typescript
+import { Datagrid } from '@mello-labs/datagrid';
+
 // Inputs
 public options: Datagrid.Options = {
     scrollbarH: true,
@@ -99,7 +101,7 @@ public options: Datagrid.Options = {
 
 public state = { "filters": [], "sorts": [], "groups": [{ "dir": "asc", "prop": "State" }] };
 public rows$: Observable<any[]> = this.api.get('/assets/mock/pipeline-sm.json');
-public columns$: Observable<any[]> = this.api.get('/assets/mock/columns-sm.json');
+public columns$: Observable<Datagrid.Column[]> = this.api.get('/assets/mock/columns-sm.json');
 
 // Methods
 /**

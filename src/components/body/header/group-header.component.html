@@ -3,21 +3,26 @@
         <a (click)="toggleGroup(group, $event)" [ngClass]="{'active': active }">
             <span class="sticky-left">
                 <strong>
-                    <ng-container [ngSwitch]="group.column.columnType">
-                        <!-- Date Time-->
-                        <ng-container *ngSwitchCase="'dateTime'">
-                            {{groupLabel | date: 'MM/dd/yyyy - h:mm a' }}
+                    <ng-container *ngIf="group?.column?.columnType">
+                        <ng-container [ngSwitch]="group.column.columnType">
+                            <!-- Date Time-->
+                            <ng-container *ngSwitchCase="'dateTime'">
+                                {{groupLabel | date: 'MM/dd/yyyy - h:mm a' }}
+                            </ng-container>
+                            <!-- Date-->
+                            <ng-container *ngSwitchCase="'date'">
+                                {{groupLabel | date: 'MM/dd/yyyy' }}
+                            </ng-container>
+                            <!-- Money -->
+                            <ng-container *ngSwitchCase="'money'">
+                                {{groupLabel | currency:'USD':true:'1.2-2' }}
+                            </ng-container>
+                            <!-- Default -->
+                            <ng-container *ngSwitchDefault>
+                                {{groupLabel}}
+                            </ng-container>
                         </ng-container>
-                        <!-- Date-->
-                        <ng-container *ngSwitchCase="'date'">
-                            {{groupLabel | date: 'MM/dd/yyyy' }}
-                        </ng-container>
-                        <!-- Money -->
-                        <ng-container *ngSwitchCase="'money'">
-                            {{groupLabel | currency:'USD':true:'1.2-2' }}
-                        </ng-container>
-                        <!-- Default -->
-                        <ng-container *ngSwitchDefault>
+                        <ng-container *ngIf="!group?.column?.columnType">
                             {{groupLabel}}
                         </ng-container>
                     </ng-container>
