@@ -192,7 +192,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     ngOnInit() {
         // Create a scroll event listener outside the zone
         this.zone.runOutsideAngular(() => {
-            window.addEventListener('scroll', this.onScrollThrottled, { capture: true, passive: true });
+            window.addEventListener('scroll', this.onScrollThrottled, <any>{ capture: true, passive: true });
         });
     }
     
