@@ -10,7 +10,7 @@
     </span>
     <ng-container *ngIf="state.sorts.length && state.filters.length"> | </ng-container>
     <span *ngIf="state.filters.length">
-        <strong>{{state.filters.length}} Filter/s Active</strong> {{state.info.rowsVisible}}/{{state.info.rowsTotal}} Rows Visible:
+        <strong>{{state?.filters?.length}} Filter/s Active</strong> {{state?.info?.rowsVisible}}/{{state?.info?.rowsTotal}} Rows Visible:
         <small *ngFor="let filter of state.filters">
             ({{columnsMapped[filter.prop].label}}
             <ng-container *ngIf="filter.operator == 'eq'">=</ng-container>

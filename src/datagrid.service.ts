@@ -11,7 +11,7 @@ export class DataGridService {
 	public cache = {
 		sortArray: _.memoize(this.sortArray, () => this.uniqueId),
 		groupRows: _.memoize(this.groupRows, () => this.uniqueId),
-		filterArray: _.memoize(this.filterArray, () => this.uniqueId)
+        filterArray: _.memoize(this.filterArray, () => this.uniqueId)
 	}
     
 	constructor(
@@ -86,7 +86,7 @@ export class DataGridService {
 	}
 
     /**
-     * Get the rows that should be visible in the scroll port
+     * Get the rows that should be visible in the scroll port based on the vertical scroll position
      * @param rows
      */
     public getVisibleRows(rows: any[], scrollProps: Datagrid.ScrollProps, gridProps: Datagrid.Props, rowHeight: number): any[] {

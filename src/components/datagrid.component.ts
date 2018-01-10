@@ -1,9 +1,10 @@
 import {Component, OnInit, OnDestroy, OnChanges, Input, Output, ViewChild, ChangeDetectionStrategy, EventEmitter, ChangeDetectorRef, ViewEncapsulation,
-    AfterViewInit, ElementRef, ContentChildren, QueryList
+    AfterViewInit, ElementRef, ContentChildren, QueryList, NgZone, DoCheck
 } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/observable/combineLatest';
+import 'rxjs/add/observable/fromEvent';
 
 import { DataGridService } from '../datagrid.service';
 import { DataTableColumnDirective } from '../directives/column.directive';
@@ -41,10 +42,11 @@ TODOS:
         '(window:resize)': 'onWindowResizeThrottled($event)'
 	}
 })
-export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy  {
+export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy, DoCheck  {
     /** Self reference */
-	@ViewChild('dataGrid') datagrid: ElementRef;
-	@ViewChild('dataGridBody') datagridBody: ElementRef;
+	@ViewChild('dataGrid') dataGrid: ElementRef;
+    @ViewChild('dataGridBody') dataGridBody: ElementRef;
+    
 
     /** Columns */
     private _columns: Datagrid.Column[];
@@ -72,7 +74,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     set state(state: Datagrid.State) {
         // If no state passed down, set a default and empty state object
         let stateNew: Datagrid.State = state ? state : {};
-
+        
         if (!stateNew.filters) {
             stateNew.filters = [];
         }
@@ -182,11 +184,17 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     
 	constructor(
 		private dgSvc: DataGridService,
-		private ref: ChangeDetectorRef
+        private ref: ChangeDetectorRef,
+		private zone: NgZone
 	) {
     }
 
-    ngOnInit() { }
+    ngOnInit() {
+        // Create a scroll event listener outside the zone
+        this.zone.runOutsideAngular(() => {
+            window.addEventListener('scroll', this.onScrollThrottled, { capture: true, passive: true });
+        });
+    }
     
 	ngOnChanges(model) {
 		// console.warn('ngOnChanges', model);
@@ -195,16 +203,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		this.dgSvc.cache.sortArray.cache.clear();
 		this.dgSvc.cache.groupRows.cache.clear();
 
-	    if (this.datagrid && this.datagrid.nativeElement) {
-	        this.gridProps.widthBody = Math.floor(this.datagrid.nativeElement.getBoundingClientRect().width);
+        if (this.dataGrid && this.dataGrid.nativeElement) {
+            this.gridProps.widthBody = Math.floor(this.dataGrid.nativeElement.getBoundingClientRect().width);
 	    }
-
-        // If columns or rows are not available, set app ready to false to show loading screen
-		if (!this.columns || !this.rows) {
-			this.appReady = false;
-		}
         
-
         // If columns are passed
         if (model.columns && this.columns) {
 
@@ -255,19 +257,19 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
             
             this.filterTerms = this.dgSvc.getDefaultTermsList(this.rows, this.columns); // Generate a list of default filter terms
             this.createRowStyles(); // Create row styles
-            this.createRowClasses(); // Row classes
+            this.createRowClasses(); // Create row classes
 
 			this.state.info = {
                 initial : true
-			}
+            }
+            
+            // Only on initial load, set app ready. This prevents the app from hanging on a route change
+            this.appReady = true;
 
-		    // If app and dom is ready, create the view
 		    if (this.appReady && this.domReady) {
-		        this.viewCreate();
+                this.viewCreate();
 		    }
 
-            // Only on initial load, set app ready. This prevents the app from hanging on a route change
-		    this.appReady = true;
 			//Emit the state change to the parent component now that the first initial view has been created
 			this.emitState(this.state);
         }
@@ -275,19 +277,29 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	}
 
     ngAfterViewInit() {
+
         // Update grid props body width, for some reason it is not available if called in datagrid on initial load OR if within a function call
-        this.gridProps.widthBody = Math.floor(this.datagrid.nativeElement.getBoundingClientRect().width);
+        this.gridProps.widthBody = Math.floor(this.dataGrid.nativeElement.getBoundingClientRect().width);
+
         this.domReady = true;
-        // If app and dom is ready, create the view
-        if (this.appReady && this.domReady) {
-            this.viewCreate();
-        }
+        // Wrapped in settimeout to ensure DOM is ready, visible and can draw with gridprops
+        setTimeout(() => {
+            // If app and dom is ready, create the view
+            if (this.appReady && this.domReady) {
+                this.viewCreate();
+                this.ref.detectChanges();
+            }
+        });
+    }
+
+    ngDoCheck(): void {
+        //console.log('ngDoCheck');
     }
 
     /**
     * Throttle the scroll event
     */
-    public onScrollThrottled = _.throttle(event => this.onScroll(event), 20, { trailing: true, leading: true });
+    public onScrollThrottled = _.throttle(event => this.onScroll(event), 50, { trailing: true, leading: true });
 
     /**
     * Throttle the window resize event
@@ -304,18 +316,20 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	* @param event
 	*/
 	private onScroll(event) {
-	    // console.log('onScroll');
-        // Manual change detection
-		this.ref.detach();
-		let scrollProps = {
-			scrollTop: event.target.scrollTop,
-			scrollLeft: event.target.scrollLeft
-		}
-        
-		this.scrollProps = { ...scrollProps };
-		this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
-		this.columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
-		this.ref.reattach();
+        //console.log('onScroll', event.target.scrollTop);
+
+        this.scrollProps = {
+            scrollTop: event.target.scrollTop,
+            scrollLeft: event.target.scrollLeft
+        }
+	    this.rowsExternal =
+	        this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
+	    this.columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
+
+        // Notify angular the update is ready
+        this.zone.run(() => {
+	        this.ref.markForCheck();
+	    });
 	}
     
 
@@ -323,7 +337,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
      * Create the view by assembling everything that modifies the state
      * @param state
      */
-    public viewCreate(state: Datagrid.State = this.state) {
+    public viewCreate() {
         // TODO Fix issues with memoization with group and sorting
 		// console.warn('createView');
 		// console.time('Creating View');
@@ -402,12 +416,14 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		//this.rowsInternal = newRows;
 
         // Add stats and info to be emitted
-		state.info.rowsTotal = this.rows.length;
-		state.info.rowsVisible = this.rowsInternal.length;
+		this.state.info.rowsTotal = this.rows.length;
+        this.state.info.rowsVisible = this.rowsInternal.length;
 		
 		this.status = this.dgSvc.createStatuses(this.state, this.columnsInternal);
-		this.state = { ...state };
-		
+        this.state = { ...this.state };
+
+        //Emit the state change to the parent component
+        this.emitState(this.state);
         // Turn change detection back on
 		this.ref.reattach();
 		// console.timeEnd('Creating View');
@@ -428,8 +444,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
      */
 	public onStateUpdated(stateChange:Datagrid.StateChange):void{
 		// console.warn('changeState ', this.state, stateChange);
-		let newState: Datagrid.State = this.state;
-		let newRows = [...this.rows];
+        this.ref.detach();
+
+	    let newState: Datagrid.State = { ...this.state };
+        let newRows = this.rows;
 		
 		newState.info.initial = false;
 
@@ -480,7 +498,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 			} else if (stateChange.data.filterAction == 'clear') {
 				newState.filters = newState.filters.filter(item => item.prop != stateChange.data.filter.prop);
 				//console.warn('Clearing filters', newState.filters);
-			}
+            }
+		    
 		}
 
         //### Reset everything ###
@@ -525,13 +544,11 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 			}
 
             this.emitColumns(this.columnsInternal);
-		}
+        }
 
+	    this.state = newState;
 		// Now create the view and update the DOM
-		this.viewCreate(newState);
-
-        //Emit the state change to the parent component
-		this.emitState(newState);
+		this.viewCreate();
 	}
 
     /**
@@ -598,13 +615,13 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		if (this.options.heightMax) {
 		    gridProps.heightTotal = <number>this.options.heightMax;
 		} else if (this.options.fullScreen) {
-            let height = this.datagrid.nativeElement.getBoundingClientRect().height;
+            let height = this.dataGrid.nativeElement.getBoundingClientRect().height;
             let newHeight = height - 2 - this.rowHeight;// Add offsets for table header and bottom scrollbar
             // Check if the info bar is showing, deduct from total height
             if (this.options.showInfo && (this.state.sorts.length || this.state.groups.length || this.state.filters.length)) {
                 newHeight -= this.rowHeight;
             }
-
+           
 			gridProps.heightTotal = newHeight;
 		}
         
@@ -617,14 +634,13 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 			gridProps.heightBody = 300;
 		}
 
-		if (this.datagrid && this.datagrid.nativeElement.getBoundingClientRect().width) {
-			gridProps.widthBody = Math.floor(this.datagrid.nativeElement.getBoundingClientRect().width);
+        if (this.dataGrid && this.dataGrid.nativeElement.getBoundingClientRect().width) {
+            gridProps.widthBody = Math.floor(this.dataGrid.nativeElement.getBoundingClientRect().width);
 		} else {
 			gridProps.widthBody = this.gridProps.widthBody;
 		}
         
 		this.gridProps = { ...this.gridProps, ...gridProps };
-        //console.log({ ...this.gridProps });
 	}
 
     /**
@@ -637,7 +653,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
         let draggingPos:Datagrid.DragSelect = {
             startX: event.pageX,
             startY: event.pageY,
-			bounding: this.datagridBody.nativeElement.getBoundingClientRect()
+			bounding: this.dataGridBody.nativeElement.getBoundingClientRect()
         }
         // Only drag on left mouse click
         // Make sure the drag starts within the datatable bounding box
@@ -657,7 +673,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
      * @param event
      */
      private handleMouseUp(event: MouseEvent) {
-         //console.warn('handleMouseUp', event.pageY, this.datagridBody.nativeElement.getBoundingClientRect().top);
+         //console.warn('handleMouseUp', event.pageY, this.dataGridBody.nativeElement.getBoundingClientRect().top);
          // Sometimes the mouse scrolls too fast to register the last hovered row. If the mouseup position is higher than the datatable top, set lasthovered to 0
          if (this.dragging && this.draggingPos && this.draggingPos.bounding && event.pageY < this.draggingPos.bounding.top) {
              this.rowHoveredLast = 0;
@@ -973,7 +989,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		} else if (this.options.heightFullscreen){
 			let height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 			//document.getElementById('datatable2')
-			let offset = this.datagridBody.nativeElement.getBoundingClientRect().top;
+			let offset = this.dataGridBody.nativeElement.getBoundingClientRect().top;
 			let newHeight = height - offset - 16// + 'px';
 			this.tableContainerHeight = newHeight;
 		}
@@ -1227,7 +1243,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     
 	ngOnDestroy() {
 		// Unsub from all subscriptions
-		this.subscriptions.forEach(sub => sub.unsubscribe());
+        this.subscriptions.forEach(sub => sub.unsubscribe());
+        window.removeEventListener('scroll', this.onScrollThrottled);
 	}
 }
 
