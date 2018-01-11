@@ -3,7 +3,7 @@
         <a (click)="toggleGroup(group, $event)" [ngClass]="{'active': active }">
             <span class="sticky-left">
                 <strong>
-                    <ng-container *ngIf="group?.column?.columnType">
+                    <ng-container *ngIf="group?.column?.columnType && groupLabel != 'No Value' && groupLabel != 'Missing Value' ">
                         <ng-container [ngSwitch]="group.column.columnType">
                             <!-- Date Time-->
                             <ng-container *ngSwitchCase="'dateTime'">
@@ -22,11 +22,11 @@
                                 {{groupLabel}}
                             </ng-container>
                         </ng-container>
-                        <ng-container *ngIf="!group?.column?.columnType">
-                            {{groupLabel}}
-                        </ng-container>
                     </ng-container>
-                </strong> <small><em>({{group.rows.length}})</em></small>
+                    <ng-container *ngIf="!group?.column?.columnType">
+                        {{groupLabel}}
+                    </ng-container>
+                </strong> <small *ngIf="group?.rows?.length"><em>({{group.rows.length}})</em></small>
             </span>
         </a>
     </div>
