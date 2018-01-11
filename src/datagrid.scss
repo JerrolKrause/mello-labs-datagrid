@@ -82,7 +82,7 @@ $border-color: #ccc;
             .datagrid-body-main{min-height: 23.5px;}
             .datagrid-row{position:relative;display: flex;flex-flow: row;min-height: 23px;
                 &.selected-state .datagrid-cell{background:#F0DADA;}
-                .datagrid-cell{position:absolute;min-height: 23px;}
+                .datagrid-cell{position:absolute;min-height: 23px;border:none;}
                 .datagrid-cell-data{line-height:23px;position:relative;z-index: 3;padding: 0px 5px;display: inline-block;white-space: nowrap;text-overflow: ellipsis; min-height: 23px;overflow: hidden;
                     //transform: translate(51%, 50%) scale(2);zoom: .5;// This prevents blurry text in chrome
                 .datagrid-cell-data-content{position:absolute;}
