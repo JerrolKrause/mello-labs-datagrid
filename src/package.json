@@ -20,8 +20,8 @@
 	"jsnext:main": "mello-labs-datagrid.js",
 	"typings": "mello-labs-datagrid.d.ts",
     "peerDependencies": {
-        "@angular/core": "^5.0.5",
-        "@angular/forms": "^5.0.5",
+        "@angular/core": "^4.0.0",
+        "@angular/forms": "^4.0.0",
         "@ng-bootstrap/ng-bootstrap": "^1.0.0-beta.5",
         "angular-resizable-element": "^2.0.0",
         "bootstrap": "4.0.0-alpha.6",
