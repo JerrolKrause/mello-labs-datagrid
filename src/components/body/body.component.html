@@ -7,7 +7,7 @@
     (mouseover)="rowHoveredLast = rowIndex"
     [ngStyle]="rowStyles[row[options.primaryKey]]"
     -->
-    <ng-container *ngFor="let row of rows; let rowIndex = index; trackBy:options.trackRow;">
+    <ng-container *ngFor="let row of rows; let rowIndex = index; trackBy:trackRow;">
 
         <div class="datagrid-body-row" *ngIf="!row.$$hidden"
              [style.top]="row.$$rowPosition + 'px'"

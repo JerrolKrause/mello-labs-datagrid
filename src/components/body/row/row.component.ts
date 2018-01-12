@@ -28,8 +28,8 @@ export class RowComponent implements OnInit, OnChanges  {
     * @param index - Number in array
     * @param item - The column
     */
-    public trackColumn(index: number, item: Datagrid.Column) {
-		return item.prop;
+	public trackColumn(index: number, item: Datagrid.Column) {
+		return item.$$track;
     }
 
     /**

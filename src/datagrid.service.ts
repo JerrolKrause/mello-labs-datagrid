@@ -552,19 +552,42 @@ export class DataGridService {
      * @param gridProps
      */
     public columnsResize(columns: Datagrid.Column[], gridProps: Datagrid.Props) {
-        console.log('Resizing columns');
         let widthTotal = gridProps.widthTotal;
 		return columns.map(column => {
 			column.width = Math.ceil(column.width * gridProps.widthBody / widthTotal) + 1;
 			return column;
 		});
-    }
+	}
+
+	/**
+	 * Attach any templates to their respective columns
+	 * Not using map to update columns array because that would retrigger the column getter logic
+	 * @param columns
+	 * @param columnTemplates
+	 */
+	public templatesAddToColumns(columns: Datagrid.Column[], columnTemplates) {
+		// Loop through supplied columns, attach templates
+		for (let i = 0; i < columns.length; i++) {
+			// If custom cell templates were supplied, attach them to their appropriate column
+			let column = columns[i];
+			if (columnTemplates[column.prop]) {
+				// Cell Templates
+				if (columnTemplates[column.prop].templateCell) {
+					column.templateCell = columnTemplates[column.prop].templateCell;
+				}
+				// Header Templates
+				if (columnTemplates[column.prop].templateCell) {
+					column.templateHeader = columnTemplates[column.prop].templateHeader;
+				}
+			}
+		}
+	}
 
     /**
      * Map custom templates to a usable object for references
      * @param arr
      */
-    public columnMapTemplates(arr:any[]) {
+	public templatesMapColumns(arr:any[]) {
         //const result: any[] = [];
         const result = {};
 

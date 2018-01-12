@@ -38,6 +38,15 @@ export class BodyComponent implements OnInit, OnChanges{
 
 	ngOnChanges() {}
 
+	/**
+    * Return a unique ID to ngfor to improve performance
+    * @param index - Number in array
+    * @param item - The column
+    */
+	public trackRow(index: number, item: any) {
+		return item.$$track;
+	}
+
     /**
      * Communicate mouse events on the body row up to the parent. Used mainly for selection
      * @param type

@@ -47,12 +47,21 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	/** Self reference */
 	@ViewChild('dataGrid') dataGrid: ElementRef;
 	@ViewChild('dataGridBody') dataGridBody: ElementRef;
-
-
+	
 	/** Columns */
 	private _columns: Datagrid.Column[];
 	@Input()
 	set columns(columns: Datagrid.Column[]) {
+		let slug = Math.floor(Math.random() * 1000000); // Create a random number slug so if different columns are passed a new instance is created every time
+		columns.forEach((column, i) => column.$$track = slug + '-' + i); // Add the unique ID which is slug + index
+		// If columnMap object is supplied, remap column props to what the datatable needs
+		if (this.options && this.options.columnMap) {
+			columns = this.dgSvc.mapPropertiesDown(columns, this.options.columnMap)
+		}
+		// If column templates supplied, map those to the column. This instance only fires if the columns are changed after initial load
+		if (this.columnTemplates && Object.keys(this.columnTemplates).length && columns) {
+			this.dgSvc.templatesAddToColumns(columns, this.columnTemplates);
+		}
 		this._columns = columns;
 	};
 	get columns(): Datagrid.Column[] {
@@ -62,8 +71,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	/** Rows */
 	private _rows: any[];
 	@Input()
-	set rows(val: any[]) {
-		this._rows = val;
+	set rows(rows: any[]) {
+		let slug = Math.floor(Math.random() * 1000000); // Create a random number slug so if different rows are passed a new instance is created every time
+		rows.forEach((row, i) => row.$$track = slug + '-' + i); // Add the unique ID which is slug + index
+		this._rows = rows;
 	};
 	get rows(): any[] {
 		return this._rows && this._rows.length ? [...this._rows] : null;
@@ -92,7 +103,22 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		return this._state;
 	}
 
+	/** Holds custom DOM templates passed from parent */
+	private _columnTemplates;
+	@ContentChildren(DataTableColumnDirective)
+	set columnTemplates(val: QueryList<DataTableColumnDirective>) {
+		const arr = val.toArray();
+		if (arr.length) {
+			this._columnTemplates = this.dgSvc.templatesMapColumns(arr);
+
+		}
+	}
+	get columnTemplates(): QueryList<DataTableColumnDirective> {
+		return this._columnTemplates;
+	}
+
 	@Input() options: Datagrid.Options;
+
 
 	/** Outputs */
 	@Output() onColumnsUpdated: EventEmitter<any> = new EventEmitter();
@@ -144,21 +170,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	/** Is the user dragging with the mouse */
 	public dragging: boolean = false;
 	public draggingPos: Datagrid.DragSelect = {};
-
-	/** Holds custom DOM templates passed from parent */
-	private _columnTemplates;
-	@ContentChildren(DataTableColumnDirective)
-	set columnTemplates(val: QueryList<DataTableColumnDirective>) {
-		const arr = val.toArray();
-		if (arr.length) {
-			this._columnTemplates = this.dgSvc.columnMapTemplates(arr);
-
-		}
-	}
-	get columnTemplates(): QueryList<DataTableColumnDirective> {
-		return this._columnTemplates;
-	}
-
 	/** Currently pressed key */
 	private keyPressed: string;
 	/** A dictionary of currently pressed keys */
@@ -201,21 +212,9 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 
 	ngAfterContentInit() {
 		// After all content has been projected into this component, attach templates to columns
+		// Has to be in this lifecycle hook because all input data isn't available at the same time for getter/setters
 		if (this.columnTemplates && Object.keys(this.columnTemplates).length && this.columns) {
-			for (let i = 0; i < this.columns.length; i++) {
-				// If custom cell templates were supplied, attach them to their appropriate column
-				let column = this.columns[i];
-				if (this.columnTemplates[column.prop]) {
-					// Cell Templates
-					if (this.columnTemplates[column.prop].templateCell) {
-						column.templateCell = this.columnTemplates[column.prop].templateCell;
-					}
-					// Header Templates
-					if (this.columnTemplates[column.prop].templateCell) {
-						column.templateHeader = this.columnTemplates[column.prop].templateHeader;
-					}
-				}
-			}
+			this.dgSvc.templatesAddToColumns(this.columns, this.columnTemplates);
 		}
 	}
 
@@ -235,8 +234,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 
 			// If columnMap object is supplied, remap column props to what the datatable needs
 			let columns = this.options.columnMap ? this.dgSvc.mapPropertiesDown(this.columns, this.options.columnMap) : this.columns;
-
-
 
 			let columnsPinnedLeft = columns.filter(column => column.pinnedLeft ? true : false);
 			this.columnsPinnedLeft = columns.length ? this.dgSvc.columnCalculations(columnsPinnedLeft) : [];
@@ -1149,12 +1146,15 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
      * @param state
      */
 	public emitState(state: Datagrid.State) {
+		// User columns has a circular reference somewhere so create new instance and remove that property before emitting up
+		let stateNew = { ...state };
+		delete (<any>stateNew).usersColumns;
+		
 		// Create a new memory reference for the state and then remap all properties up into the layout
-		let remapProps = { ...state };
+		let remapProps = JSON.parse(JSON.stringify(stateNew));
 		remapProps.groups = remapProps.groups && remapProps.groups.length ? this.dgSvc.mapPropertiesUp(remapProps.groups, this.options.controlsMap) : [];
 		remapProps.sorts = remapProps.sorts && remapProps.sorts.length ? this.dgSvc.mapPropertiesUp(remapProps.sorts, this.options.controlsMap) : [];
 		remapProps.filters = remapProps.filters && remapProps.filters.length ? this.dgSvc.mapPropertiesUp(remapProps.filters, this.options.controlsMap) : [];
-
 		this.onStateChange.emit(remapProps);
 	}
 
