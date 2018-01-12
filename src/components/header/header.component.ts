@@ -49,7 +49,15 @@ export class HeaderComponent implements OnInit, OnChanges{
      */
     public columnsUpdated(event) {
         this.onColumnsUpdated.emit(event);
-    }
+	}
+
+	/**
+     * Emit a custom link event response up to the parent component
+     * @param data
+     */
+	public customLinkEvent(data: { link: Datagrid.ControlsCustomLinksGroup, column: Datagrid.Column }) {
+		this.onCustomLinkEvent.emit(data);
+	}
 
 	/**
 	* On a successfull drag reorder of the column headers

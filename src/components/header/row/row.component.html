@@ -20,7 +20,8 @@
                            [column]="column"
                            [columnIndex]="columnIndex"
                            [filterTerms]="filterTerms"
-                           (onStateUpdated)="stateUpdated($event)">
+                           (onStateUpdated)="stateUpdated($event)"
+						   (onCustomLinkEvent)="customLinkEvent($event)">
         </datagrid-controls>
 
         <!-- Resize Handle -->

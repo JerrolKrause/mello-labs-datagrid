@@ -25,9 +25,7 @@ export class DataGridService {
      */
 	public mapPropertiesDown(array: any[], mapObj: any): any[] {
 		//console.warn('mapProperties Down', JSON.parse(JSON.stringify(array))); 
-		//console.warn('mapProperties',  mapObj); 
-		
-		array.forEach(element => {
+		return array.map(element => {
 			for (let key in mapObj) {
 		        if (mapObj.hasOwnProperty(key)) {
 		            // If the default property needed by the DT is NOT found in the object
@@ -39,10 +37,9 @@ export class DataGridService {
 		                //delete element[mapObj[key]];
 		            }
 		        }
-		    }
+			}
+			return element;
 		});
-		//console.warn(JSON.parse(JSON.stringify(array)));
-		return array;
 	}
 
     /**

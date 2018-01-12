@@ -51,6 +51,14 @@ export class HeaderRowComponent implements OnInit, OnChanges{
 	}
 
 	/**
+     * Emit a custom link event response up to the parent component
+     * @param data
+     */
+	public customLinkEvent(data: { link: Datagrid.ControlsCustomLinksGroup, column: Datagrid.Column }) {
+		this.onCustomLinkEvent.emit(data);
+	}
+
+	/**
 	* Return a unique ID to ngfor to improve performance
 	* @param index - Number in array
 	* @param item - The column
