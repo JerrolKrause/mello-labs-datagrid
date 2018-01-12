@@ -453,13 +453,13 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		this.ref.detach();
 
 		let newState: Datagrid.State = { ...this.state };
-		let newRows = this.rows;
+		//let newRows = this.rows;
 
 		newState.info.initial = false;
 
 		// If the global filter is set
-		if (this.options.filterGlobal && this.options.filterGlobal.term) {
-			newRows = this.dgSvc.filterGlobal(newRows, this.options);
+		if (this.filterGlobal && this.filterGlobal.term) {
+			//newRows = this.dgSvc.filterGlobal(newRows, this.filterGlobal);
 		}
 
 		//### Update Sorting ###
@@ -510,7 +510,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 
 		//### Reset everything ###
 		else if (stateChange.action == Actions.reset) {
-			newRows = [...this.rows];
+			//newRows = [...this.rows];
 		}
 
 		//### Column Changes ###
@@ -1232,7 +1232,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 			this.columns.forEach(column => { column.pinnedLeft = false; column.locked = false; column = Object.assign({}, column) });
 			this.columnsInternal.forEach(column => { column.pinnedLeft = false; column.locked = false; column = Object.assign({}, column) });
 			this.columnsInternal = [...this.columnsInternal];
-			this.options.filterGlobal.term = null;
+			this.filterGlobal.term = null;
 		}
 		this.emitColumns(this.columnsInternal);
 		this.onStateUpdated({ action: Actions.reset, data: null });

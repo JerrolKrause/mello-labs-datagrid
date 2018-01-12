@@ -5,7 +5,7 @@ import { Datagrid } from '../../typings';
     selector: 'datagrid-body',
 	templateUrl: './body.component.html',
     styles: [],
-    changeDetection: ChangeDetectionStrategy.OnPush
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BodyComponent implements OnInit, OnChanges{
 
@@ -44,6 +44,7 @@ export class BodyComponent implements OnInit, OnChanges{
     * @param item - The column
     */
 	public trackRow(index: number, item: any) {
+		console.log('Tracking Rows');
 		return item.$$track;
 	}
 
@@ -53,8 +54,9 @@ export class BodyComponent implements OnInit, OnChanges{
      * @param rowIndex
      * @param event
      */
-    public onMouseEvent(type: 'click' | 'contextmenu' | 'mousedown' | 'mouseup' | 'mouseover', rowIndex: number, event?: MouseEvent) {
-        this.onRowMouseEvent.emit({ type: type, rowIndex: rowIndex, event: event });
+	public onMouseEvent(type: 'click' | 'contextmenu' | 'mousedown' | 'mouseup' | 'mouseenter', rowIndex: number, event?: MouseEvent) {
+		this.onRowMouseEvent.emit({ type: type, rowIndex: rowIndex, event: event });
+
     }
 
     /**
