@@ -6,15 +6,15 @@ $border-color: #ccc;
     &.fullscreen{position:absolute;top:0;bottom:0;left:0;right:0;}
     &.scrollH{overflow-x:scroll;}
     &.selectable{user-select: none;
+		.datagrid-body-row:hover{
+            &:before{content:"";display:block;position:absolute;top:-1px;height:2px;z-index:999;left:0;right:0;background: #000;}
+            &:after{content:"";display:block;position:absolute;bottom:-2px;height:2px;z-index:999;left:0;right:0;background: #000;}
+        }
         .datagrid-body-row.selected{background-color: #ececec;
             .datagrid-body-pinned{background-color: #ececec;}
              &:before{content:"";display:block;position:absolute;top:-1px;height:2px;z-index:999;left:0;right:0;background: red;}
              &:after{content:"";display:block;position:absolute;bottom:-2px;height:2px;z-index:999;left:0;right:0;background: red;}
              & + .datagrid-body-row.selected:before{display:none!important;}
-        }
-        .datagrid-body-row:hover{
-            &:before{content:"";display:block;position:absolute;top:-1px;height:2px;z-index:999;left:0;right:0;background: #000;}
-            &:after{content:"";display:block;position:absolute;bottom:-2px;height:2px;z-index:999;left:0;right:0;background: #000;}
         }
     }
    

@@ -139,19 +139,17 @@ export class DataGridService {
      * Filters based on the global object. Also creates the necessary filter structure.
      * @param array
      */
-	public filterGlobal(array: any[], options: Datagrid.Options): any[] {
+	public filterGlobal(array: any[], filterGlobal: Datagrid.FilterGlobal): any[] {
 		//console.warn('filterGlobal', options.filterGlobal.props);
 
         // Loop through the existing props supplied and create the appropriate filter object
 		let filters = [];
-		options.filterGlobal.props.forEach(prop => {
+		filterGlobal.props.forEach(prop => {
 			filters.push({
 				operator: 'search',
 				prop: prop,
-				value: options.filterGlobal.term
-			})
-
-
+				value: filterGlobal.term
+			});
 		});
 		
 		return this.filterArray(array, filters);

@@ -119,6 +119,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 
 	@Input() options: Datagrid.Options;
 
+	@Input() filterGlobal: Datagrid.FilterGlobal;
 
 	/** Outputs */
 	@Output() onColumnsUpdated: EventEmitter<any> = new EventEmitter();
@@ -219,7 +220,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	}
 
 	ngOnChanges(model) {
-		//console.warn('ngOnChanges', model);
+		// console.warn('ngOnChanges', model);
 
 		// Clear all memoized caches anytime new data is loaded into the grid
 		this.dgSvc.cache.sortArray.cache.clear();
@@ -227,6 +228,11 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 
 		if (this.dataGrid && this.dataGrid.nativeElement) {
 			this.gridProps.widthBody = Math.floor(this.dataGrid.nativeElement.getBoundingClientRect().width);
+		}
+
+		// If columns are passed
+		if (model.filterGlobal && this.filterGlobal && this.filterGlobal.term) {
+			_.throttle(() => this.viewCreate(), 500, { trailing: true, leading: true });
 		}
 
 		// If columns are passed
@@ -347,8 +353,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		let newRows = this.rows;
 		//console.log('Total Rows', newRows.length)
 		// If global filter option is set filter 
-		if (this.options.filterGlobal && this.options.filterGlobal.term) {
-			newRows = this.dgSvc.filterGlobal(newRows, this.options);
+		if (this.filterGlobal && this.filterGlobal.term) {
+			newRows = this.dgSvc.filterGlobal(newRows, this.filterGlobal);
 		}
 
 		// If custom filters are specified

@@ -79,14 +79,6 @@ declare namespace Datagrid {
 		/** A unique ID for each row object. Currently used for row classes and row styles */
 		primaryKey?: string,
         /** Should the filter search option be inline below the table header. NOT CURRENTLY FUNCTIONAL */
-		//filterInline?: boolean,
-        /** A global filter/search object independent of column filtering */
-		filterGlobal?: {
-            /** The string to filter with */
-			term: string,
-            /** A global filter/search object independent of column filtering.  */
-            props: string[]
-        }
         /** Is the draggable red box visible? */
         showDragBox?: boolean;
         /** Can the rows be reordered via drag and drop */
@@ -237,6 +229,14 @@ declare namespace Datagrid {
 		icon?: string
         /** Is this a flyout with submenu links */
 		submenu?: ControlsCustomLinksGroup[]
+	}
+
+	/** A global filter/search object independent of column filtering */
+	export interface FilterGlobal {
+		/** The string to filter with */
+		term: string,
+		/** A global filter/search object independent of column filtering.  */
+		props: string[]
 	}
 
 	export interface Groupings {
