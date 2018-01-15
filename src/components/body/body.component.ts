@@ -30,13 +30,13 @@ export class BodyComponent implements OnInit, OnChanges{
     @Output() onRowMouseUp: EventEmitter<any> = new EventEmitter();
     
 	constructor(
-    ) { 
-    	
-    }
+    ) { }
 
 	ngOnInit() {}
 
-	ngOnChanges() {}
+	ngOnChanges(model) {
+    //console.log(model)
+	}
 
 	/**
     * Return a unique ID to ngfor to improve performance
@@ -44,7 +44,7 @@ export class BodyComponent implements OnInit, OnChanges{
     * @param item - The column
     */
 	public trackRow(index: number, item: any) {
-		console.log('Tracking Rows');
+		//console.log('Tracking Rows');
 		return item.$$track;
 	}
 

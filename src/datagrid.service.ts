@@ -89,7 +89,11 @@ export class DataGridService {
     public getVisibleRows(rows: any[], scrollProps: Datagrid.ScrollProps, gridProps: Datagrid.Props, rowHeight: number): any[] {
 		//console.log('getVisibleRowsoffSetRowsFromTop', rows, this.scrollProps, this.rowHeight, this.gridProps);
 		let rowsNew = [...rows];
-		let buffer = 1;
+    let buffer = 5;
+    if (window.navigator.userAgent.indexOf("Edge") > -1) {
+      buffer = 15;
+    }
+
 		let offSetRowsFromTop = Math.floor(scrollProps.scrollTop / (rowHeight + 1));
 		if (offSetRowsFromTop - buffer > 0) {
 			offSetRowsFromTop -= buffer;
@@ -113,7 +117,7 @@ export class DataGridService {
 	public getVisibleColumns(columns: any[], scrollProps, gridProps) {
 		//console.log('getVisibleColumns', this.scrollProps, this.gridProps, this.columnsInternal.length);
 		let colsExternal = [];
-
+	  let buffer = 150;
 		//let widthTotal = this.scrollProps.scrollLeft;
 		let widthCurrent = 0;
 		// Loop through column widths
@@ -123,8 +127,8 @@ export class DataGridService {
 			// If current column width + all widths before this one is greater than the left scroll position
 			// If total column widths is less than the width of the body minus the left scroll position
 			if (
-				column.width + widthCurrent > scrollProps.scrollLeft &&
-				widthCurrent < gridProps.widthBody + scrollProps.scrollLeft
+        column.width + widthCurrent + buffer > scrollProps.scrollLeft &&
+        widthCurrent < gridProps.widthBody + scrollProps.scrollLeft + buffer
 			) {
 				colsExternal.push(column);
 			}

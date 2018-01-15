@@ -1,6 +1,6 @@
 import {
 	Component, OnInit, OnDestroy, OnChanges, Input, Output, ViewChild, ChangeDetectionStrategy, EventEmitter, ChangeDetectorRef, ViewEncapsulation,
-	AfterViewInit, ElementRef, ContentChildren, QueryList, NgZone, AfterContentInit
+	AfterViewInit, ElementRef, ContentChildren, QueryList, NgZone, AfterContentInit, DoCheck
 } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -43,7 +43,7 @@ TODOS:
 		'(window:resize)': 'onWindowResizeThrottled($event)'
 	}
 })
-export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy, AfterContentInit {
+export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy, AfterContentInit, DoCheck {
 	/** Self reference */
 	@ViewChild('dataGrid') dataGrid: ElementRef;
 	@ViewChild('dataGridBody') dataGridBody: ElementRef;
@@ -210,8 +210,12 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		});
 	}
 
+  // Check when change detection is run
+  ngDoCheck(): void {
+    //console.log('Checking')
+  }
 
-	ngAfterContentInit() {
+  ngAfterContentInit() {
 		// After all content has been projected into this component, attach templates to columns
 		// Has to be in this lifecycle hook because all input data isn't available at the same time for getter/setters
 		if (this.columnTemplates && Object.keys(this.columnTemplates).length && this.columns) {
@@ -321,22 +325,31 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	* When the datatable is scrolled
 	* @param event
 	*/
-	private onScroll(event) {
-		//console.log('onScroll', event.target.scrollTop);
+  private onScroll(event) {
+    //console.log('onScroll', event.target.scrollTop);
+    this.ref.detach();
+    let scrollPropsOld = { ...this.scrollProps };
 
-		this.scrollProps = {
-			scrollTop: event.target.scrollTop,
-			scrollLeft: event.target.scrollLeft
-		}
-		this.rowsExternal =
-			this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
-		this.columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
+    this.scrollProps = {
+      scrollTop: event.target.scrollTop,
+      scrollLeft: event.target.scrollLeft
+    }
 
-		// Notify angular the update is ready
-		this.zone.run(() => {
-			this.ref.markForCheck();
-		});
-	}
+    // Update rows only if rows have changed
+    if (scrollPropsOld.scrollTop != this.scrollProps.scrollTop) {
+      this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
+    }
+     // Update columns only if columns have changed
+     if (scrollPropsOld.scrollLeft != this.scrollProps.scrollLeft) {
+      this.columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
+    }
+    
+    // Notify angular the update is ready
+     this.zone.run(() => {
+        this.ref.reattach();
+        this.ref.markForCheck();
+    });
+  }
 
 
     /**   
