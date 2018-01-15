@@ -13,14 +13,13 @@ export class BodyComponent implements OnInit, OnChanges{
     @Input() columnsPinnedLeft: Datagrid.Column[];
     @Input() rows: any[];
     @Input() rowStyles;
-	@Input() state: Datagrid.State;
-	@Input() status: Datagrid.Status;
-	@Input() options: Datagrid.Options;
+	  @Input() state: Datagrid.State;
+	  @Input() status: Datagrid.Status;
+	  @Input() options: Datagrid.Options;
     @Input() gridProps: Datagrid.Props;
     
-
-	@Output() onColumnsUpdated: EventEmitter<any> = new EventEmitter();
-	@Output() onStateUpdated: EventEmitter<any> = new EventEmitter();
+	  @Output() onColumnsUpdated: EventEmitter<any> = new EventEmitter();
+	  @Output() onStateUpdated: EventEmitter<any> = new EventEmitter();
     @Output() onCustomLinkEvent: EventEmitter<any> = new EventEmitter();
     @Output() onRowUpdated: EventEmitter<any> = new EventEmitter();
     @Output() onRowMouseEvent: EventEmitter<any> = new EventEmitter();

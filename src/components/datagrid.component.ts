@@ -327,7 +327,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	*/
   private onScroll(event) {
     //console.log('onScroll', event.target.scrollTop);
-    this.ref.detach();
     let scrollPropsOld = { ...this.scrollProps };
 
     this.scrollProps = {
@@ -346,7 +345,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     
     // Notify angular the update is ready
      this.zone.run(() => {
-        this.ref.reattach();
         this.ref.markForCheck();
     });
   }
