@@ -53,7 +53,11 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	@Input()
 	set columns(columns: Datagrid.Column[]) {
 		let slug = Math.floor(Math.random() * 1000000); // Create a random number slug so if different columns are passed a new instance is created every time
-		columns.forEach((column, i) => column.$$track = slug + '-' + i); // Add the unique ID which is slug + index
+    // Create custom track property and new reference for each column
+	  columns = columns.map((column, i) => {
+	    column.$$track = slug + '-' + i;
+	    return { ...column };
+	  });
 		// If columnMap object is supplied, remap column props to what the datatable needs
 		if (this.options && this.options.columnMap) {
 			columns = this.dgSvc.mapPropertiesDown(columns, this.options.columnMap)
