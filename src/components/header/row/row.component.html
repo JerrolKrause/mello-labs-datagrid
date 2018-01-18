@@ -5,11 +5,11 @@
          [ngClass]="{'reorderable': column.canReorder }"
          [ngStyle]="{'width' : column.width + 'px', 'left' : column.$$leftOffset + 'px' }"
          mwlResizable [enableGhostResize]="true" [resizeEdges]="{right: column.canResize || false}" (resizeEnd)="onResizeEnd($event, column.$$index, columnType)"
-         dnd-sortable [sortableIndex]="columnIndex" [dragEnabled]="column.canReorder && !column.pinnedLeft"
+         dnd-sortable [sortableIndex]="columnIndex" [dragEnabled]="column.canReorder && !column.pinnedLeft" dnd-sortable-handle
          (onDragSuccess)="onReorderSuccess(data, columnType)">
 
         <!-- Column Label -->
-        <span class="datagrid-header-cell-label" dnd-sortable-handle>
+        <span class="datagrid-header-cell-label">
             {{column.label}}
         </span>
 
