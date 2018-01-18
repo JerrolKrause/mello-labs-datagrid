@@ -1,63 +1,68 @@
-<div class="datagrid-body" [ngStyle]="{'width' : gridProps.widthTotal + 'px', 'height' : gridProps.heightBody + 'px' }">
-    <!--
-    (click)="selectRow(row, rowIndex, null, false, rowElement.elementRef)"
-    (contextmenu)="rightClick(row, rowIndex, $event)"
-    (mousedown)="rowMouseDown(rowIndex, $event)"
-    (mouseup)="rowMouseUp(rowIndex, $event)"
-    (mouseover)="rowHoveredLast = rowIndex"
-    [ngStyle]="rowStyles[row[options.primaryKey]]"
-    -->
-    <ng-container *ngFor="let row of rows; let rowIndex = index; trackBy:trackRow;">
+<div class="datagrid-body-container" id="dataGridBody" #dataGridBody
+	 [ngStyle]="{'height': gridProps.heightTotal + 'px'}"
+	 [ngClass]="{ 'widthFixed' : gridProps.widthFixed }">
 
-        <div class="datagrid-body-row" *ngIf="!row.$$hidden"
-             [style.top]="row.$$rowPosition + 'px'"
-             [ngClass]="{'selected': row.$$selected }">
+	<div class="datagrid-body" [ngStyle]="{'width' : gridProps.widthTotal + 'px', 'height' : gridProps.heightBody + 'px' }">
+		<!--
+		(click)="selectRow(row, rowIndex, null, false, rowElement.elementRef)"
+		(contextmenu)="rightClick(row, rowIndex, $event)"
+		(mousedown)="rowMouseDown(rowIndex, $event)"
+		(mouseup)="rowMouseUp(rowIndex, $event)"
+		(mouseover)="rowHoveredLast = rowIndex"
+		[ngStyle]="rowStyles[row[options.primaryKey]]"
+		-->
+		<ng-container *ngFor="let row of rows; let rowIndex = index; trackBy:trackRow;">
 
-            <!-- Group header. Treated as a row -->
-            <group-header *ngIf="row.type == 'group' "
-                          [group]="row"
-                          [options]="options"
-                          [width]="gridProps.widthTotal"
-                          (onGroupToggled)="groupToggled($event)">
-            </group-header>
+			<div class="datagrid-body-row" *ngIf="!row.$$hidden"
+				 [style.top]="row.$$rowPosition + 'px'"
+				 [ngClass]="{'selected': row.$$selected }">
 
-            <!-- Normal Row -->
-            <ng-container *ngIf="row.type != 'group' ">
+				<!-- Group header. Treated as a row -->
+				<group-header *ngIf="row.type == 'group' "
+							  [group]="row"
+							  [options]="options"
+							  [width]="gridProps.widthTotal"
+							  (onGroupToggled)="groupToggled($event)">
+				</group-header>
 
-                <!-- Pinned columns -->
-                <div class="datagrid-body-pinned sticky-left" *ngIf="columnsPinnedLeft?.length"
-                     [style.width]="gridProps.widthPinned + 'px'"
-                     [ngStyle]="rowStyles[row[options.primaryKey]]"
-                     (click)="onMouseEvent('click', row.$$rowIndex, $event)"
-                     (contextmenu)="onMouseEvent('contextmenu', row.$$rowIndex, $event)"
-                     (mousedown)="onMouseEvent('mousedown', row.$$rowIndex, $event)"
-                     (mouseup)="onMouseEvent('mouseup', row.$$rowIndex, $event)"
-                     (mouseenter)="onMouseEvent('mouseenter', row.$$rowIndex, $event)">
-                    <datagrid-body-row [columns]="columnsPinnedLeft"
-                                       [row]="row"
-                                       [options]="options"
-                                       (onRowUpdated)="rowUpdated($event, row.$$rowIndex)">
-                    </datagrid-body-row>
-                </div>
+				<!-- Normal Row -->
+				<ng-container *ngIf="row.type != 'group' ">
 
-                <!-- Non-pinned columns -->
-                <div class="datagrid-body-main" style="display: inline-block"
-                     [style.width]="gridProps.widthMain + 'px'"
-                     [ngStyle]="rowStyles[row[options.primaryKey]]"
-                     (click)="onMouseEvent('click', row.$$rowIndex, $event)"
-                     (contextmenu)="onMouseEvent('contextmenu', row.$$rowIndex, $event)"
-                     (mousedown)="onMouseEvent('mousedown', row.$$rowIndex, $event)"
-                     (mouseup)="onMouseEvent('mouseup', row.$$rowIndex, $event)"
-                     (mouseenter)="onMouseEvent('mouseenter', row.$$rowIndex, $event)">
-                    <datagrid-body-row [columns]="columns"
-                                       [row]="row"
-                                       [options]="options"
-                                       (onRowUpdated)="rowUpdated($event, row.$$rowIndex)">
-                    </datagrid-body-row>
-                </div>
+					<!-- Pinned columns -->
+					<div class="datagrid-body-pinned sticky-left" *ngIf="columnsPinnedLeft?.length"
+						 [style.width]="gridProps.widthPinned + 'px'"
+						 [ngStyle]="rowStyles[row[options.primaryKey]]"
+						 (click)="onMouseEvent('click', row.$$rowIndex, $event)"
+						 (contextmenu)="onMouseEvent('contextmenu', row.$$rowIndex, $event)"
+						 (mousedown)="onMouseEvent('mousedown', row.$$rowIndex, $event)"
+						 (mouseup)="onMouseEvent('mouseup', row.$$rowIndex, $event)"
+						 (mouseenter)="onMouseEvent('mouseenter', row.$$rowIndex, $event)">
+						<datagrid-body-row [columns]="columnsPinnedLeft"
+										   [row]="row"
+										   [options]="options"
+										   (onRowUpdated)="rowUpdated($event, row.$$rowIndex)">
+						</datagrid-body-row>
+					</div>
 
-            </ng-container>
+					<!-- Non-pinned columns -->
+					<div class="datagrid-body-main" style="display: inline-block"
+						 [style.width]="gridProps.widthMain + 'px'"
+						 [ngStyle]="rowStyles[row[options.primaryKey]]"
+						 (click)="onMouseEvent('click', row.$$rowIndex, $event)"
+						 (contextmenu)="onMouseEvent('contextmenu', row.$$rowIndex, $event)"
+						 (mousedown)="onMouseEvent('mousedown', row.$$rowIndex, $event)"
+						 (mouseup)="onMouseEvent('mouseup', row.$$rowIndex, $event)"
+						 (mouseenter)="onMouseEvent('mouseenter', row.$$rowIndex, $event)">
+						<datagrid-body-row [columns]="columns"
+										   [row]="row"
+										   [options]="options"
+										   (onRowUpdated)="rowUpdated($event, row.$$rowIndex)">
+						</datagrid-body-row>
+					</div>
 
-        </div>
-    </ng-container>
+				</ng-container>
+
+			</div>
+		</ng-container>
+	</div>
 </div>

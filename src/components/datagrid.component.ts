@@ -1,6 +1,6 @@
 import {
 	Component, OnInit, OnDestroy, OnChanges, Input, Output, ViewChild, ChangeDetectionStrategy, EventEmitter, ChangeDetectorRef, ViewEncapsulation,
-	AfterViewInit, ElementRef, ContentChildren, QueryList, NgZone, AfterContentInit, DoCheck
+	AfterViewInit, ElementRef, ContentChildren, QueryList, NgZone, AfterContentInit, DoCheck, Renderer2
 } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -13,6 +13,7 @@ import { Actions } from '../datagrid.props';
 import { Datagrid } from '../typings';
 
 import * as _ from 'lodash';
+import { BodyComponent } from './body/body.component';
 
 
 /**
@@ -46,18 +47,18 @@ TODOS:
 export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy, AfterContentInit, DoCheck {
 	/** Self reference */
 	@ViewChild('dataGrid') dataGrid: ElementRef;
-	@ViewChild('dataGridBody') dataGridBody: ElementRef;
-	
+	@ViewChild('dataGridBody') dataGridBody: BodyComponent;
+
 	/** Columns */
 	private _columns: Datagrid.Column[];
 	@Input()
 	set columns(columns: Datagrid.Column[]) {
 		let slug = Math.floor(Math.random() * 1000000); // Create a random number slug so if different columns are passed a new instance is created every time
-    // Create custom track property and new reference for each column
-	  columns = columns.map((column, i) => {
-	    column.$$track = slug + '-' + i;
-	    return { ...column };
-	  });
+		// Create custom track property and new reference for each column
+		columns = columns.map((column, i) => {
+			column.$$track = slug + '-' + i;
+			return { ...column };
+		});
 		// If columnMap object is supplied, remap column props to what the datatable needs
 		if (this.options && this.options.columnMap) {
 			columns = this.dgSvc.mapPropertiesDown(columns, this.options.columnMap)
@@ -99,7 +100,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		}
 		if (!stateNew.groups) {
 			stateNew.groups = [];
-		}
+    }
+	  if (!stateNew.info) {
+      stateNew.info = {};
+	  }
 
 		this._state = stateNew;
 	};
@@ -122,7 +126,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	}
 
 	@Input() options: Datagrid.Options;
-
 	@Input() filterGlobal: Datagrid.FilterGlobal;
 
 	/** Outputs */
@@ -186,7 +189,9 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	}
 	/** The height of the row. Necessary for virtual scroll calculation. Needs to be an odd number to prevent partial pixel problems. Has 1px border added*/
 	private rowHeight: number = 23;
-
+	/** Keep track of which indexes are visible to prevent the component tree from being updated unless actually changed */
+	private rowsIndexes = { start: 0, end: 0 };
+	private columnIndexes = { start: 0, end: 0 };
 	/** Hold subs for future unsub */
 	private subscriptions: Subscription[] = [];
 	/** Default state of datatable, necessary if no state passed from parent */
@@ -203,23 +208,22 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	constructor(
 		private dgSvc: DataGridService,
 		private ref: ChangeDetectorRef,
-		private zone: NgZone
+		private zone: NgZone,
+		private renderer: Renderer2
 	) {
 	}
 
 	ngOnInit() {
 		// Create a scroll event listener outside the zone
-		this.zone.runOutsideAngular(() => {
-			window.addEventListener('scroll', this.onScrollThrottled, <any>{ capture: true, passive: true });
-		});
+
 	}
 
-  // Check when change detection is run
-  ngDoCheck(): void {
-    //console.log('Checking')
-  }
+	// Check when change detection is run
+	ngDoCheck(): void {
+		//console.log('Checking')
+	}
 
-  ngAfterContentInit() {
+	ngAfterContentInit() {
 		// After all content has been projected into this component, attach templates to columns
 		// Has to be in this lifecycle hook because all input data isn't available at the same time for getter/setters
 		if (this.columnTemplates && Object.keys(this.columnTemplates).length && this.columns) {
@@ -295,7 +299,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	}
 
 	ngAfterViewInit() {
-
 		// Update grid props body width, for some reason it is not available if called in datagrid on initial load OR if within a function call
 		this.gridProps.widthBody = Math.floor(this.dataGrid.nativeElement.getBoundingClientRect().width);
 
@@ -311,11 +314,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	}
 
     /**
-    * Throttle the scroll event
-    */
-	public onScrollThrottled = _.throttle(event => this.onScroll(event), 20, { trailing: true, leading: true });
-
-    /**
     * Throttle the window resize event
     */
 	public onWindowResizeThrottled = _.throttle(event => this.onWindowResize(event), 300, { trailing: true, leading: true });
@@ -324,35 +322,45 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
      * Throttle keyboard events. Not really necessary since repeated key events are ignored but will allow for more events down the road
      */
 	public onKeyEventThrottled = _.throttle(event => this.handleKeyboardEvents(event), 100, { trailing: true, leading: true });
-
+	
 	/**
 	* When the datatable is scrolled
 	* @param event
 	*/
-  private onScroll(event) {
-    //console.log('onScroll', event.target.scrollTop);
-    let scrollPropsOld = { ...this.scrollProps };
+	private onScroll(scrollPropsNew: Datagrid.ScrollProps) {
+		//console.log('onScroll', scrollPropsNew);
+		let scrollPropsOld = { ...this.scrollProps };
+		//this.ref.detach();
+		this.scrollProps = scrollPropsNew;
 
-    this.scrollProps = {
-      scrollTop: event.target.scrollTop,
-      scrollLeft: event.target.scrollLeft
-    }
+		// Update rows only if rows have changed
+		if (scrollPropsOld.scrollTop != this.scrollProps.scrollTop) {
+			let rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
+			if (!this.rowsIndexes || (rowsExternal[0].$$track != this.rowsIndexes.start && rowsExternal[rowsExternal.length - 1].$$track != this.rowsIndexes.end)) {
+				this.rowsExternal = rowsExternal;
+				this.rowsIndexes.start = rowsExternal[0].$$track;
+				this.rowsIndexes.end = rowsExternal[rowsExternal.length - 1].$$track;
+			}
 
-    // Update rows only if rows have changed
-    if (scrollPropsOld.scrollTop != this.scrollProps.scrollTop) {
-      this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
-    }
-     // Update columns only if columns have changed
-     if (scrollPropsOld.scrollLeft != this.scrollProps.scrollLeft) {
-      this.columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
-    }
-    
-    // Notify angular the update is ready
-     this.zone.run(() => {
-        this.ref.markForCheck();
-    });
-  }
+		}
+		// Update columns only if columns have changed
+		if (scrollPropsOld.scrollLeft != this.scrollProps.scrollLeft) {
+			let columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
+			if (!this.columnIndexes || (columnsExternal[0].$$track != this.columnIndexes.start && columnsExternal[columnsExternal.length - 1].$$track != this.columnIndexes.end)) {
+				this.columnsExternal = columnsExternal;
+				this.columnIndexes.start = columnsExternal[0].$$track;
+				this.columnIndexes.end = columnsExternal[columnsExternal.length - 1].$$track;
+			}
 
+		}
+		this.ref.detectChanges();
+		//this.ref.markForCheck();
+		//this.ref.reattach();
+		// Notify angular the update is ready
+		//this.zone.run(() => {
+			//this.ref.markForCheck();
+		//});
+	}
 
     /**   
      * Create the view by assembling everything that modifies the state
@@ -669,12 +677,12 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
      * @param event
      */
 	private handleMouseDown(event: MouseEvent) {
-		//console.warn('handleMouseDown', event)
+		// console.warn('handleMouseDown 1', event, this.dataGridBody)
 		// Set the default starting position of the initial click and also get the bounding box of the datatable
 		let draggingPos: Datagrid.DragSelect = {
 			startX: event.pageX,
 			startY: event.pageY,
-			bounding: this.dataGridBody.nativeElement.getBoundingClientRect()
+			bounding: this.dataGridBody.body.getBoundingClientRect()
 		}
 		// Only drag on left mouse click
 		// Make sure the drag starts within the datatable bounding box
@@ -1158,8 +1166,14 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	public emitColumns(columns: Datagrid.Column[]) {
 		// TODO: Mapping properties back up isn't seamless and needs work, commenting out for now
 		// let remapColumns = this.dgSvc.mapPropertiesUp([...columns], this.options.columnMap);
+    // Remove templates and emit new column references up. Templates have a circulate reference which blows up json usage
+	  let columnsEmitted = columns.map((column) => {
+	    delete column.templateCell;
+	    delete column.templateHeader;
+	    return { ...column };
+	  });
 		// Remap data back up
-		this.onColumnsUpdated.emit(columns);
+    this.onColumnsUpdated.emit(columnsEmitted);
 	}
 
     /**
@@ -1170,7 +1184,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		// User columns has a circular reference somewhere so create new instance and remove that property before emitting up
 		let stateNew = { ...state };
 		delete (<any>stateNew).usersColumns;
-		
+
 		// Create a new memory reference for the state and then remap all properties up into the layout
 		let remapProps = JSON.parse(JSON.stringify(stateNew));
 		remapProps.groups = remapProps.groups && remapProps.groups.length ? this.dgSvc.mapPropertiesUp(remapProps.groups, this.options.controlsMap) : [];
@@ -1233,25 +1247,27 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		this.onCustomLinkEvent.emit(data);
 	}
 
-    /**
-     * Reset all datatable controls, filters sorts groups etc
-     */
-	public reset(resetType?: 'groups' | 'sorts' | 'filters') {
-		if (resetType) {
-			this.state[resetType] = [];
-		} else {
-			//console.warn('Resetting State');
-			this.state.groups = [];
-			this.state.filters = [];
-			this.state.sorts = [];
-			this.columns.forEach(column => { column.pinnedLeft = false; column.locked = false; column = Object.assign({}, column) });
-			this.columnsInternal.forEach(column => { column.pinnedLeft = false; column.locked = false; column = Object.assign({}, column) });
-			this.columnsInternal = [...this.columnsInternal];
-			this.filterGlobal.term = null;
-		}
-		this.emitColumns(this.columnsInternal);
-		this.onStateUpdated({ action: Actions.reset, data: null });
-	}
+  /**
+   * Reset all datatable controls, filters sorts groups etc
+   */
+  public reset(resetType?: 'groups' | 'sorts' | 'filters') {
+
+    //console.warn('Resetting State');
+    this.state = {
+      groups: [],
+      filters: [],
+      sorts: [],
+      info:{}
+    }
+    this.columnsInternal = this.columns.map(column => {
+      column.pinnedLeft = false;
+      column.locked = false;
+      return { ...column };
+    });
+    this.filterGlobal.term = null;
+    this.emitColumns(this.columnsInternal);
+    this.onStateUpdated({ action: Actions.reset, data: null });
+  }
 
 	/**
 	* On window resize
@@ -1268,7 +1284,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	ngOnDestroy() {
 		// Unsub from all subscriptions
 		this.subscriptions.forEach(sub => sub.unsubscribe());
-		window.removeEventListener('scroll', this.onScrollThrottled);
 	}
 }
 
