@@ -100,10 +100,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		}
 		if (!stateNew.groups) {
 			stateNew.groups = [];
-    }
-	  if (!stateNew.info) {
-      stateNew.info = {};
-	  }
+		}
+		if (!stateNew.info) {
+			stateNew.info = {};
+		}
 
 		this._state = stateNew;
 	};
@@ -322,7 +322,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
      * Throttle keyboard events. Not really necessary since repeated key events are ignored but will allow for more events down the road
      */
 	public onKeyEventThrottled = _.throttle(event => this.handleKeyboardEvents(event), 100, { trailing: true, leading: true });
-	
+
 	/**
 	* When the datatable is scrolled
 	* @param event
@@ -358,7 +358,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		//this.ref.reattach();
 		// Notify angular the update is ready
 		//this.zone.run(() => {
-			//this.ref.markForCheck();
+		//this.ref.markForCheck();
 		//});
 	}
 
@@ -1166,14 +1166,14 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	public emitColumns(columns: Datagrid.Column[]) {
 		// TODO: Mapping properties back up isn't seamless and needs work, commenting out for now
 		// let remapColumns = this.dgSvc.mapPropertiesUp([...columns], this.options.columnMap);
-    // Remove templates and emit new column references up. Templates have a circulate reference which blows up json usage
-	  let columnsEmitted = columns.map((column) => {
-	    delete column.templateCell;
-	    delete column.templateHeader;
-	    return { ...column };
-	  });
+		// Remove templates and emit new column references up. Templates have a circulate reference which blows up json usage
+		let columnsEmitted = columns.map((column) => {
+			delete column.templateCell;
+			delete column.templateHeader;
+			return { ...column };
+		});
 		// Remap data back up
-    this.onColumnsUpdated.emit(columnsEmitted);
+		this.onColumnsUpdated.emit(columnsEmitted);
 	}
 
     /**
@@ -1247,27 +1247,26 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		this.onCustomLinkEvent.emit(data);
 	}
 
-  /**
-   * Reset all datatable controls, filters sorts groups etc
-   */
-  public reset(resetType?: 'groups' | 'sorts' | 'filters') {
+	/**
+	 * Reset all datatable controls, filters sorts groups etc
+	 */
+	public reset(resetType?: 'groups' | 'sorts' | 'filters') {
 
-    //console.warn('Resetting State');
-    this.state = {
-      groups: [],
-      filters: [],
-      sorts: [],
-      info:{}
-    }
-    this.columnsInternal = this.columns.map(column => {
-      column.pinnedLeft = false;
-      column.locked = false;
-      return { ...column };
-    });
-    this.filterGlobal.term = null;
-    this.emitColumns(this.columnsInternal);
-    this.onStateUpdated({ action: Actions.reset, data: null });
-  }
+		//Reset State
+		this.state.groups = [];
+		this.state.filters = [];
+		this.state.sorts = [];
+		this.state.info = {};
+		//Reset Columns
+		this.columnsInternal = this.columns.map(column => {
+			column.pinnedLeft = false;
+			column.locked = false;
+			return { ...column };
+		});
+		this.filterGlobal.term = null;
+		this.emitColumns(this.columnsInternal);
+		this.onStateUpdated({ action: Actions.reset, data: null });
+	}
 
 	/**
 	* On window resize
