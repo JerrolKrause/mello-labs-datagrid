@@ -53,7 +53,7 @@ export class BodyComponent implements OnInit, OnChanges {
 	/**
    * Throttle the scroll event
    */
-	public onScrollThrottled = _.throttle(event => this.onScroll(event), 60, { trailing: true, leading: true });
+	public onScrollThrottled = _.throttle(event => this.onScroll(event), 20, { trailing: true, leading: true });
 
 	/**
 	* When the datatable is scrolled

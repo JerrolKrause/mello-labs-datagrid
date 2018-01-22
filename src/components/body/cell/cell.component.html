@@ -1,81 +1,46 @@
 <div class="datagrid-cell-data"
      [ngStyle]="{'width' : column.width + 'px'}"
      title="{{row[column.prop]}}">
-   
-    <!---->
-    <ng-template #cellTemplate
-                 *ngIf="column.templateCell"
-                 [ngTemplateOutlet]="column.templateCell"
-                 [ngTemplateOutletContext]="cellContext">
-    </ng-template>
-    
 
-    <div class="datagrid-cell-data-content" #cellData
-         *ngIf="!column.templateCell"
-         [ngSwitch]="column.columnType"
-         [ngbPopover]="fieldContent" #p="ngbPopover" triggers="manual" container="body" placement="top-left" (dblclick)="fieldEdit($event);">
-        <!-- Date Time-->
-        <ng-container *ngSwitchCase="'dateTime'">
-            {{row[column.prop] | date: 'MM/dd/yyyy - h:mm a' }}
-        </ng-container>
-        <!-- Date-->
-        <ng-container *ngSwitchCase="'date'">
-            {{row[column.prop] | date: 'MM/dd/yyyy' }}
-        </ng-container>
+  <ng-template #cellTemplate
+               *ngIf="column.templateCell"
+               [ngTemplateOutlet]="column.templateCell"
+               [ngTemplateOutletContext]="cellContext">
+  </ng-template>
 
-        <!-- Money -->
-        <ng-container *ngSwitchCase="'money'">
-            {{row[column.prop] | currency:'USD' }}
-        </ng-container>
+  <div class="datagrid-cell-data-content"
+       #cellData
+       *ngIf="!column.templateCell"
+       [ngbPopover]="fieldContent" #p="ngbPopover"container="body" placement="top-left"  triggers="manual" (dblclick)="fieldEdit($event);">
+    <ng-container [ngSwitch]="column.columnType">
+      <!-- Date Time-->
+      <ng-container *ngSwitchCase="'dateTime'">
+        {{row[column.prop] | date: 'MM/dd/yyyy - h:mm a' }}
+      </ng-container>
+      <!-- Date-->
+      <ng-container *ngSwitchCase="'date'">
+        {{row[column.prop] | date: 'MM/dd/yyyy' }}
+      </ng-container>
 
-        <!-- Default -->
-        <ng-container *ngSwitchDefault>
-            {{row[column.prop]}}
-        </ng-container>
-    </div>
+      <!-- Money -->
+      <ng-container *ngSwitchCase="'money'">
+        {{row[column.prop] | currency:'USD' }}
+      </ng-container>
 
-    <div class="datagrid-truncated" *ngIf="truncated"></div>
+      <!-- Default -->
+      <ng-container *ngSwitchDefault>
+        {{row[column.prop]}}
+      </ng-container>
+
+    </ng-container>
+  </div>
+
+  <div class="datagrid-truncated" *ngIf="truncated"></div>
 </div>
 
 <ng-template #fieldContent>
-    <textarea class="form-control form-control-sm" style="width:400px;" rows="3" #editBox autofocus
-                          (dblclick)="$event.target.select();"
-                          (blur)="rowUpdated($event);">{{row[column.prop]}}</textarea>
-                        <!--(keyup.enter)="rowUpdated($event);"-->
+  <textarea class="form-control form-control-sm" style="width:400px;" rows="3" #editBox autofocus
+            (dblclick)="$event.target.select();"
+            (blur)="rowUpdated($event);">{{row[column.prop]}}</textarea>
+  <!--(keyup.enter)="rowUpdated($event);"-->
 </ng-template>
-
-
-<!--
-<div class="cell">
-
-    <templates-cell [column]="column" [options]="options" [rowData]="rowData" (updateDatatable)="onUpdateDatatable($event)">
-        <div class="cell2" title="{{rowData[column.prop]}}" #cell2>
-            <span class="cell3" #cell3>
-                <ng-container [ngSwitch]="column.columnType">
-                    <!-- Date Time->
-                    <ng-container *ngSwitchCase="'dateTime'">
-                        {{rowData[column.prop] | date: 'MM/dd/yyyy - h:mm a' }}
-                    </ng-container>
-                    <!-- Date->
-                    <ng-container *ngSwitchCase="'date'">
-                        {{rowData[column.prop] | date: 'MM/dd/yyyy' }}
-                    </ng-container>
-
-                    <!-- Money ->
-                    <ng-container *ngSwitchCase="'money'">
-                        {{rowData[column.prop] | currency:'USD':true:'1.2-2' }}
-                    </ng-container>
-
-                    <!-- Default ->
-                    <ng-container *ngSwitchDefault>
-                        {{rowData[column.prop]}}
-                    </ng-container>
-                </ng-container>
-            </span>
-
-            <div class="truncated" *ngIf="truncated$ | async">{{isTruncated}}</div>
-        </div>
-    </templates-cell>
-</div>
-
--->

@@ -232,7 +232,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	}
 
 	ngOnChanges(model) {
-		// console.warn('ngOnChanges', model);
+		//console.warn('ngOnChanges', model);
 
 		// Clear all memoized caches anytime new data is loaded into the grid
 		this.dgSvc.cache.sortArray.cache.clear();
@@ -313,14 +313,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		});
 	}
 
-    /**
-    * Throttle the window resize event
-    */
+    /** Throttle the window resize event */
 	public onWindowResizeThrottled = _.throttle(event => this.onWindowResize(event), 300, { trailing: true, leading: true });
 
-    /*
-     * Throttle keyboard events. Not really necessary since repeated key events are ignored but will allow for more events down the road
-     */
+    /** Throttle keyboard events. Not really necessary since repeated key events are ignored but will allow for more events down the road */
 	public onKeyEventThrottled = _.throttle(event => this.handleKeyboardEvents(event), 100, { trailing: true, leading: true });
 
 	/**
@@ -329,6 +325,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	*/
 	private onScroll(scrollPropsNew: Datagrid.ScrollProps) {
 		//console.log('onScroll', scrollPropsNew);
+
 		let scrollPropsOld = { ...this.scrollProps };
 		//this.ref.detach();
 		this.scrollProps = scrollPropsNew;
@@ -351,15 +348,11 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 				this.columnIndexes.start = columnsExternal[0].$$track;
 				this.columnIndexes.end = columnsExternal[columnsExternal.length - 1].$$track;
 			}
-
 		}
-		this.ref.detectChanges();
-		//this.ref.markForCheck();
-		//this.ref.reattach();
-		// Notify angular the update is ready
-		//this.zone.run(() => {
-		//this.ref.markForCheck();
-		//});
+		// Not ideal but row updates aren't as seamless without the zone.run
+		this.zone.run(() => {
+			this.ref.detectChanges();
+		});
 	}
 
     /**   
@@ -441,12 +434,9 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		// TODO: Grid props needed to build visible rows and columns but visible rows and columns needed to update grid props
 		this.updateGridProps();
 
-		// Update DOM
-		//this.rowsInternal = newRows;
-
 		// Add stats and info to be emitted
 		this.state.info.rowsTotal = this.rows.length;
-		this.state.info.rowsVisible = this.rowsInternal.length;
+		this.state.info.rowsVisible = this.rowsInternal.filter(row => !row.type).length; // Filter out any group columns
 
 		this.status = this.dgSvc.createStatuses(this.state, this.columnsInternal);
 		this.state = { ...this.state };
@@ -1168,9 +1158,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		// let remapColumns = this.dgSvc.mapPropertiesUp([...columns], this.options.columnMap);
 		// Remove templates and emit new column references up. Templates have a circulate reference which blows up json usage
 		let columnsEmitted = columns.map((column) => {
-			delete column.templateCell;
-			delete column.templateHeader;
-			return { ...column };
+			let columnNew = { ... column };
+			delete columnNew.templateCell;
+			delete columnNew.templateHeader;
+			return columnNew;
 		});
 		// Remap data back up
 		this.onColumnsUpdated.emit(columnsEmitted);
@@ -1277,8 +1268,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 			this.viewCreate();
 		}
 	}
-
-
 
 	ngOnDestroy() {
 		// Unsub from all subscriptions

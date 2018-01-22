@@ -15,7 +15,8 @@ export class RowComponent implements OnInit, OnChanges  {
     @Output() updateDatatable: EventEmitter<any> = new EventEmitter();
     @Output() onRowUpdated: EventEmitter<any> = new EventEmitter();
 
-	constructor(public elementRef: ElementRef
+	constructor(
+		public elementRef: ElementRef
     ) {
     }
 
@@ -44,7 +45,7 @@ export class RowComponent implements OnInit, OnChanges  {
     * Pass updated field up the component chain
     * @param event
     */
-    public rowUpdated(event: Datagrid.FieldEdit) {
+	public rowUpdated(event: Datagrid.FieldEdit) {
         this.onRowUpdated.emit(event);
     }
    

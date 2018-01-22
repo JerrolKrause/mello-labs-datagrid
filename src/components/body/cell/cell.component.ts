@@ -44,6 +44,7 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit, OnDestro
   ngOnInit() { }
 
   ngOnChanges(model) {
+
     // console.log('Cell Changes', this.column.prop);
     this.checkTruncated();
     this.cellContext.column = this.column;

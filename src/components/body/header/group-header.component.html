@@ -3,6 +3,8 @@
         <a (click)="toggleGroup(group, $event)" [ngClass]="{'active': active }">
             <span class="sticky-left">
                 <strong>
+                    <span class="red" *ngIf="options?.showGroupColumnName">{{group.columnLabel}}:</span>
+
                     <ng-container *ngIf="group?.column?.columnType && groupLabel != 'No Value' && groupLabel != 'Missing Value' ">
                         <ng-container [ngSwitch]="group.column.columnType">
                             <!-- Date Time-->
