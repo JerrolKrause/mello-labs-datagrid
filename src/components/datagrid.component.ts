@@ -232,7 +232,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	}
 
 	ngOnChanges(model) {
-		//console.warn('ngOnChanges', model);
+		// console.warn('ngOnChanges', model);
 
 		// Clear all memoized caches anytime new data is loaded into the grid
 		this.dgSvc.cache.sortArray.cache.clear();
@@ -299,18 +299,19 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	}
 
 	ngAfterViewInit() {
+		// console.warn('ngAfterViewInit', Math.floor(this.dataGrid.nativeElement.getBoundingClientRect().width));
 		// Update grid props body width, for some reason it is not available if called in datagrid on initial load OR if within a function call
 		this.gridProps.widthBody = Math.floor(this.dataGrid.nativeElement.getBoundingClientRect().width);
 
-		this.domReady = true;
 		// Wrapped in settimeout to ensure DOM is ready, visible and can draw with gridprops
 		setTimeout(() => {
+			this.domReady = true;
 			// If app and dom is ready, create the view
 			if (this.appReady && this.domReady) {
 				this.viewCreate();
 				this.ref.detectChanges();
 			}
-		});
+		},100);
 	}
 
     /** Throttle the window resize event */
@@ -361,7 +362,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
      */
 	public viewCreate() {
 		// TODO Fix issues with memoization with group and sorting
-		// console.warn('createView');
+		// console.warn('createView',this.rows, this.columns);
 		// console.time('Creating View');
 		// Set manual change detection
 		this.ref.detach();
@@ -410,7 +411,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 
 		// TODO: Grid props needed to build visible rows and columns but visible rows and columns needed to update grid props
 		this.updateGridProps();
-
 		// If the total width of the columns is less than the viewport, resize columns to fit
 		// TODO: This is very inefficient to call on every view change, memoize?
 		if (this.gridProps.widthTotal < this.gridProps.widthBody) {
