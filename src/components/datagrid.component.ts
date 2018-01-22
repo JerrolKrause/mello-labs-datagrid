@@ -1242,11 +1242,21 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	 * Reset all datatable controls, filters sorts groups etc
 	 */
 	public reset(resetType?: 'groups' | 'sorts' | 'filters') {
-
+		this.ref.detach();
+		
 		//Reset State
-		this.state.groups = [];
-		this.state.filters = [];
-		this.state.sorts = [];
+		if (resetType && resetType == 'groups') {
+			this.state.groups = [];
+		} else if (resetType && resetType == 'sorts') {
+			this.state.sorts = [];
+		} else if (resetType && resetType == 'filters') {
+			this.state.filters = [];
+		} else {
+			this.state.groups = [];
+			this.state.filters = [];
+			this.state.sorts = [];
+		}
+
 		this.state.info = {};
 		//Reset Columns
 		this.columnsInternal = this.columns.map(column => {
@@ -1257,6 +1267,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		this.filterGlobal.term = null;
 		this.emitColumns(this.columnsInternal);
 		this.onStateUpdated({ action: Actions.reset, data: null });
+		this.ref.reattach();
 	}
 
 	/**
