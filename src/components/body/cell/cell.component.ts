@@ -20,9 +20,9 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit, OnDestro
   @Output() onRowUpdated: EventEmitter<any> = new EventEmitter();
 
   /** The popover used for inline editing */
-  @ViewChild('p') p;
+	@ViewChild('p') p;
   /** The popover textarea for inline editing */
-  @ViewChild('editBox') editBox;
+	@ViewChild('editBox') editBox: ElementRef;
   /** Reference to content inside the cell */
   @ViewChild('cellData') cellData: ElementRef;
   /** Reference to content inside the cell */
@@ -79,8 +79,8 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit, OnDestro
    */
   public fieldEdit(event) {
     if (this.column.canEdit) {
-      this.p.open();
-      //document.getElementById('privateNoteEditBox').focus();
+				this.p.open();
+				setTimeout(() => this.editBox.nativeElement.focus());
     }
   }
 
@@ -89,7 +89,7 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit, OnDestro
    * @param event
    */
   public rowUpdated(event) {
-    let valueOld = this.row[this.column.prop].toString();
+    let valueOld = this.row[this.column.prop];
     this.row[this.column.prop] = event.target.value;
 
     let fieldData: Datagrid.FieldEdit = {
@@ -97,9 +97,14 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit, OnDestro
       valueOld: valueOld,
       prop: this.column.prop,
       row: this.row
-    }
-    // Pass data up chain
-    this.onRowUpdated.emit(fieldData);
+		}
+		console.log(fieldData.valueNew, fieldData.valueOld)
+    // If the data has changed
+		if (fieldData.valueNew && fieldData.valueNew == fieldData.valueOld) {
+				// Pass data up chain
+				this.onRowUpdated.emit(fieldData);
+		}
+    
     // Fixes bug with ng-bootstrap not seeing close method
     setTimeout(() => this.p.close());
 

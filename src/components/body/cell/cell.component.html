@@ -41,6 +41,6 @@
 <ng-template #fieldContent>
   <textarea class="form-control form-control-sm" style="width:400px;" rows="3" #editBox autofocus
             (dblclick)="$event.target.select();"
-            (blur)="rowUpdated($event);">{{row[column.prop]}}</textarea>
-  <!--(keyup.enter)="rowUpdated($event);"-->
+            (blur)="rowUpdated($event);"
+            (keyup.enter)="rowUpdated($event);">{{row[column.prop]}}</textarea>
 </ng-template>
