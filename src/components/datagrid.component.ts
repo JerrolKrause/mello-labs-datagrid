@@ -643,6 +643,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 
 			gridProps.heightTotal = newHeight;
 		}
+		// Set default height if non specified
+		else {
+			gridProps.heightTotal = 300;
+		}
 
 		gridProps.rowsVisible = Math.ceil(gridProps.heightTotal / this.rowHeight); // Get max visible rows
 		if (this.rowsInternal && this.rowsInternal.length) {
@@ -1264,7 +1268,11 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 			column.locked = false;
 			return { ...column };
 		});
-		this.filterGlobal.term = null;
+
+		if (this.filterGlobal){
+			this.filterGlobal.term = null;
+		}
+		
 		this.emitColumns(this.columnsInternal);
 		this.onStateUpdated({ action: Actions.reset, data: null });
 		this.ref.reattach();
