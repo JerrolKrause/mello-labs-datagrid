@@ -98,9 +98,9 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit, OnDestro
       prop: this.column.prop,
       row: this.row
 		}
-		console.log(fieldData.valueNew, fieldData.valueOld)
+
     // If the data has changed
-		if (fieldData.valueNew && fieldData.valueNew == fieldData.valueOld) {
+		if (fieldData.valueNew != fieldData.valueOld) {
 				// Pass data up chain
 				this.onRowUpdated.emit(fieldData);
 		}
