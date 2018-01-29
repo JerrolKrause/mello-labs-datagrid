@@ -1,6 +1,7 @@
 <div class="datagrid-cell-data"
      [ngStyle]="{'width' : column.width + 'px'}"
-     title="{{row[column.prop]}}">
+     title="{{row[column.prop]}}"
+     [ngbPopover]="fieldContent" #p="ngbPopover" container="body" placement="top-left" triggers="manual" (dblclick)="fieldEdit($event);">
 
   <ng-template #cellTemplate
                *ngIf="column.templateCell"
@@ -10,13 +11,14 @@
 
   <div class="datagrid-cell-data-content"
        #cellData
-       *ngIf="!column.templateCell"
-       [ngbPopover]="fieldContent" #p="ngbPopover"container="body" placement="top-left"  triggers="manual" (dblclick)="fieldEdit($event);">
+       *ngIf="!column.templateCell">
     <ng-container [ngSwitch]="column.columnType">
+
       <!-- Date Time-->
       <ng-container *ngSwitchCase="'dateTime'">
         {{row[column.prop] | date: 'MM/dd/yyyy - h:mm a' }}
       </ng-container>
+
       <!-- Date-->
       <ng-container *ngSwitchCase="'date'">
         {{row[column.prop] | date: 'MM/dd/yyyy' }}

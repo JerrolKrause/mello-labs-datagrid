@@ -18,9 +18,11 @@ import { BodyComponent } from './body/body.component';
 
 /**
 TODOS:
+- Better condition management for rendering th einitial view
 - Allow configurable options for resize: Min column width, max column width
 - Move row height calculations from the SCSS file into inline so custom row heights will be supported
 - Only generate filter terms on demand
+- Drill down filter terms so only visible ones are present. Also should counts of each
 - Better handling/performance of initial load. Should also have null value for rows to avoid FOUC of 'no rows found'
 - Datatable is not properly cleaning up after itself when emitting data up to parent. Need to remove props added by DT, either directly or by mapping. Look in dgSvc map props up
 - Update scaffolding
@@ -232,10 +234,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 				this.dgSvc.cache.sortArray.cache.clear();
 				this.dgSvc.cache.groupRows.cache.clear();
 
-				if (this.dataGrid && this.dataGrid.nativeElement) {
-						this.gridProps.widthBody = Math.floor(this.dataGrid.nativeElement.getBoundingClientRect().width);
-				}
-
 				// If columns are passed
 				if (model.filterGlobal && this.filterGlobal && this.filterGlobal.term) {
 						_.throttle(() => this.viewCreate(), 500, { trailing: true, leading: true });
@@ -281,10 +279,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 
 						// Only on initial load, set app ready. This prevents the app from hanging on a route change
 						this.appReady = true;
-
-						if (this.appReady && this.domReady) {
-								this.viewCreate();
-						}
+						this.dataGridReady();
 
 						//Emit the state change to the parent component now that the first initial view has been created
 						this.emitState(this.state);
@@ -293,20 +288,39 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		}
 
 		ngAfterViewInit() {
-				// Wrapped in settimeout to ensure DOM is ready, visible and can draw with gridprops
 				setTimeout(() => {
-            // Update grid props body width, for some reason it is not available if called in datagrid on initial load OR if within a function call
-						this.gridProps.widthBody = Math.floor(this.dataGrid.nativeElement.getBoundingClientRect().width);
-						this.domReady = true;
-						// If app and dom is ready, create the view
-						if (this.appReady && this.domReady) {
+				  this.domReady = true;
+				  this.dataGridReady();
+				});
+		}
+
+		ngAfterViewChecked() { }
+
+    /**
+     * Determine the conditions for when the datagrid is ready to render to the dom
+     * TODO: Set max iterations to check to avoid infinite loop
+     */
+		private dataGridReady() {
+        // If appdata and DOM are ready
+				if (this.appReady && this.domReady) {
+            // Make sure that the datagrid is visible on the DOM so that the width can be extracted
+						if (this.dataGrid && this.dataGrid.nativeElement) {
+								this.gridProps.widthBody = Math.floor(this.dataGrid.nativeElement.getBoundingClientRect().width);
+						}
+
+            // If width is available, create the view and render the dom
+						if (this.gridProps.widthBody) {
 								this.viewCreate();
 								this.ref.detectChanges();
 						}
-				},200);// HACK: Figure out why native element isn't ready in afterviewinit even though it should be
+            // If for some reason the DOM is not available, check every 100 seconds until it is
+						else {
+								setTimeout(() => {
+										this.dataGridReady();
+								}, 100);
+						}
+				}
 		}
-
-		ngAfterViewChecked() {}
 
 		/** Throttle the window resize event */
 		public onWindowResizeThrottled = _.throttle(event => this.onWindowResize(event), 300, { trailing: true, leading: true });
@@ -458,9 +472,22 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		public onStateUpdated(stateChange: Datagrid.StateChange): void {
 				// console.warn('changeState ', this.state, stateChange);
 				this.ref.detach();
-
+        
 				let newState: Datagrid.State = { ...this.state };
-				//let newRows = this.rows;
+
+        // Legacy support for previous states of the grid. Ensure all arrays exist to prevent errors
+				if (!newState.filters) {
+						newState.filters = [];
+				}
+				if (!newState.sorts) {
+						newState.sorts = [];
+				}
+				if (!newState.groups) {
+						newState.groups = [];
+				}
+				if (!newState.info) {
+						newState.info = {};
+				}
 
 				newState.info.initial = false;
 
