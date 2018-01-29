@@ -564,7 +564,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 
 				//### Pinning ###
 				else if (stateChange.action == Actions.pinLeft) {
-						//console.warn('Pinning');
 						if (stateChange.data.isPinned) {
 								// Get column being unpinned
 								let colNew = this.columnsPinnedLeft[stateChange.data.index];
@@ -595,8 +594,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
      * When columns are modified from a lower component
      * @param columns
      */
-		public columnsUpdated(columnData: { action: 'resize' | 'reorder', columnIndex?: number, columnIndex2?: number, type?: 'pinnedLeft' | 'main', width?: number, columns?: Datagrid.Column[] }) {
-				console.log('columnsUpdated', columnData);
+		public columnsUpdated(columnData: { action: 'resize' | 'reorder', columnIndex?: number, prop?: string, type?: 'pinnedLeft' | 'main', width?: number, columns?: Datagrid.Column[] }) {
+				// console.log('columnsUpdated', columnData);
 				// If this is a resize column event
 				if (columnData.action == 'resize') {
 						// Determine if updating pinned or regular columns
@@ -613,17 +612,15 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 				// If this is a reorder columns event
 				else if (columnData.action == 'reorder') {
 						if (columnData.type == 'pinnedLeft') {
-								// Swap the columns based on the new indexes
-								let colOld = { ...this.columnsPinnedLeft[columnData.columnIndex] };
-								let colNew = { ...this.columnsPinnedLeft[columnData.columnIndex2] };
-								this.columnsPinnedLeft[columnData.columnIndex2] = colOld;
-								this.columnsPinnedLeft[columnData.columnIndex] = colNew;
+								let colOld = this.columnsPinnedLeft.filter(column => column.prop == columnData.prop)[0]; // Get column being moved
+								let colsNew = this.columnsPinnedLeft.filter(column => column.prop != columnData.prop); // Get new array without that column
+								colsNew.splice(columnData.columnIndex, 0, colOld); // Insert into index location
+								this.columnsPinnedLeft = colsNew; // Update reference
 						} else {
-								// Swap the columns based on the new indexes
-								let colOld = { ...this.columnsInternal[columnData.columnIndex] };
-								let colNew = { ...this.columnsInternal[columnData.columnIndex2] };
-								this.columnsInternal[columnData.columnIndex2] = colOld;
-								this.columnsInternal[columnData.columnIndex] = colNew;
+								let colOld = this.columnsInternal.filter(column => column.prop == columnData.prop)[0]; // Get column being moved
+								let colsNew = this.columnsInternal.filter(column => column.prop != columnData.prop); // Get new array without that column
+								colsNew.splice(columnData.columnIndex, 0, colOld); // Insert into index location
+								this.columnsInternal = colsNew; // Update reference
 						}
 				}
 				this.emitColumns(this.columnsInternal);
