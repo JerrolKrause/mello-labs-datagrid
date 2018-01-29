@@ -23,6 +23,13 @@ export class HeaderRowComponent implements OnInit, OnChanges {
 		@Output() onStateUpdated: EventEmitter<any> = new EventEmitter();
 		@Output() onCustomLinkEvent: EventEmitter<any> = new EventEmitter();
 
+		public cellContext: {
+				column?: Datagrid.Column,
+				row?: any,
+				options?: Datagrid.Options,
+				value?: any
+		} = {};
+
 		/** During a resize, disable some stuff */
 		public reSizing: boolean = false;
 
@@ -37,6 +44,12 @@ export class HeaderRowComponent implements OnInit, OnChanges {
 		}
 
 		ngOnChanges() {
+
+				//this.cellContext.column = this.column;
+				//this.cellContext.row = this.row;
+				//this.cellContext.options = this.options;
+				//this.cellContext.value = this.row[this.column.prop];
+
 				if (this.columns) {
 						this.columnsOriginal = [...this.columns];
 				}
