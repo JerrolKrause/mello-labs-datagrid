@@ -854,8 +854,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
      * When a mouse event has happend on a body row
      * @param event
      */
-		public onRowMouseEvent(action: { type: 'click' | 'contextmenu' | 'mousedown' | 'mouseup' | 'mouseenter', rowIndex: number, event: MouseEvent }) {
-
+		public onRowMouseEvent(action: { type: 'click' | 'contextmenu' | 'mousedown' | 'mouseup' | 'mouseenter' | 'dblclick', rowIndex: number, event: MouseEvent }) {
+				//console.log('onRowMouseEvent', action);
 				let row = this.rowsInternal[action.rowIndex];
 
 				switch (action.type) {
@@ -893,6 +893,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 						case 'mouseenter':
 								this.rowHoveredLast = action.rowIndex;
 								break;
+						case 'dblclick':
+								this.rowHoveredLast = null;
+								this.rowSelectedLast = null;
+								break;
 						default:
 								console.warn('An unknown mouse event was passed to onRowMouseEvent');
 				}
@@ -903,7 +907,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
      * @param row - The row object
      * @param rowIndex - The index of the currently selected row
      */
-		public selectRow(row, rowIndex: number, isRightClick?: boolean, elementRef?) {
+		public selectRow(row: any, rowIndex: number, isRightClick?: boolean, elementRef?: any) {
 				// console.warn('selectRow', this.keysPressed);
 				// console.warn('selectRow', groupIndex);
 

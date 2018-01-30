@@ -1,5 +1,6 @@
 <div class="datagrid-cell-data"
      [ngStyle]="{'width' : column.width + 'px'}"
+	 [ngClass]="{'canEdit': column.canEdit }"
      title="{{row[column.prop]}}"
      [ngbPopover]="fieldContent" #p="ngbPopover" container="body" placement="top-left" triggers="manual" (dblclick)="fieldEdit($event);">
 

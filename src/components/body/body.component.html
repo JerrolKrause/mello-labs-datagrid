@@ -3,14 +3,7 @@
 	 [ngClass]="{ 'widthFixed' : gridProps.widthFixed }">
 
 	<div class="datagrid-body" [ngStyle]="{'width' : gridProps.widthTotal + 'px', 'height' : gridProps.heightBody + 'px' }">
-		<!--
-		(click)="selectRow(row, rowIndex, null, false, rowElement.elementRef)"
-		(contextmenu)="rightClick(row, rowIndex, $event)"
-		(mousedown)="rowMouseDown(rowIndex, $event)"
-		(mouseup)="rowMouseUp(rowIndex, $event)"
-		(mouseover)="rowHoveredLast = rowIndex"
-		[ngStyle]="rowStyles[row[options.primaryKey]]"
-		-->
+
 		<ng-container *ngFor="let row of rows; let rowIndex = index; trackBy:trackRow;">
 
 			<div class="datagrid-body-row" *ngIf="!row.$$hidden"
@@ -33,6 +26,7 @@
 						 [style.width]="gridProps.widthPinned + 'px'"
 						 [ngStyle]="rowStyles[row[options.primaryKey]]"
 						 (click)="onMouseEvent('click', row.$$rowIndex, $event)"
+						 (dblclick)="onMouseEvent('dblclick', row.$$rowIndex, $event)"
 						 (contextmenu)="onMouseEvent('contextmenu', row.$$rowIndex, $event)"
 						 (mousedown)="onMouseEvent('mousedown', row.$$rowIndex, $event)"
 						 (mouseup)="onMouseEvent('mouseup', row.$$rowIndex, $event)"
@@ -49,6 +43,7 @@
 						 [style.width]="gridProps.widthMain + 'px'"
 						 [ngStyle]="rowStyles[row[options.primaryKey]]"
 						 (click)="onMouseEvent('click', row.$$rowIndex, $event)"
+						 (dblclick)="onMouseEvent('dblclick', row.$$rowIndex, $event)"
 						 (contextmenu)="onMouseEvent('contextmenu', row.$$rowIndex, $event)"
 						 (mousedown)="onMouseEvent('mousedown', row.$$rowIndex, $event)"
 						 (mouseup)="onMouseEvent('mouseup', row.$$rowIndex, $event)"

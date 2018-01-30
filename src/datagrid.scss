@@ -83,7 +83,7 @@ $border-color: #ccc;
                 &.selected-state .datagrid-cell{background:#F0DADA;}
                 .datagrid-cell{position:absolute;min-height: 23px;border:none;}
                 .datagrid-cell-data{line-height:23px;position:relative;z-index: 3;display: inline-block;white-space: nowrap;text-overflow: ellipsis; min-height: 23px;overflow: hidden;
-                    //transform: translate(51%, 50%) scale(2);zoom: .5;// This prevents blurry text in chrome
+                .datagrid-cell-data.canEdit:hover{outline: 2px dashed #e0e0e0;outline-offset: -2px;}
                 .datagrid-cell-data-content{position:absolute;padding: 0px 5px;left:0;right:0;bottom:0;top:0;}
                 &.pinned{box-shadow: 2px 5px 5px rgba(0, 0, 0, 0.3);background-color:#fff;z-index: 4;}
                     .cell{height:22px;padding: 3px 8px;}
