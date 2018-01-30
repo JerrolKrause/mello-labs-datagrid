@@ -18,7 +18,7 @@ import { BodyComponent } from './body/body.component';
 
 /**
 TODOS:
-- Better condition management for rendering th einitial view
+- Better condition management for rendering the initial view
 - Allow configurable options for resize: Min column width, max column width
 - Move row height calculations from the SCSS file into inline so custom row heights will be supported
 - Only generate filter terms on demand

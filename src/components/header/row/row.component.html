@@ -1,38 +1,37 @@
-<div dnd-sortable-container [sortableData]="columns">
+<div draggable="false">
+	<div class="datagrid-header-cell" title="{{column.label}}"
+		 *ngFor="let column of columns; let columnIndex = index; trackBy:trackColumn"
+		 [ngClass]="{'reorderable': column.canReorder }"
+		 [ngStyle]="{'width' : column.width + 'px', 'left' : column.$$leftOffset + 'px' }"
+		 mwlResizable [enableGhostResize]="true" [resizeEdges]="{right: column.canResize || false}" (resizeEnd)="onResizeEnd($event, column.$$index, columnType)"
+		 
+		 [draggable]="column.canReorder" (dragstart)="dragStartProp = column.prop;" (dragover)="$event.preventDefault()" (drop)="dragDrop(columnType, column.$$index)">
 
-  <div class="datagrid-header-cell" title="{{column.label}}"
-       *ngFor="let column of columns; let columnIndex = index; trackBy:trackColumn"
-       [ngClass]="{'reorderable': column.canReorder }"
-       [ngStyle]="{'width' : column.width + 'px', 'left' : column.$$leftOffset + 'px' }"
-       mwlResizable [enableGhostResize]="true" [resizeEdges]="{right: column.canResize || false}" (resizeEnd)="onResizeEnd($event, column.$$index, columnType)"
-       dnd-sortable [sortableIndex]="columnIndex" [dragEnabled]="column.canReorder && !column.pinnedLeft" dnd-sortable-handle
-       (onDragSuccess)="onReorderSuccess(columnType, columnIndex, column)">
+		<!-- Column Label -->
+		<span class="datagrid-header-cell-label">
+			<ng-template #cellTemplate
+						 *ngIf="column.templateHeader"
+						 [ngTemplateOutlet]="column.templateHeader"
+						 [ngTemplateOutletContext]="cellContext">
+			</ng-template>
+			<ng-container *ngIf="!column.templateHeader">
+				{{column.label}}
+			</ng-container>
+		</span>
 
-    <!-- Column Label -->
-    <span class="datagrid-header-cell-label">
-      <ng-template #cellTemplate
-                   *ngIf="column.templateHeader"
-                   [ngTemplateOutlet]="column.templateHeader"
-                   [ngTemplateOutletContext]="cellContext">
-      </ng-template>
-      <ng-container *ngIf="!column.templateHeader">
-        {{column.label}}
-      </ng-container>
-    </span>
+		<!-- Controls Dropdown -->
+		<datagrid-controls *ngIf="options.controlsDropdown"
+						   [options]="options"
+						   [status]="status"
+						   [column]="column"
+						   [columnIndex]="columnIndex"
+						   [filterTerms]="filterTerms"
+						   (onStateUpdated)="stateUpdated($event)"
+						   (onCustomLinkEvent)="customLinkEvent($event)">
+		</datagrid-controls>
 
-    <!-- Controls Dropdown -->
-    <datagrid-controls *ngIf="options.controlsDropdown"
-                       [options]="options"
-                       [status]="status"
-                       [column]="column"
-                       [columnIndex]="columnIndex"
-                       [filterTerms]="filterTerms"
-                       (onStateUpdated)="stateUpdated($event)"
-                       (onCustomLinkEvent)="customLinkEvent($event)">
-    </datagrid-controls>
+		<!-- Resize Handle -->
+		<a class="resize-handle" mwlResizeHandle [resizeEdges]="{right: true}" *ngIf="column.canResize" (mousedown)="reSizing = true"></a>
 
-    <!-- Resize Handle -->
-    <a class="resize-handle" mwlResizeHandle [resizeEdges]="{right: true}" *ngIf="column.canResize" (mousedown)="reSizing = true"></a>
-
-  </div>
+	</div>
 </div>

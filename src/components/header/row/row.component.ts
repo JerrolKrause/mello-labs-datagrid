@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter, OnChanges, ChangeDetectorRef } from '@angular/core';
 import { Datagrid } from '../../../typings';
 
 @Component({
@@ -33,15 +33,16 @@ export class HeaderRowComponent implements OnInit, OnChanges {
 		/** During a resize, disable some stuff */
 		public reSizing: boolean = false;
 
-		public columnWidth: string = '';
+		//public columnWidth: string = '';
+		public dragStartProp: string;
+
 
 		constructor(
+				private ref: ChangeDetectorRef
 		) {
 		}
 
-		ngOnInit() {
-
-		}
+		ngOnInit() { }
 
 		ngOnChanges() {
 
@@ -83,11 +84,11 @@ export class HeaderRowComponent implements OnInit, OnChanges {
 		/**
 		* On a successful drag reorder of the column headers
 		*/
-		public onReorderSuccess(type: 'pinnedLeft' | 'main', columnIndex, column) {
-				// console.log('onReorderSuccess', type, columnIndex, column.prop);
+		public dragDrop(type: 'pinnedLeft' | 'main', columnNewPosition) {
+				// console.log('onReorderSuccess', this.dragStartProp, columnNewPosition);
 				// If columns are being dragged before a pinned column, set that column to pinned
 				let isPinned = false;
-				let payload = { action: 'reorder', type: type, columnIndex: columnIndex, prop: column.prop };
+				let payload = { action: 'reorder', type: type, prop: this.dragStartProp, columnIndex: columnNewPosition };
 
 				for (let i = this.columns.length - 1; i >= 0; i--) {
 						let column = this.columns[i];
@@ -98,31 +99,6 @@ export class HeaderRowComponent implements OnInit, OnChanges {
 						column.pinnedLeft = isPinned;
 				}
 
-				//payload.columnIndex = columnIndex;
-				//console.log(this.columns[columnIndex]);
-				//// Get the first changed index
-				//for (let i = 0; i < this.columns.length; i++) {
-				//		//console.log(i, this.columns[i].prop, this.columnsOriginal[i].prop);
-				//		if (this.columns[i].prop != this.columnsOriginal[i].prop && payload.columnIndex == null) {
-				//				payload.columnIndex = this.columnsOriginal[i].$$index;
-				//				//console.warn('col1', this.columnsOriginal[i].prop, this.columnsOriginal[i].$$index)
-				//				break;
-				//		}
-				//}
-
-				//// Get the last changed item
-				//for (let i = this.columns.length - 1; i >= 0; i--) {
-				//		let column = this.columns[i];
-
-				//		if (column.prop != this.columnsOriginal[i].prop && payload.columnIndex2 == null) {
-				//				payload.columnIndex2 = this.columnsOriginal[i].$$index;
-				//				//console.warn('col2', this.columnsOriginal[i].prop, this.columnsOriginal[i].$$index);
-				//				break;
-				//		}
-				//}
-
-				this.columns = [...this.columnsOriginal];
-				//console.log('Swapped', payload.col1, payload.col2);
 				this.onColumnsUpdated.emit(payload);
 		}
 

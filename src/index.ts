@@ -10,7 +10,7 @@ import { HeaderComponent } from './components/header/header.component';
 import { FiltersComponent } from './components/header/filters/filters.component';
 import { ControlsComponent } from './components/header/controls/controls.component';
 import { HeaderRowComponent } from './components/header/row/row.component';
- 
+
 import { BodyComponent } from './components/body/body.component';
 import { GroupHeaderComponent } from './components/body/header/group-header.component';
 import { RowComponent } from './components/body/row/row.component';
@@ -21,40 +21,39 @@ import { InfoComponent } from './components/info/info.component';
 
 // Directives
 import { DataTableColumnDirective } from './directives/column.directive';
-import { DataGridColumnCellDirective  } from './directives/cell-body.directive';
+import { DataGridColumnCellDirective } from './directives/cell-body.directive';
 import { DataGridColumnHeaderDirective } from './directives/cell-header.directive';
 
 // Services
 import { DataGridService } from './datagrid.service';
 
 // 3rd party controls  
-import { DndModule } from 'ng2-dnd'; // Drag and drop
 import { ResizableModule } from 'angular-resizable-element';
 
 import { Datagrid } from './typings';
 export * from './typings';
 
 @NgModule({
-  imports: [
-    CommonModule, NgbModule.forRoot(), FormsModule, DndModule.forRoot(), ResizableModule
-  ],
-  declarations: [
-      DataGridComponent, RowComponent, GroupHeaderComponent, HeaderComponent, ControlsComponent, FiltersComponent, BodyComponent, CellComponent, 
-      InfoComponent, HeaderRowComponent,
+		imports: [
+				CommonModule, NgbModule.forRoot(), FormsModule, ResizableModule
+		],
+		declarations: [
+				DataGridComponent, RowComponent, GroupHeaderComponent, HeaderComponent, ControlsComponent, FiltersComponent, BodyComponent, CellComponent,
+				InfoComponent, HeaderRowComponent,
 
-      DataTableColumnDirective, DataGridColumnCellDirective, DataGridColumnHeaderDirective
-  ],
-  providers:[DataGridService],
-  exports: [
-      DataGridComponent,
-      DataTableColumnDirective, DataGridColumnCellDirective, DataGridColumnHeaderDirective
-  ]
+				DataTableColumnDirective, DataGridColumnCellDirective, DataGridColumnHeaderDirective
+		],
+		providers: [DataGridService],
+		exports: [
+				DataGridComponent,
+				DataTableColumnDirective, DataGridColumnCellDirective, DataGridColumnHeaderDirective
+		]
 })
 export class DatagridModule {
-  static forRoot(): ModuleWithProviders {
-    return {
-		ngModule: DatagridModule,
-		providers: [DataGridService]
-    };
-  }
+		static forRoot(): ModuleWithProviders {
+				return {
+						ngModule: DatagridModule,
+						providers: [DataGridService]
+				};
+		}
 }
