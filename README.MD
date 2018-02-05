@@ -97,9 +97,28 @@ public options: Datagrid.Options = {
   ],
 }
 
+public columns: Datagrid.Column[] = [
+	{
+		prop: 'name',
+		label: 'Name',
+		columnType: 'string',
+		canSort: true,
+		canGroup: true,
+		canFilter: true
+	},
+	{
+		prop: 'pod',
+		label: 'POD',
+		columnType: 'string',
+		width: 70,
+		canSort: true,
+		canGroup: true,
+		canFilter: true
+	}	
+];
+
 public state = { "filters": [], "sorts": [], "groups": [{ "dir": "asc", "prop": "State" }] };
 public rows$: Observable<any[]> = this.api.get('/assets/mock/pipeline-sm.json');
-public columns$: Observable<Datagrid.Column[]> = this.api.get('/assets/mock/columns-sm.json');
 
 // Methods
 /**
