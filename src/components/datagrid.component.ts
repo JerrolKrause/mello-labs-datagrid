@@ -233,7 +233,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		}
 
 		ngOnChanges(model) {
-				console.log('ngOnChanges');
+				//console.log('ngOnChanges');
 				// Clear all memoized caches anytime new data is loaded into the grid
 				this.dgSvc.cache.sortArray.cache.clear();
 				this.dgSvc.cache.groupRows.cache.clear();
@@ -263,7 +263,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 				}
 
 				if (this.columns && this.state){
-						console.log('I have columns and state, check for corruption', this.state, this.columnsMapped);
+						//console.log('I have columns and state, check for corruption', this.state, this.columnsMapped);
 				}
 
 				if (this.columns && this.rows) {
