@@ -55,7 +55,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		private _columns: Datagrid.Column[];
 		@Input()
 		set columns(columns: Datagrid.Column[]) {
-				console.log('Setting columns');
 				if (columns){
 						let slug = Math.floor(Math.random() * 1000000); // Create a random number slug so if different columns are passed a new instance is created every time
 						// Create custom track property and new reference for each column
@@ -234,7 +233,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		}
 
 		ngOnChanges(model) {
-				// console.log('ngOnChanges');
+				console.log('ngOnChanges');
 				// Clear all memoized caches anytime new data is loaded into the grid
 				this.dgSvc.cache.sortArray.cache.clear();
 				this.dgSvc.cache.groupRows.cache.clear();
@@ -263,6 +262,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 						}
 				}
 
+				if (this.columns && this.state){
+						console.log('I have columns and state, check for corruption', this.state, this.columnsMapped);
+				}
+
 				if (this.columns && this.rows) {
 						//console.warn(this.columns, this.rows)
 						if (this.state) {
@@ -281,7 +284,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 						this.state.info = {
 								initial: true
 						}
-
 
 						// Only on initial load, set app ready. This prevents the app from hanging on a route change
 						this.appReady = true;
@@ -476,13 +478,13 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
      * @param stateChange
      */
 		public onStateUpdated(stateChange: Datagrid.StateChange): void {
-				// console.warn('changeState ', this.state, stateChange);
+				// console.warn('changeState ', newState);
 				this.ref.detach();
         
 				let newState: Datagrid.State = { ...this.state };
 
-        // Legacy support for previous states of the grid. Ensure all arrays exist to prevent errors
-				if (!newState.filters) {
+				// Legacy support for previous states of the grid. Ensure all arrays exist to prevent errors
+				if (!newState.filters || !Array.isArray(newState.filters)) {
 						newState.filters = [];
 				}
 				if (!newState.sorts) {
@@ -1291,7 +1293,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 
 				this.state.info = {};
 				//Reset Columns
-				this.columnsInternal = this.columns.map(column => {
+				this.columnsInternal = this.columnsInternal.map(column => {
 						column.pinnedLeft = false;
 						column.locked = false;
 						return { ...column };
