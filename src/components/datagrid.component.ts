@@ -233,7 +233,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		}
 
 		ngOnChanges(model) {
-				//console.log('ngOnChanges');
+				// console.log('ngOnChanges');
 				// Clear all memoized caches anytime new data is loaded into the grid
 				this.dgSvc.cache.sortArray.cache.clear();
 				this.dgSvc.cache.groupRows.cache.clear();
@@ -260,30 +260,45 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 						if (this.options.showInfo) {
 								this.columnsMapped = this.dgSvc.mapColumns(this.columns);
 						}
+
 				}
 
-				if (this.columns && this.state){
-						//console.log('I have columns and state, check for corruption', this.state, this.columnsMapped);
-				}
-
-				if (this.columns && this.rows) {
-						//console.warn(this.columns, this.rows)
-						if (this.state) {
-								this.state.groups = this.state.groups && this.state.groups.length && this.options.controlsMap ? this.dgSvc.mapPropertiesDown(this.state.groups, this.options.controlsMap) : this.state.groups;
-								this.state.sorts = this.state.sorts && this.state.sorts.length && this.options.controlsMap ? this.dgSvc.mapPropertiesDown(this.state.sorts, this.options.controlsMap) : this.state.sorts;
-								this.state.filters = this.state.filters && this.state.filters.length && this.options.controlsMap ? this.dgSvc.mapPropertiesDown(this.state.filters, this.options.controlsMap) : this.state.filters;
-
-						} else {
-								this.state = { ...this.stateDefault }
-						}
-
-						this.filterTerms = this.dgSvc.getDefaultTermsList(this.rows, this.columns); // Generate a list of default filter terms
-						this.createRowStyles(); // Create row styles
-						this.createRowClasses(); // Create row classes
+				// If state is passed
+				if (this.state) {
+						// If controls map is specified, map state property to appropriate fields
+						this.state.groups = this.state.groups && this.state.groups.length && this.options.controlsMap ? this.dgSvc.mapPropertiesDown(this.state.groups, this.options.controlsMap) : this.state.groups;
+						this.state.sorts = this.state.sorts && this.state.sorts.length && this.options.controlsMap ? this.dgSvc.mapPropertiesDown(this.state.sorts, this.options.controlsMap) : this.state.sorts;
+						this.state.filters = this.state.filters && this.state.filters.length && this.options.controlsMap ? this.dgSvc.mapPropertiesDown(this.state.filters, this.options.controlsMap) : this.state.filters;
 
 						this.state.info = {
 								initial: true
 						}
+
+						// Loop through each element in the state object and verify that the columns exist
+						// Delete columns that are referenced in state that don't exist. Helps protect against corrupt states
+						if (this.state.sorts && this.state.sorts.length && !this.columnsMapped[this.state.sorts[0].prop]) {
+								this.state.sorts = [];
+								console.error(`Sorting option is for a column that doesn't exist. Sort option has been removed.`);
+						}
+						if (this.state.groups && this.state.groups.length && !this.columnsMapped[this.state.groups[0].prop]) {
+								this.state.groups = [];
+								console.error(`Grouping option is for a column that doesn't exist. Group option has been removed.`);
+						}
+						if (this.state.filters && this.state.filters.length) {
+								for (let i = this.state.filters.length - 1; i >= 0; i--){
+										if (!this.columnsMapped[this.state.filters[i].prop]){
+												this.state.filters = this.state.filters.filter((filter, index) => i != index);
+												console.error(`Filter option is for a column that doesn't exist. Filter option has been removed.`);
+										}
+								}
+						}
+				}
+
+				if (this.columns && this.rows) {
+						
+						this.filterTerms = this.dgSvc.getDefaultTermsList(this.rows, this.columns); // Generate a list of default filter terms
+						this.createRowStyles(); // Create row styles
+						this.createRowClasses(); // Create row classes
 
 						// Only on initial load, set app ready. This prevents the app from hanging on a route change
 						this.appReady = true;
