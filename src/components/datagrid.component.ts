@@ -15,7 +15,7 @@ import { Datagrid } from '../typings';
 import * as _ from 'lodash';
 import { BodyComponent } from './body/body.component';
 
-
+ 
 /**
 TODOS:
 - Better condition management for rendering the initial view
@@ -55,19 +55,22 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		private _columns: Datagrid.Column[];
 		@Input()
 		set columns(columns: Datagrid.Column[]) {
-				let slug = Math.floor(Math.random() * 1000000); // Create a random number slug so if different columns are passed a new instance is created every time
-				// Create custom track property and new reference for each column
-				columns = columns.map((column, i) => {
-						column.$$track = slug + '-' + i;
-						return { ...column };
-				});
-				// If columnMap object is supplied, remap column props to what the datatable needs
-				if (this.options && this.options.columnMap) {
-						columns = this.dgSvc.mapPropertiesDown(columns, this.options.columnMap)
-				}
-				// If column templates supplied, map those to the column. This instance only fires if the columns are changed after initial load
-				if (this.columnTemplates && Object.keys(this.columnTemplates).length && columns) {
-						this.dgSvc.templatesAddToColumns(columns, this.columnTemplates);
+				console.log('Setting columns');
+				if (columns){
+						let slug = Math.floor(Math.random() * 1000000); // Create a random number slug so if different columns are passed a new instance is created every time
+						// Create custom track property and new reference for each column
+						columns = columns.map((column, i) => {
+								column.$$track = slug + '-' + i;
+								return { ...column };
+						});
+						// If columnMap object is supplied, remap column props to what the datatable needs
+						if (this.options && this.options.columnMap) {
+								columns = this.dgSvc.mapPropertiesDown(columns, this.options.columnMap)
+						}
+						// If column templates supplied, map those to the column. This instance only fires if the columns are changed after initial load
+						if (this.columnTemplates && Object.keys(this.columnTemplates).length && columns) {
+								this.dgSvc.templatesAddToColumns(columns, this.columnTemplates);
+						}
 				}
 				this._columns = columns;
 		};
@@ -79,8 +82,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		private _rows: any[];
 		@Input()
 		set rows(rows: any[]) {
-				let slug = Math.floor(Math.random() * 1000000); // Create a random number slug so if different rows are passed a new instance is created every time
-				rows.forEach((row, i) => row.$$track = slug + '-' + i); // Add the unique ID which is slug + index
+				if (rows){
+						let slug = Math.floor(Math.random() * 1000000); // Create a random number slug so if different rows are passed a new instance is created every time
+						rows.forEach((row, i) => row.$$track = slug + '-' + i); // Add the unique ID which is slug + index
+				}
 				this._rows = rows;
 		};
 		get rows(): any[] {
@@ -213,7 +218,6 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 				private zone: NgZone,
 				private renderer: Renderer2
 		) {
-
 		}
 
 		ngOnInit() {}
@@ -230,6 +234,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		}
 
 		ngOnChanges(model) {
+				// console.log('ngOnChanges');
 				// Clear all memoized caches anytime new data is loaded into the grid
 				this.dgSvc.cache.sortArray.cache.clear();
 				this.dgSvc.cache.groupRows.cache.clear();
@@ -276,6 +281,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 						this.state.info = {
 								initial: true
 						}
+
 
 						// Only on initial load, set app ready. This prevents the app from hanging on a route change
 						this.appReady = true;
@@ -370,7 +376,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
      */
 		public viewCreate() {
 				// TODO Fix issues with memoization with group and sorting
-				// console.warn('createView',this.rows, this.columns);
+				// console.warn('createView',this.state, this.rows, this.columns);
 				// console.time('Creating View');
 				// Set manual change detection
 				this.ref.detach();

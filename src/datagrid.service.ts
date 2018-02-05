@@ -165,7 +165,7 @@ export class DataGridService {
      * @param filters
      */
 		public filterArray(array: any[], filters: Datagrid.Filter[]): any[] {
-				//console.warn('filterArray: ', array);
+				// console.warn('filterArray 1: ', array, filters );
 
 				// Get number of contains filters
 				let contains = filters.filter(filter => filter.operator == 'contains');
@@ -180,7 +180,6 @@ export class DataGridService {
 						}
 						equals[filter.prop].push(filter);
 				});
-
 				// Perform filter and return
 				return array.filter(row => {
 
@@ -235,40 +234,50 @@ export class DataGridService {
 										return false
 								}
 						}
-						// Equals contains sets of rules groups. Each rule group is based on field and is an OR. Between rule groups it must be an AND
+						// Equals contains sets of rules groups. Each rule group is based on field and is an OR. Between rule groups it must be an AND 
 						// Results must contain at least one match within each field
 						if (Object.keys(equals).length) {
 								let allGroupMatches = 0;
 								// Loop through all equals collections
 								for (let key in equals) {
-										// Within each field, only need 1 match to include in the collection
-										let matches = false;
-										for (let i = 0; i < equals[key].length; i++) {
-												let filter = equals[key][i];
+										if (equals.hasOwnProperty(key)) {
+												// Within each field, only need 1 match to include in the collection
+												let matches = false;
+												for (let i = 0; i < equals[key].length; i++) {
+														let filter = equals[key][i];
+														
+														// If this field isn't found on the row, return false
+														if (!row[filter.prop] && row[filter.prop] != false) {
+																return false;
+														}
 
-												// If this field isn't found on the row, return false
-												if (!row[filter.prop]) {
-														return false;
+														// If row property is an array of strings, see if the field value is in the array
+														if (Array.isArray(row[filter.prop]) && row[filter.prop] && row[filter.prop].indexOf(filter.value.toString()) > -1) {
+																matches = true;
+																break;
+														}
+
+														// If the field value matches the filter value
+														if (row[filter.prop] == filter.value) {
+																matches = true;
+																break;
+														}
+
+														// If this is a boolean and needs to match true false
+														if (filter.value == 'True' && row[filter.prop] == true ||
+																filter.value == 'False' && row[filter.prop] == false) {
+																matches = true;
+																break;
+														}
+
+
 												}
-
-												// If row property is an array of strings, see if the field value is in the array
-												if (Array.isArray(row[filter.prop]) && row[filter.prop] && row[filter.prop].indexOf(filter.value.toString()) > -1) {
-														matches = true;
-														break;
-												}
-
-												// If the field value matches the filter value
-												if (row[filter.prop] == filter.value) {
-														matches = true;
-														break;
+												// If this group has a match, increment the group matcher
+												if (matches) {
+														allGroupMatches++;
 												}
 										}
-										// If this group has a match, increment the group matcher
-										if (matches) {
-												allGroupMatches++;
-										}
-								}
-
+						}
 								if (allGroupMatches != Object.keys(equals).length) {
 										return false;
 								}
@@ -490,8 +499,13 @@ export class DataGridService {
 				rows.forEach(row => {
 						for (let key in termsList) {
 								if (termsList.hasOwnProperty(key)) {
-										if (row[key] && uniques[key]) {
-												uniques[key][row[key]] = true;
+										if ((row[key] || row[key] == false) && uniques[key]) {
+												let keyNew = row[key];
+												// If boolean, convert key to string
+												if (typeof row[key] == 'boolean'){
+														keyNew = _.startCase(_.toLower(row[key].toString()));
+												}
+												uniques[key][keyNew]= true;
 										}
 								}
 						}
@@ -511,10 +525,18 @@ export class DataGridService {
 				// Now sort terms in default order
 				for (let key in termsList) {
 						if (termsList.hasOwnProperty(key)) {
-								termsList[key].sort();
+                // If boolean, have true be first
+								if (termsList[key][0] == 'False' || termsList[key][0] == 'True') {
+										termsList[key] = ['True','False']; // TODO: Better method of handling boolean than hard coded
+								} else {
+										termsList[key].sort();
+								}
+
+							
+								
 						}
 				}
-				// console.warn(termsList);
+				// console.warn('getDefaultTermsList', termsList);
 				// console.timeEnd('getDefaultTermsList');
 
 				return termsList;
@@ -564,7 +586,7 @@ export class DataGridService {
 		 * @param columns
 		 * @param columnTemplates
 		 */
-		public templatesAddToColumns(columns: Datagrid.Column[], columnTemplates) {
+		public templatesAddToColumns(columns: Datagrid.Column[], columnTemplates:any) {
 				// Loop through supplied columns, attach templates
 				for (let i = 0; i < columns.length; i++) {
 						// If custom cell templates were supplied, attach them to their appropriate column
