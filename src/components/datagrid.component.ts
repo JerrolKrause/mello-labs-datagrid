@@ -406,7 +406,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 				}
 
 				// If custom filters are specified
-				if (this.state.filters.length) {
+				if (this.state && this.state.filters && this.state.filters.length) {
 						newRows = this.dgSvc.filterArray(newRows, this.state.filters);
 				}
 
@@ -581,7 +581,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 
 								goodbye = this.columns.splice(stateChange.data.columnIndex, 1);
 								this.columns = [...this.columns];
-								this.emitColumns(this.columnsInternal);
+								this.emitColumns();
 						}
 				}
 
@@ -605,7 +605,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 								this.columnsInternal = this.columnsInternal.filter(col => col.prop != stateChange.data.prop);
 						}
 
-						this.emitColumns(this.columnsInternal);
+						this.emitColumns();
 				}
 
 				this.state = newState;
@@ -646,7 +646,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 								this.columnsInternal = colsNew; // Update reference
 						}
 				}
-				this.emitColumns(this.columnsInternal);
+				this.emitColumns();
 				this.viewCreate();
 		}
 
@@ -1202,17 +1202,21 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     /**
      * Emit changed columns up to the parent component
      */
-		public emitColumns(columns: Datagrid.Column[]) {
+		public emitColumns() {
 				// TODO: Mapping properties back up isn't seamless and needs work, commenting out for now
 				// let remapColumns = this.dgSvc.mapPropertiesUp([...columns], this.options.columnMap);
 				// Remove templates and emit new column references up. Templates have a circulate reference which blows up json usage
-				let columnsEmitted = columns.map((column) => {
+				let columnsNew: any[] = [...this.columnsPinnedLeft, ...this.columnsInternal];
+				
+				let columnsEmitted = columnsNew.map((column) => {
 						let columnNew = { ...column };
+						columnNew.locked = columnNew.pinnedLeft ? true : false;
 						delete columnNew.templateCell;
 						delete columnNew.templateHeader;
 						return columnNew;
 				});
-				// Remap data back up
+			
+				// Emit data back up
 				this.onColumnsUpdated.emit(columnsEmitted);
 		}
 
@@ -1318,7 +1322,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 						this.filterGlobal.term = null;
 				}
 
-				this.emitColumns(this.columnsInternal);
+				this.emitColumns();
 				this.onStateUpdated({ action: Actions.reset, data: null });
 				this.ref.reattach();
 		}
