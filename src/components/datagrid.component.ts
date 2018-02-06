@@ -91,8 +91,13 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 				return this._rows && this._rows.length ? [...this._rows] : null;
 		}
 
-		/** State */
-		private _state: Datagrid.State;
+		/** State. Set default if state is not passed down from parent */
+		private _state: Datagrid.State = {
+				filters: [],
+				sorts: [],
+				groups: [],
+				info: {},
+		};
 		@Input()
 		set state(state: Datagrid.State) {
 				// If no state passed down, set a default and empty state object
@@ -273,7 +278,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 						this.state.info = {
 								initial: true
 						}
+				}
 
+				// If state and columns are present, check to make sure state has valid fields
+				if (this.state && this.columns){
 						// Loop through each element in the state object and verify that the columns exist
 						// Delete columns that are referenced in state that don't exist. Helps protect against corrupt states
 						if (this.state.sorts && this.state.sorts.length && !this.columnsMapped[this.state.sorts[0].prop]) {
@@ -285,8 +293,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 								console.error(`Grouping option is for a column that doesn't exist. Group option has been removed.`);
 						}
 						if (this.state.filters && this.state.filters.length) {
-								for (let i = this.state.filters.length - 1; i >= 0; i--){
-										if (!this.columnsMapped[this.state.filters[i].prop]){
+								for (let i = this.state.filters.length - 1; i >= 0; i--) {
+										if (!this.columnsMapped[this.state.filters[i].prop]) {
 												this.state.filters = this.state.filters.filter((filter, index) => i != index);
 												console.error(`Filter option is for a column that doesn't exist. Filter option has been removed.`);
 										}
@@ -414,7 +422,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 				if (this.state && this.state.groups.length) {
 						// Create groups
 						this.dgSvc.uniqueId = newRows.length + '-' + this.columns.length + '-' + this.state.groups[0].prop + '-' + this.state.groups[0].dir;
-						if (this.state.sorts.length) {
+						if (this.state.sorts && this.state.sorts.length) {
 								this.dgSvc.uniqueId += '-' + this.state.sorts[0].prop + '-' + this.state.sorts[0].dir;
 						}
 						// let groupings = this.dgSvc.cache.groupRows(newRows, this.columns, this.state.groups, this.state.sorts);
@@ -427,7 +435,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 				else {
 						this.groups = null;
 						// If sorts
-						if (this.state.sorts.length) {
+						if (this.state && this.state.sorts && this.state.sorts.length) {
 								// Sort rows and use memoize function to cache results
 								this.dgSvc.uniqueId = this.state.sorts[0].prop + this.state.sorts[0].dir + newRows.length;
 								//newRows = this.dgSvc.cache.sortArray(newRows, this.state.sorts[0].prop, this.state.sorts[0].dir);
