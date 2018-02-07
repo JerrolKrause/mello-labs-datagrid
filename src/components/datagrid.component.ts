@@ -83,7 +83,10 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		set rows(rows: any[]) {
 				if (rows){
 						let slug = Math.floor(Math.random() * 1000000); // Create a random number slug so if different rows are passed a new instance is created every time
-						rows.forEach((row, i) => row.$$track = slug + '-' + i); // Add the unique ID which is slug + index
+						rows.forEach((row, i) => {
+								row.$$track = slug + '-' + i;
+								row.$$selected = false;
+						}); // Add the unique ID which is slug + index
 				}
 				this._rows = rows;
 		};
@@ -237,7 +240,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 				}
 		}
 
-		ngOnChanges(model) {
+		ngOnChanges(model:any) {
 				// console.log('ngOnChanges');
 				// Clear all memoized caches anytime new data is loaded into the grid
 				this.dgSvc.cache.sortArray.cache.clear();
@@ -249,7 +252,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 				}
 
 				// If columns are passed
-				if (model.columns && this.columns) {
+				if (this.columns) {
 
 						// If columnMap object is supplied, remap column props to what the datatable needs
 						let columns = this.options.columnMap ? this.dgSvc.mapPropertiesDown(this.columns, this.options.columnMap) : this.columns;
@@ -267,7 +270,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 						}
 
 				}
-
+				
 				// If state is passed
 				if (this.state) {
 						// If controls map is specified, map state property to appropriate fields
@@ -303,7 +306,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 				}
 
 				if (this.columns && this.rows) {
-						
+						// On any column or row changes, unselect rows
+						this.rows.forEach((row, i) => row.$$selected = false);
 						this.filterTerms = this.dgSvc.getDefaultTermsList(this.rows, this.columns); // Generate a list of default filter terms
 						this.createRowStyles(); // Create row styles
 						this.createRowClasses(); // Create row classes
@@ -886,9 +890,9 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
      * @param event
      */
 		public onRowMouseEvent(action: { type: 'click' | 'contextmenu' | 'mousedown' | 'mouseup' | 'mouseenter' | 'dblclick', rowIndex: number, event: MouseEvent }) {
-				//if (action.type != 'mouseenter') {
-				//		console.log('onRowMouseEvent', action);
-				//};
+				if (action.type != 'mouseenter') {
+						console.log('onRowMouseEvent', action);
+				};
 
 				let row = this.rowsInternal.filter((row, i) => row.$$rowIndex == action.rowIndex)[0];//this.rowsInternal[action.rowIndex];
 
