@@ -886,8 +886,11 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
      * @param event
      */
 		public onRowMouseEvent(action: { type: 'click' | 'contextmenu' | 'mousedown' | 'mouseup' | 'mouseenter' | 'dblclick', rowIndex: number, event: MouseEvent }) {
-				//console.log('onRowMouseEvent', action);
-				let row = this.rowsInternal[action.rowIndex];
+				//if (action.type != 'mouseenter') {
+				//		console.log('onRowMouseEvent', action);
+				//};
+
+				let row = this.rowsInternal.filter((row, i) => row.$$rowIndex == action.rowIndex)[0];//this.rowsInternal[action.rowIndex];
 
 				switch (action.type) {
 						case 'click':
