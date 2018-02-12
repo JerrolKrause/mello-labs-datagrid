@@ -57,7 +57,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	private _columns: Datagrid.Column[];
 	@Input()
 	set columns(columns: Datagrid.Column[]) {
-		if (columns) {
+		if (columns && columns.length) {
 			let slug = Math.floor(Math.random() * 1000000); // Create a random number slug so if different columns are passed a new instance is created every time
 			// Create custom track property and new reference for each column
 			columns = columns.map((column, i) => {
@@ -83,7 +83,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 	private _rows: any[];
 	@Input()
 	set rows(rows: any[]) {
-		if (rows) {
+		if (rows && rows.length) {
 			let slug = Math.floor(Math.random() * 1000000); // Create a random number slug so if different rows are passed a new instance is created every time
 			rows.forEach((row, i) => {
 				row.$$track = slug + '-' + i;
@@ -248,7 +248,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		this.dgSvc.cache.sortArray.cache.clear();
 		this.dgSvc.cache.groupRows.cache.clear();
 
-		// If columns are passed
+		// If filter global is set or updated
 		if (model.filterGlobal && this.filterGlobal && this.filterGlobal.term) {
 			_.throttle(() => this.viewCreate(), 500, { trailing: true, leading: true });
 		}
@@ -266,11 +266,8 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 			let columnsInternal = columns.filter(column => !column.pinnedLeft ? true : false);
 			this.columnsInternal = columns.length ? this.dgSvc.columnCalculations(columnsInternal) : [];
 
-			// If show info is set, create a column map
-			if (this.options.showInfo) {
-				this.columnsMapped = this.dgSvc.mapColumns(this.columns);
-			}
-
+			// Create a column map
+			this.columnsMapped = this.dgSvc.mapColumns(this.columns);
 		}
 
 		// If state is passed
@@ -379,7 +376,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		// Update rows only if rows have changed
 		if (scrollPropsOld.scrollTop != this.scrollProps.scrollTop) {
 			let rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
-			if (!this.rowsIndexes || (rowsExternal[0].$$track != this.rowsIndexes.start && rowsExternal[rowsExternal.length - 1].$$track != this.rowsIndexes.end)) {
+			if (!this.rowsIndexes || (rowsExternal[0] && rowsExternal[0].$$track != this.rowsIndexes.start && rowsExternal[rowsExternal.length - 1].$$track != this.rowsIndexes.end)) {
 				this.rowsExternal = rowsExternal;
 				this.rowsIndexes.start = rowsExternal[0].$$track;
 				this.rowsIndexes.end = rowsExternal[rowsExternal.length - 1].$$track;
@@ -389,7 +386,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		// Update columns only if columns have changed
 		if (scrollPropsOld.scrollLeft != this.scrollProps.scrollLeft) {
 			let columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
-			if (!this.columnIndexes || (columnsExternal[0].$$track != this.columnIndexes.start && columnsExternal[columnsExternal.length - 1].$$track != this.columnIndexes.end)) {
+			if (!this.columnIndexes || (columnsExternal[0] && columnsExternal[0].$$track != this.columnIndexes.start && columnsExternal[columnsExternal.length - 1].$$track != this.columnIndexes.end)) {
 				this.columnsExternal = columnsExternal;
 				this.columnIndexes.start = columnsExternal[0].$$track;
 				this.columnIndexes.end = columnsExternal[columnsExternal.length - 1].$$track;
@@ -407,7 +404,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
      */
 	public viewCreate() {
 		// TODO Fix issues with memoization with group and sorting
-		// console.warn('createView',this.state, this.rows, this.columns);
+		// console.warn('createView', this.state, this.status, this.filterTerms );
 		// console.time('Creating View');
 		// Set manual change detection
 		this.ref.detach();
@@ -484,6 +481,7 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
 		this.state.info.rowsVisible = this.rowsInternal.filter(row => !row.type).length; // Filter out any group columns
 
 		this.status = this.dgSvc.createStatuses(this.state, this.columnsInternal);
+		// console.warn('this.status', this.status);
 		this.state = { ...this.state };
 
 		//Emit the state change to the parent component
@@ -950,17 +948,17 @@ export class DataGridComponent implements OnInit, OnChanges, AfterViewInit, OnDe
      * @param rowIndex - The index of the currently selected row
      */
 	public selectRow(row: any, rowIndex: number, isRightClick?: boolean, elementRef?: any) {
-		// console.warn('selectRow', this.keysPressed, row, rowIndex, isRightClick, elementRef);
+		 // console.warn('selectRow', this.keysPressed, row, rowIndex, isRightClick, elementRef);
 
 		// Only allow row selection if set
 		if (this.options.selectionType) {
 			let newRows = [...this.rowsInternal];
 			// If control is pressed while clicking
-			if (this.keysPressed['Control'] && this.options.selectionType == 'multi') {
+			if (this.keysPressed['control'] && this.options.selectionType == 'multi') {
 				row.$$selected = row.$$selected ? false : true;
 			}
 			// If shift is pressed while clicking
-			else if (this.keysPressed['Shift'] && this.options.selectionType == 'multi') {
+			else if (this.keysPressed['shift'] && this.options.selectionType == 'multi') {
 				// Unset all selected flags
 				newRows.forEach(rowNew => rowNew.$$selected = false);
 				// Figure out if the selection goes top to bottom or bottom to top
