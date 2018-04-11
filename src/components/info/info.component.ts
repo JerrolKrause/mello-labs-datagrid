@@ -1,32 +1,28 @@
-import { Component, OnInit, ChangeDetectionStrategy, Input, EventEmitter, Output} from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, Input, EventEmitter, Output } from '@angular/core';
 import { Datagrid } from '../../typings';
 
 @Component({
-    selector: 'datagrid-info',
-    templateUrl: './info.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+  selector: 'datagrid-info',
+  templateUrl: './info.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InfoComponent implements OnInit  {
+export class InfoComponent implements OnInit {
+  @Input() state: Datagrid.State;
+  @Input() options: Datagrid.Options;
+  @Input() columnsMapped: Datagrid.Column;
+  @Output() onReset: EventEmitter<any> = new EventEmitter();
 
-	@Input() state: Datagrid.State;
-	@Input() options: Datagrid.Options;
-    @Input() columnsMapped: Datagrid.Column;
-	@Output() onReset: EventEmitter<any> = new EventEmitter();
+  constructor() {}
 
-	constructor(
-    ) { }
+  ngOnInit() {
+    //console.log(this.state, this.columnsMapped);
+  }
 
-	ngOnInit() {
-        //console.log(this.state, this.columnsMapped);
-	}
-
-    /**
-     * Reset one of the datatable controls
-     * @param resetType
-     */
-	public reset(resetType: 'groups' | 'sorts' | 'filters'): void {
-		this.onReset.emit(resetType);
-	}
-
-   
+  /**
+   * Reset one of the datatable controls
+   * @param resetType
+   */
+  public reset(resetType: 'groups' | 'sorts' | 'filters'): void {
+    this.onReset.emit(resetType);
+  }
 }

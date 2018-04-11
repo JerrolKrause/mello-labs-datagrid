@@ -1,32 +1,30 @@
 {
-	"name": "@mello-labs/datagrid",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/JerrolKrause/mello-labs-datagrid"
-	},
-	"author": {
-		"name": "Jerrol Krause",
-		"email": "jerrolkrause@gmail.com"
-	},
-	"keywords": [
-		"angular"
-	],
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/JerrolKrause/mello-labs-datagrid/issues"
-	},
-	"main": "mello-labs-datagrid.umd.js",
-	"module": "mello-labs-datagrid.js",
-	"jsnext:main": "mello-labs-datagrid.js",
-	"typings": "mello-labs-datagrid.d.ts",
-    "peerDependencies": {
-        "@angular/core": "^4.0.0",
-        "@angular/forms": "^4.0.0",
-        "@ng-bootstrap/ng-bootstrap": "^1.0.0-beta.5",
-        "angular-resizable-element": "^2.0.0",
-        "bootstrap": "4.0.0-alpha.6",
-        "lodash": "^4.17.4",
-        "rxjs": "^5.1.0",
-        "zone.js": "^0.8.4"
-    }
+  "name": "@mello-labs/datagrid",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JerrolKrause/mello-labs-datagrid"
+  },
+  "author": {
+    "name": "Jerrol Krause",
+    "email": "jerrolkrause@gmail.com"
+  },
+  "keywords": ["angular"],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JerrolKrause/mello-labs-datagrid/issues"
+  },
+  "main": "mello-labs-datagrid.umd.js",
+  "module": "mello-labs-datagrid.js",
+  "jsnext:main": "mello-labs-datagrid.js",
+  "typings": "mello-labs-datagrid.d.ts",
+  "peerDependencies": {
+    "@angular/core": "^4.0.0",
+    "@angular/forms": "^4.0.0",
+    "@ng-bootstrap/ng-bootstrap": "^1.0.0-beta.5",
+    "angular-resizable-element": "^2.0.0",
+    "bootstrap": "4.0.0-alpha.6",
+    "lodash": "^4.17.4",
+    "rxjs": "^5.1.0",
+    "zone.js": "^0.8.4"
+  }
 }

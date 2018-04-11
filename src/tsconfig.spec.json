@@ -7,12 +7,7 @@
     "module": "commonjs",
     "target": "es6",
     "baseUrl": "",
-    "types": [
-      "jest",
-      "node"
-    ]
+    "types": ["jest", "node"]
   },
-  "files": [
-    "**/*.spec.ts"
-  ]
+  "files": ["**/*.spec.ts"]
 }
