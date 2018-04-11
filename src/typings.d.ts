@@ -4,6 +4,7 @@
 import { Observable } from 'rxjs/Observable';
 
 declare namespace Datagrid {
+
   export interface Props {
     widthTotal: number;
     widthPinned: number;

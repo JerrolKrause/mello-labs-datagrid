@@ -232,7 +232,7 @@ export class DataGridComponent
             bottom: 0,
             left: 0,
             right: 0,
-        };
+        }
     }
     /** Currently pressed key */
     public keyPressed: string | null;
@@ -736,16 +736,28 @@ export class DataGridComponent
     public updateGridProps() {
         let gridProps: Datagrid.Props = { ...this.gridProps };
         // Get total grid width
-        gridProps.widthTotal = this.columns.map(b => b.width).reduce((p, c) => p + c);
+        gridProps.widthTotal = this.columns.map(b => b.width).reduce((p, c) => {
+            if (p && c){
+                return p + c;
+            }
+        }) || 0;
 
         // Get width of pinned columns
         gridProps.widthPinned = this.columnsPinnedLeft.length
-            ? this.columnsPinnedLeft.map(b => b.width).reduce((p, c) => p + c)
+            ? this.columnsPinnedLeft.map(b => b.width).reduce((p, c) => {
+                if (p && c) {
+                    return p + c;
+                }
+            }) || 0
             : 0;
 
         // Get width of internal columns
         gridProps.widthMain = this.columnsInternal.length
-            ? this.columnsInternal.map(b => b.width).reduce((p, c) => p + c)
+            ? this.columnsInternal.map(b => b.width).reduce((p, c) => {
+                if (p && c) {
+                    return p + c;
+                }
+            }) || 0
             : 0;
 
         // Get height of grid
@@ -821,7 +833,7 @@ export class DataGridComponent
             this.rowHoveredLast = 0;
         }
         // If a drag event ended NOT on a row, fire the onrowmouseup event with the last hovered row
-        if (this.dragging) {
+        if (this.dragging && this.rowHoveredLast !== null) {
             this.onRowMouseEvent({ type: 'mouseup', rowIndex: this.rowHoveredLast, event: event });
             //this.onRowMouseUp(this.rowHoveredLast, event);
             // Unselect all text after drag to prevent weird selection issues
@@ -1291,10 +1303,12 @@ export class DataGridComponent
                             this.options.rowStyle[index].rules
                         ) {
                             // Merge the newly created styles with what is already existing. This allows for multiple rulesets to assign styles without wiping out preexisting
-                            if (this.options.rowStyle && this.options.rowStyle[index] && this.options.rowStyle[index].rules){
+                            if (this.options.rowStyle &&
+                                this.options.rowStyle[index] &&
+                                this.options.rowStyle[index].rules) {
                                 rowStyles[row[primaryKey]] = {
                                     ...rowStyles[row[primaryKey]] || {},
-                                    ...this.options.rowStyle[index].rules(row, model)
+                                    ...(<any>this.options.rowStyle[index]).rules(row, model)
                                 }
                             }
                             

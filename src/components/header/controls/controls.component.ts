@@ -37,8 +37,6 @@ export class ControlsComponent implements OnInit, OnDestroy {
       direction = 'asc';
     } else if (direction == 'asc') {
       direction = 'desc';
-    } else {
-      direction = null;
     }
 
     this.modifyState(action, { dir: direction, prop: prop });

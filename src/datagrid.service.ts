@@ -379,7 +379,7 @@ export class DataGridService {
           rows: [],
           column: column && column[0] ? column[0] : null,
           columnProp: group.prop,
-          columnLabel: null,
+          columnLabel: '',
           label: row[group.prop] || 'No Value',
           visible: true,
           type: 'group',
@@ -409,10 +409,13 @@ export class DataGridService {
     grouped.forEach((group: Datagrid.Group) => {
       if (sorts.length) {
         this.sortArray(group.rows, sorts[0].prop, sorts[0].dir);
-      }
-      // Create a primary key used for the trackRows method. Group headers are treated as a row and need to have the same primary key as the rest
-      (<any>group)[options.primaryKey] = group.label + '-' + group.rows.length;
+        }
 
+      if (options.primaryKey){
+          // Create a primary key used for the trackRows method. Group headers are treated as a row and need to have the same primary key as the rest
+          (<any>group)[options.primaryKey] = group.label + '-' + group.rows.length;
+      }
+      
       let currentLoc = newRows.length;
       groupsFinal[currentLoc] = group;
       newRows = [...newRows, group, ...group.rows];
@@ -426,8 +429,12 @@ export class DataGridService {
    * @param state
    */
   public createStatuses(state: Datagrid.State, columns: Datagrid.Column[]): Datagrid.Status {
-    //console.warn('createStatuses: ',JSON.parse(JSON.stringify(state)));
-    let status: Datagrid.Status = {};
+    // console.warn('createStatuses: ',JSON.parse(JSON.stringify(state)));
+    let status: Datagrid.Status = {
+      groups: {},
+      sorts: {},
+      filters: {}
+    };
     // If groupings are found, create dictionary
     if (state.groups.length) {
       let newStatus: { [key: string]: any } = {};
@@ -450,8 +457,6 @@ export class DataGridService {
       status.sorts = {};
     }
 
-    //console.warn('createStatuses: ', JSON.parse(JSON.stringify(status.sorts)));
-    //console.warn('state.filters: ', JSON.parse(JSON.stringify(state.filters)));
     let newFilters: { [key: string]: any } = {};
     if (columns && columns.length) {
       columns.forEach(column => {
@@ -462,12 +467,11 @@ export class DataGridService {
       });
     }
 
-    //console.warn('status 1: ', JSON.parse(JSON.stringify(state.filters)));
+   
     // If filters are found, create dictionary
     if (state.filters && typeof state.filters != 'string' && state.filters.length) {
       //console.warn('Adding filters')
       state.filters.forEach(filter => {
-        //console.warn('Filter ',filter)
         // Create field/property object
         if (!newFilters[filter.prop]) {
           newFilters[filter.prop] = {
@@ -483,7 +487,6 @@ export class DataGridService {
           newFilters[filter.prop].hasFilters = true;
         } else {
           // Everything else
-          //console.warn('EQ', filter)
           // Create operator object inside field object
           if (!newFilters[filter.prop][filter.operator]) {
             newFilters[filter.prop][filter.operator] = {};
@@ -596,7 +599,9 @@ export class DataGridService {
   public columnsResize(columns: Datagrid.Column[], gridProps: Datagrid.Props) {
     let widthTotal = gridProps.widthTotal;
     return columns.map(column => {
-      column.width = Math.ceil(column.width * gridProps.widthBody / widthTotal) + 1;
+        if (column.width){
+            column.width = Math.ceil(column.width * gridProps.widthBody / widthTotal) + 1;
+        }
       return column;
     });
   }
