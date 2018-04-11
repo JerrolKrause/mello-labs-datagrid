@@ -8,7 +8,7 @@
         "strictFunctionTypes": true,
         "skipLibCheck": true,
 
-
+        "target": "es5",
         "baseUrl": "./src",
         "experimentalDecorators": true,
         "moduleResolution": "node",

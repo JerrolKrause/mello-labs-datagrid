@@ -78,10 +78,8 @@ export class GroupHeaderComponent implements OnInit, OnChanges, OnDestroy {
         let columnData = options.columnData[group.columnProp];
         let newLabel: any[] = [];
         // If this row property is an array, join all possible settings
-        if (group && group.label && Array.isArray(group.label)) {
+        if (group && group.label && Array.isArray(group.label) && group.columnProp && group.rows) {
           // Loop through the labels in the group prop
-          //console.warn(columnData, model, this.group.rows[0][this.group.columnProp]);
-
           group.rows[0][group.columnProp].forEach((id: string) => {
             model[columnData.modelSrc].forEach((element: any) => {
               if (id == element[columnData.value]) {

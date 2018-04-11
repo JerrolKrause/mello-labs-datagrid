@@ -5,19 +5,19 @@ import { Observable } from 'rxjs/Observable';
 
 declare namespace Datagrid {
   export interface Props {
-    widthTotal?: number;
-    widthPinned?: number;
-    widthMain?: number;
-    heightTotal?: number;
-    rowsVisible?: number;
-    heightBody?: number;
-    widthBody?: number;
-    widthFixed?: boolean;
+    widthTotal: number;
+    widthPinned: number;
+    widthMain: number;
+    heightTotal: number;
+    rowsVisible: number;
+    heightBody: number;
+    widthBody: number;
+    widthFixed: boolean;
   }
 
   export interface ScrollProps {
-    scrollTop?: number;
-    scrollLeft?: number;
+    scrollTop: number;
+    scrollLeft: number;
   }
 
   export interface ColsVisible {
@@ -35,9 +35,9 @@ declare namespace Datagrid {
   }
 
   export interface State {
-    groups?: Sorts[];
-    sorts?: Sorts[];
-    filters?: Filter[];
+    groups: Sorts[];
+    sorts: Sorts[];
+    filters: Filter[];
     info?: {
       rowsTotal?: number;
       rowsVisible?: number;
@@ -54,9 +54,9 @@ declare namespace Datagrid {
   }
 
   export interface Status {
-    groups?: {};
-    sorts?: {};
-    filters?: {};
+    groups: {};
+    sorts: {};
+    filters: {};
   }
 
   export interface Filter {
@@ -66,8 +66,8 @@ declare namespace Datagrid {
   }
 
   export interface Sorts {
-    dir?: string;
-    prop?: string;
+    dir: string;
+    prop: string;
   }
 
   export interface Options {
@@ -116,17 +116,17 @@ declare namespace Datagrid {
     columnData?: {
       [key: string]: {
         /** An observable of data for the column field */
-        model?: Observable<any>;
+        model: Observable<any>;
         /** If the model being supplied is a complex object, get the data out of this property instead of in the root object */
-        modelSrc?: string;
+        modelSrc: string;
         /** The label or human readable value to display */
-        label?: string;
+        label: string;
         /** The unique ID which should map to the row property */
-        value?: string;
+        value: string;
         /** Property on the model with a list of inline css styles */
-        styles?: string;
+        styles: string;
         /** Property on the model with a list of css classes */
-        classes?: string;
+        classes: string;
       };
     };
     /** Map grouping/sorting properties to values in your table  */
@@ -153,9 +153,9 @@ declare namespace Datagrid {
     /** A unique ID generated for the trackBy loop */
     $$track?: string;
     /**  The property in the object to pull data from. Prop also defines which cell template to use in the HTML file */
-    prop?: string;
+    prop: string;
     /** Static text to display in the header column */
-    label?: string;
+    label: string;
     /** Use this property from the column object as the label instead */
     labelProp?: string;
     /** Default width */
@@ -247,12 +247,12 @@ declare namespace Datagrid {
   }
 
   export interface Group {
-    rows?: any[];
+    rows: any[];
     column?: Datagrid.Column;
-    columnProp?: string;
-    columnLabel?: string;
-    label?: string;
-    visible?: boolean;
+    columnProp: string;
+    columnLabel: string;
+    label: string;
+    visible: boolean;
   }
 
   export interface Filter {
@@ -267,20 +267,20 @@ declare namespace Datagrid {
   }
 
   export interface DragSelect {
-    hasMinSize?: boolean;
-    startX?: number;
-    startY?: number;
-    top?: number;
-    bottom?: number;
-    left?: number;
-    right?: number;
-    width?: number;
-    height?: number;
-    bounding?: {
-      top?: number;
-      bottom?: number;
-      left?: number;
-      right?: number;
+    hasMinSize: boolean;
+    startX: number;
+    startY: number;
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
+    width: number;
+    height: number;
+    bounding: {
+      top: number;
+      bottom: number;
+      left: number;
+      right: number;
     };
   }
 }

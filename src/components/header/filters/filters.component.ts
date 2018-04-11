@@ -32,28 +32,31 @@ export class FiltersComponent implements OnInit, OnDestroy {
   constructor() {}
 
   ngOnInit() {
-    // Create an subscription to debounce the user input
-    this.filterTerm.debounceTime(300).subscribe(filter => {
-      if (filter) {
-        this.onFiltersUpdated.emit(filter);
-      }
-    });
-
-    // If custom column data has been supplied
-    if (this.options.columnData && this.options.columnData[this.column.prop]) {
-      let sub = this.options.columnData[this.column.prop].model.subscribe(model => {
-        // If a modelSrc has been supplied, fetch data from that. If not get it straight from the model
-        this.model = this.options.columnData[this.column.prop].modelSrc
-          ? model[this.options.columnData[this.column.prop].modelSrc]
-          : model;
-        // Simplify some of the properties for easier use in the dom
-        this.modelLabel = this.options.columnData[this.column.prop].label;
-        this.modelValue = this.options.columnData[this.column.prop].value;
-        this.modelClasses = this.options.columnData[this.column.prop].classes;
-        this.modelStyles = this.options.columnData[this.column.prop].styles;
+      // Create an subscription to debounce the user input
+      this.filterTerm.debounceTime(300).subscribe(filter => {
+          if (filter) {
+              this.onFiltersUpdated.emit(filter);
+          }
       });
-      this.subs.push(sub);
-    }
+
+      // If custom column data has been supplied
+      if (this.options.columnData) {
+          let sub = this.options.columnData[this.column.prop].model.subscribe(model => {
+              if (this.options.columnData) {
+                  // If a modelSrc has been supplied, fetch data from that. If not get it straight from the model
+                  this.model = this.options.columnData[this.column.prop].modelSrc
+                      ? model[this.options.columnData[this.column.prop].modelSrc]
+                      : model;
+
+                  // Simplify some of the properties for easier use in the dom
+                  this.modelLabel = this.options.columnData[this.column.prop].label || '';
+                  this.modelValue = this.options.columnData[this.column.prop].value || '';
+                  this.modelClasses = this.options.columnData[this.column.prop].classes || '';
+                  this.modelStyles = this.options.columnData[this.column.prop].styles || '';
+              }
+          });
+          this.subs.push(sub);
+      }
   }
 
   /**
