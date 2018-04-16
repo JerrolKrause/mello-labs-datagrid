@@ -652,8 +652,8 @@ export class DataGridComponent
             // ### Column Changes ###
             // Deletion
             if (stateChange.data.action === 'delete') {
-                this.columnsInternal = this.columnsInternal.filter(column => column.$$index != stateChange.data.columnIndex);
-                this.columns = this.columns.filter(column => column.$$index != stateChange.data.columnIndex);
+                this.columnsInternal = this.columnsInternal.filter(column => column.$$index !== stateChange.data.columnIndex);
+                this.columns = this.columns.filter(column => column.$$index !== stateChange.data.columnIndex);
                 this.emitColumns();
             }
         } else if (stateChange.action === Actions.pinLeft) {

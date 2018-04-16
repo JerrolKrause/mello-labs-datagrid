@@ -1,5 +1,5 @@
 <div draggable="false">
-	<div class="datagrid-header-cell" title="{{column.label}}"
+	<div class="datagrid-header-cell" [title]="column.label"
 		 *ngFor="let column of columns; let columnIndex = index; trackBy:trackColumn"
 		 [ngClass]="{'reorderable': column.canReorder }"
 		 [ngStyle]="{'width' : column.width + 'px', 'left' : column.$$leftOffset + 'px' }"
