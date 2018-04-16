@@ -650,16 +650,10 @@ export class DataGridComponent
             // newRows = [...this.rows];
         } else if (stateChange.action === Actions.column) {
             // ### Column Changes ###
-            // console.warn('Column Changes ', stateChange);
             // Deletion
             if (stateChange.data.action === 'delete') {
-                // stateChange.data.columnIndex
-                let goodbye = this.columnsInternal.splice(stateChange.data.columnIndex, 1);
-                this.columnsInternal = [...this.columnsInternal];
-
-                goodbye = this.columns.splice(stateChange.data.columnIndex, 1);
-                this.columns = [...this.columns];
-                console.log('Fix column deletion', goodbye);
+                this.columnsInternal = this.columnsInternal.filter(column => column.$$index != stateChange.data.columnIndex);
+                this.columns = this.columns.filter(column => column.$$index != stateChange.data.columnIndex);
                 this.emitColumns();
             }
         } else if (stateChange.action === Actions.pinLeft) {
