@@ -41,7 +41,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
 
       // If custom column data has been supplied
       if (this.options.columnData) {
-          let sub = this.options.columnData[this.column.prop].model.subscribe(model => {
+          const sub = this.options.columnData[this.column.prop].model.subscribe(model => {
               if (this.options.columnData) {
                   // If a modelSrc has been supplied, fetch data from that. If not get it straight from the model
                   this.model = this.options.columnData[this.column.prop].modelSrc
@@ -67,19 +67,19 @@ export class FiltersComponent implements OnInit, OnDestroy {
    * @param oldTerm
    */
   public modifyFilter(columnProp: string, operator: string, newTerm: string | boolean, oldTerm: string) {
-    //console.warn('modifyFilter',newTerm, oldTerm);
-    let filterObj = {
+    // console.warn('modifyFilter',newTerm, oldTerm);
+    const filterObj = {
       filterAction: '',
       filter: { prop: columnProp, operator: operator, value: newTerm },
     };
 
     // Adding new filter
-    if ((oldTerm == '' || !oldTerm) && newTerm != '') {
+    if ((oldTerm === '' || !oldTerm) && newTerm !== '') {
       filterObj.filterAction = 'add';
-    } else if (newTerm == '' || newTerm == false || !newTerm || newTerm == oldTerm) {
+    } else if (newTerm === '' || newTerm == false || !newTerm || newTerm === oldTerm) {
       // Removing existing filter
       filterObj.filterAction = 'remove';
-    } else if (newTerm != oldTerm) {
+    } else if (newTerm !== oldTerm) {
       // Changing existing filter
       filterObj.filterAction = 'change';
     }

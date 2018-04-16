@@ -30,7 +30,7 @@ export class HeaderRowComponent implements OnInit, OnChanges {
   } = {};
 
   /** During a resize, disable some stuff */
-  public reSizing: boolean = false;
+  public reSizing = false;
 
   //public columnWidth: string = '';
   public dragStartProp: string;
@@ -40,10 +40,10 @@ export class HeaderRowComponent implements OnInit, OnChanges {
   ngOnInit() {}
 
   ngOnChanges() {
-    //this.cellContext.column = this.column;
-    //this.cellContext.row = this.row;
-    //this.cellContext.options = this.options;
-    //this.cellContext.value = this.row[this.column.prop];
+    // this.cellContext.column = this.column;
+    // this.cellContext.row = this.row;
+    // this.cellContext.options = this.options;
+    // this.cellContext.value = this.row[this.column.prop];
     // if (this.columns) {
     //		this.columnsOriginal = [...this.columns];
     // }
@@ -81,10 +81,10 @@ export class HeaderRowComponent implements OnInit, OnChanges {
     // console.log('onReorderSuccess', this.dragStartProp, columnNewPosition);
     // If columns are being dragged before a pinned column, set that column to pinned
     let isPinned = false;
-    let payload = { action: 'reorder', type: type, prop: this.dragStartProp, columnIndex: columnNewPosition };
+    const payload = { action: 'reorder', type: type, prop: this.dragStartProp, columnIndex: columnNewPosition };
 
     for (let i = this.columns.length - 1; i >= 0; i--) {
-      let column = this.columns[i];
+      const column = this.columns[i];
       if (column.pinnedLeft) {
         isPinned = true;
       }

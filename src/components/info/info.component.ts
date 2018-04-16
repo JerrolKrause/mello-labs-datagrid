@@ -15,7 +15,6 @@ export class InfoComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
-    //console.log(this.state, this.columnsMapped);
   }
 
   /**

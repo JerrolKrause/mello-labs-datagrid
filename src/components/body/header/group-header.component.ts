@@ -24,8 +24,8 @@ export class GroupHeaderComponent implements OnInit, OnChanges, OnDestroy {
 
   @Output() onGroupToggled: EventEmitter<any> = new EventEmitter();
 
-  public groupLabel: string = '';
-  public active: boolean = true;
+  public groupLabel = '';
+  public active = true;
 
   private sub: Subscription;
 
@@ -75,22 +75,22 @@ export class GroupHeaderComponent implements OnInit, OnChanges, OnDestroy {
     ) {
       // Sub to the observable
       this.sub = options.columnData[group.columnProp].model.subscribe(model => {
-        
+
         // If this row property is an array, join all possible settings
           if (options.columnData && group && group.label && Array.isArray(group.label) && group.columnProp && group.rows) {
-              let columnData = options.columnData[group.columnProp];
-              let newLabel: any[] = [];
+              const columnData = options.columnData[group.columnProp];
+              const newLabel: any[] = [];
           // Loop through the labels in the group prop
           group.rows[0][group.columnProp].forEach((id: string) => {
             model[columnData.modelSrc].forEach((element: any) => {
-              if (id == element[columnData.value]) {
+              if (id === element[columnData.value]) {
                 newLabel.push(element[columnData.label]);
               }
             });
           });
           this.groupLabel = newLabel.length ? newLabel.join(' & ') : 'Missing Value';
         } else {
-          //If this row property is NOT an array
+          // If this row property is NOT an array
           this.groupLabel = 'No Value';
         }
       });

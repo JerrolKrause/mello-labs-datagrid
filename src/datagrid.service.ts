@@ -21,17 +21,15 @@ export class DataGridService {
    * @param mapObj
    */
   public mapPropertiesDown(array: any[], mapObj: any): any[] {
-    //console.warn('mapProperties Down', JSON.parse(JSON.stringify(array)));
     return array.map(element => {
-      for (let key in mapObj) {
+      for (const key in mapObj) {
         if (mapObj.hasOwnProperty(key)) {
           // If the default property needed by the DT is NOT found in the object
           // This avoids issues where the correct property is actually being passed in even though it is mapped
           if (!element[key]) {
             // If mapping data, any column references will be camel case instead of title case. Remap to camel case
-            //console.warn('mapProperties', key)
             element[key] = element[mapObj[key]];
-            //delete element[mapObj[key]];
+            // delete element[mapObj[key]];
           }
         }
       }
@@ -50,18 +48,16 @@ export class DataGridService {
     // console.warn('mapProperties', array, mapObj);
 
     return JSON.parse(JSON.stringify(array)).map((element: any) => {
-      //console.warn(element);
-      for (let key in mapObj) {
+      // console.warn(element);
+      for (const key in mapObj) {
         if (mapObj.hasOwnProperty(key)) {
           // If the default property needed by the DT is NOT found in the object
           // This avoids issues where the correct property is actually being passed in even though it is mapped
-          //if (!element[mapObj[key]]) {
-          //console.warn('Current State: Key:', key, '- element[key]', element[key], '- mapObj[key]:', mapObj[key]);
+          // if (!element[mapObj[key]]) {
           element[mapObj[key]] = element[key];
-          //console.warn(element);
-          //}
-          //console.warn('mapProperties', JSON.parse(JSON.stringify(element)));
-          //delete element[key];
+          // console.warn(element);
+          // }
+          // delete element[key];
           // Possible related to mapping a property down
         }
       }
@@ -89,8 +85,8 @@ export class DataGridService {
     gridProps: Datagrid.Props,
     rowHeight: number,
   ): any[] {
-    //console.log('getVisibleRowsoffSetRowsFromTop', rows, this.scrollProps, this.rowHeight, this.gridProps);
-    let rowsNew = [...rows];
+    // console.log('getVisibleRowsoffSetRowsFromTop', rows, this.scrollProps, this.rowHeight, this.gridProps);
+    const rowsNew = [...rows];
     let buffer = 5;
     if (window.navigator.userAgent.indexOf('Edge') > -1) {
       buffer = 15;
@@ -108,8 +104,7 @@ export class DataGridService {
     if (rowsEnd > rowsNew.length) {
       rowsEnd = rowsNew.length;
     }
-    //console.log('getVisibleRows', offSetRowsFromTop, rowsEnd);
-    //console.log('getVisibleRowsoffSetRowsFromTop', rowsEnd)
+ 
     return rowsNew.slice(offSetRowsFromTop, rowsEnd);
   }
 
@@ -117,14 +112,13 @@ export class DataGridService {
    * Create an object of columns that should be visible based on horizontal scroll width
    */
   public getVisibleColumns(columns: any[], scrollProps: Datagrid.ScrollProps, gridProps: Datagrid.Props) {
-    //console.log('getVisibleColumns', this.scrollProps, this.gridProps, this.columnsInternal.length);
-    let colsExternal = [];
-    let buffer = 150;
-    //let widthTotal = this.scrollProps.scrollLeft;
+    const colsExternal = [];
+    const buffer = 150;
+    // let widthTotal = this.scrollProps.scrollLeft;
     let widthCurrent = 0;
     // Loop through column widths
     for (let i = 0; i < columns.length; i++) {
-      let column = columns[i];
+      const column = columns[i];
 
       // If current column width + all widths before this one is greater than the left scroll position
       // If total column widths is less than the width of the body minus the left scroll position
@@ -138,7 +132,7 @@ export class DataGridService {
       widthCurrent = widthCurrent + column.width;
     }
     return [...colsExternal];
-    //this.columnsExternal = colsExternal;
+    // this.columnsExternal = colsExternal;
   }
 
   /**
@@ -146,10 +140,9 @@ export class DataGridService {
    * @param array
    */
   public filterGlobal(array: any[], filterGlobal: Datagrid.FilterGlobal): any[] {
-    //console.warn('filterGlobal', options.filterGlobal.props);
-
+ 
     // Loop through the existing props supplied and create the appropriate filter object
-    let filters: any[] = [];
+    const filters: any[] = [];
     filterGlobal.props.forEach(prop => {
       filters.push({
         operator: 'search',
@@ -170,13 +163,13 @@ export class DataGridService {
     // console.warn('filterArray 1: ', array, filters );
 
     // Get number of contains filters
-    let contains = filters.filter(filter => filter.operator == 'contains');
+    const contains = filters.filter(filter => filter.operator === 'contains');
     // Get searches which as passed from the global search option
-    let searches = filters.filter(filter => filter.operator == 'search');
+    const searches = filters.filter(filter => filter.operator === 'search');
     // Equals filters are an OR within the same field but an AND between different fields
     // Map down to dictionary with field as key so we can handle that difference
-    let equals: { [key: string]: any } = {};
-    filters.filter(filter => filter.operator == 'eq').forEach(filter => {
+    const equals: { [key: string]: any } = {};
+    filters.filter(filter => filter.operator === 'eq').forEach(filter => {
       if (!equals[filter.prop]) {
         equals[filter.prop] = [];
       }
@@ -188,24 +181,23 @@ export class DataGridService {
       if (searches.length) {
         let matches = false;
         for (let i = 0; i < searches.length; i++) {
-          let filter = searches[i];
+          const filter = searches[i];
           // If this field isn't found on the row, return false
           if (!row[filter.prop]) {
             return false;
           }
 
           // Perform some cleanup on the strings
-          let rowValue = row[filter.prop]
+          const rowValue = row[filter.prop]
             .toString()
             .toLowerCase()
             .trim();
-          let filterValue = filter.value
+          const filterValue = filter.value
             .toString()
             .toLowerCase()
             .trim();
 
-          //console.warn(rowValue, filterValue, rowValue.indexOf(filterValue));
-          if (rowValue.indexOf(filterValue) != -1) {
+          if (rowValue.indexOf(filterValue) !== -1) {
             matches = true;
             break;
           }
@@ -220,24 +212,23 @@ export class DataGridService {
       if (contains.length) {
         let matches = false;
         for (let i = 0; i < contains.length; i++) {
-          let filter = contains[i];
+          const filter = contains[i];
           // If this field isn't found on the row, return false
           if (!row[filter.prop]) {
             return false;
           }
-          //console.warn(row[filter.prop], '-', filter.prop)
+          // console.warn(row[filter.prop], '-', filter.prop)
           // Perform some cleanup on the strings
-          let rowValue = row[filter.prop]
+          const rowValue = row[filter.prop]
             .toString()
             .toLowerCase()
             .trim();
-          let filterValue = filter.value
+          const filterValue = filter.value
             .toString()
             .toLowerCase()
             .trim();
 
-          //console.warn(rowValue, filterValue, rowValue.indexOf(filterValue));
-          if (rowValue.indexOf(filterValue) != -1) {
+          if (rowValue.indexOf(filterValue) !== -1) {
             matches = true;
             break;
           }
@@ -257,10 +248,10 @@ export class DataGridService {
             // Within each field, only need 1 match to include in the collection
             let matches = false;
             for (let i = 0; i < equals[key].length; i++) {
-              let filter = equals[key][i];
+              const filter = equals[key][i];
 
               // If this field isn't found on the row, return false
-              if (!row[filter.prop] && row[filter.prop] != false) {
+              if (!row[filter.prop] && row[filter.prop] !== false) {
                 return false;
               }
 
@@ -275,15 +266,15 @@ export class DataGridService {
               }
 
               // If the field value matches the filter value
-              if (row[filter.prop] == filter.value) {
+              if (row[filter.prop] === filter.value) {
                 matches = true;
                 break;
               }
 
               // If this is a boolean and needs to match true false
               if (
-                (filter.value == 'True' && row[filter.prop] == true) ||
-                (filter.value == 'False' && row[filter.prop] == false)
+                (filter.value === 'True' && row[filter.prop] === true) ||
+                (filter.value === 'False' && row[filter.prop] === false)
               ) {
                 matches = true;
                 break;
@@ -295,12 +286,11 @@ export class DataGridService {
             }
           }
         }
-        if (allGroupMatches != Object.keys(equals).length) {
+        if (allGroupMatches !== Object.keys(equals).length) {
           return false;
         }
       }
-      // If there isn't a match within each group, return false
-
+   
       // If no filters failed, return true
       return true;
     });
@@ -313,25 +303,24 @@ export class DataGridService {
    * @param sortType
    */
   public sortArray(array: any[], prop: string, sortType: string): any[] {
-    //console.warn('sortRows', prop, sortType);
-    //console.warn('sortRows', array);
-    let mapProp = (prop: any) => {
+    // console.warn('sortRows', prop, sortType);
+    const mapProp = (prop2: any) => {
       // If string, make lower case and remove special characters
-      if (typeof prop == 'string') {
-        return prop.toLowerCase().replace(/[^a-z0-9]/gi, '');
-      } else if (typeof prop == 'number') {
+      if (typeof prop2 === 'string') {
+        return prop2.toLowerCase().replace(/[^a-z0-9]/gi, '');
+      } else if (typeof prop2 === 'number') {
         // If number
-        return prop * 1000;
+        return prop2 * 1000;
       } else {
         // Make string
-        if (prop) {
-          return prop.toString();
+        if (prop2) {
+          return prop2.toString();
         }
         return '';
       }
     };
 
-    if (sortType == 'asc') {
+    if (sortType === 'asc') {
       return array.sort(
         (a, b) => (mapProp(a[prop]) !== mapProp(b[prop]) ? (mapProp(a[prop]) < mapProp(b[prop]) ? -1 : 1) : 0),
       );
@@ -357,22 +346,22 @@ export class DataGridService {
     options: Datagrid.Options,
   ): { rows: any[]; groups: Datagrid.Groupings } {
     // console.log('groupRows', groups, sorts);
-    let newGroups: { [key: string]: any } = {};
-    let group = groups[0];
+    const newGroups: { [key: string]: any } = {};
+    const group = groups[0];
 
     rows.forEach(row => {
       // If the row property is an array of strings, flatten it down to a string. Otherwise just use string
       let newProp = Array.isArray(row[group.prop]) ? row[group.prop].join() : row[group.prop];
       // If this is an empty array, set to null instead
-      //if (Array.isArray(row[group.prop]) && !row[group.prop].length){
+      // if (Array.isArray(row[group.prop]) && !row[group.prop].length){
       //    newProp = row[group.prop] = null;
-      //}
+      // }
 
-      if (!newProp || newProp == '') {
+      if (!newProp || newProp === '') {
         newProp = 'No Value';
       }
       // Get current column
-      let column = columns.filter(columnNew => columnNew.prop == group.prop);
+      const column = columns.filter(columnNew => columnNew.prop === group.prop);
 
       if (!newGroups[newProp]) {
         newGroups[newProp] = <Datagrid.Group>{
@@ -385,7 +374,7 @@ export class DataGridService {
           type: 'group',
         };
 
-        //let label = columns.filter(column => column.prop == group.prop);
+        // let label = columns.filter(column => column.prop == group.prop);
         newGroups[newProp].columnLabel = column && column[0] ? column[0].label : 'No Value';
       }
 
@@ -394,7 +383,7 @@ export class DataGridService {
 
     // Now remap the object into an array
     let grouped = [];
-    for (let key in newGroups) {
+    for (const key in newGroups) {
       if (newGroups.hasOwnProperty(key)) {
         grouped.push(newGroups[key]);
       }
@@ -404,21 +393,21 @@ export class DataGridService {
     grouped = this.sortArray(grouped, 'label', group.dir);
 
     let newRows: any[] = [];
-    let groupsFinal: Datagrid.Groupings = {};
+    const groupsFinal: Datagrid.Groupings = {};
     // Sort the rows within the group
-    grouped.forEach((group: Datagrid.Group) => {
+    grouped.forEach((group2: Datagrid.Group) => {
       if (sorts.length) {
-        this.sortArray(group.rows, sorts[0].prop, sorts[0].dir);
+        this.sortArray(group2.rows, sorts[0].prop, sorts[0].dir);
         }
 
-      if (options.primaryKey){
+      if (options.primaryKey) {
           // Create a primary key used for the trackRows method. Group headers are treated as a row and need to have the same primary key as the rest
-          (<any>group)[options.primaryKey] = group.label + '-' + group.rows.length;
+          (<any>group2)[options.primaryKey] = group2.label + '-' + group2.rows.length;
       }
-      
-      let currentLoc = newRows.length;
-      groupsFinal[currentLoc] = group;
-      newRows = [...newRows, group, ...group.rows];
+
+      const currentLoc = newRows.length;
+      groupsFinal[currentLoc] = group2;
+      newRows = [...newRows, group2, ...group2.rows];
     });
 
     return { rows: newRows, groups: groupsFinal };
@@ -430,14 +419,14 @@ export class DataGridService {
    */
   public createStatuses(state: Datagrid.State, columns: Datagrid.Column[]): Datagrid.Status {
     // console.warn('createStatuses: ',JSON.parse(JSON.stringify(state)));
-    let status: Datagrid.Status = {
+    const status: Datagrid.Status = {
       groups: {},
       sorts: {},
       filters: {}
     };
     // If groupings are found, create dictionary
     if (state.groups.length) {
-      let newStatus: { [key: string]: any } = {};
+      const newStatus: { [key: string]: any } = {};
       state.groups.forEach(group => {
         newStatus[group.prop] = group.dir;
       });
@@ -445,10 +434,10 @@ export class DataGridService {
     } else {
       status.groups = {};
     }
-    //console.warn('createStatuses: ', JSON.parse(JSON.stringify(status.groups)));
+ 
     // If sortings are found, create dictionary
     if (state.sorts.length) {
-      let newStatus: { [key: string]: any } = {};
+      const newStatus: { [key: string]: any } = {};
       state.sorts.forEach(sort => {
         newStatus[sort.prop] = sort.dir;
       });
@@ -457,7 +446,7 @@ export class DataGridService {
       status.sorts = {};
     }
 
-    let newFilters: { [key: string]: any } = {};
+    const newFilters: { [key: string]: any } = {};
     if (columns && columns.length) {
       columns.forEach(column => {
         newFilters[column.prop] = {
@@ -467,10 +456,10 @@ export class DataGridService {
       });
     }
 
-   
+
     // If filters are found, create dictionary
-    if (state.filters && typeof state.filters != 'string' && state.filters.length) {
-      //console.warn('Adding filters')
+    if (state.filters && typeof state.filters !== 'string' && state.filters.length) {
+
       state.filters.forEach(filter => {
         // Create field/property object
         if (!newFilters[filter.prop]) {
@@ -482,7 +471,7 @@ export class DataGridService {
         }
 
         // Operator is Contains
-        if (filter.operator == 'contains') {
+        if (filter.operator === 'contains') {
           newFilters[filter.prop][filter.operator] = filter.value;
           newFilters[filter.prop].hasFilters = true;
         } else {
@@ -498,7 +487,7 @@ export class DataGridService {
     }
 
     status.filters = newFilters;
-    //console.warn('status 2: ', JSON.parse(JSON.stringify(status)));
+    // console.warn('status 2: ', JSON.parse(JSON.stringify(status)));
     return status;
   }
 
@@ -507,10 +496,10 @@ export class DataGridService {
    * @param columnProp
    */
   public getDefaultTermsList(rows: any[], columns: Datagrid.Column[]) {
-    //console.log('getDefaultTermsList');
+    // console.log('getDefaultTermsList');
     // console.time('getDefaultTermsList');
-    let termsList: { [key: string]: any } = {};
-    let uniques: { [key: string]: any } = {};
+    const termsList: { [key: string]: any } = {};
+    const uniques: { [key: string]: any } = {};
 
     // Loop through all the columns
     columns.forEach(column => {
@@ -524,12 +513,12 @@ export class DataGridService {
 
     // Find the unique values for each row
     rows.forEach(row => {
-      for (let key in termsList) {
+      for (const key in termsList) {
         if (termsList.hasOwnProperty(key)) {
-          if ((row[key] || row[key] == false) && uniques[key]) {
+          if ((row[key] || row[key] === false) && uniques[key]) {
             let keyNew = row[key];
             // If boolean, convert key to string
-            if (typeof row[key] == 'boolean') {
+            if (typeof row[key] === 'boolean') {
               keyNew = _.startCase(_.toLower(row[key].toString()));
             }
             uniques[key][keyNew] = true;
@@ -539,10 +528,10 @@ export class DataGridService {
     });
 
     // Now push the uniques to the termslist
-    for (let key in uniques) {
+    for (const key in uniques) {
       if (uniques.hasOwnProperty(key)) {
-        let foo = uniques[key];
-        for (let key2 in foo) {
+        const foo = uniques[key];
+        for (const key2 in foo) {
           if (foo.hasOwnProperty(key2)) {
             termsList[key].push(key2);
           }
@@ -550,10 +539,10 @@ export class DataGridService {
       }
     }
     // Now sort terms in default order
-    for (let key in termsList) {
+    for (const key in termsList) {
       if (termsList.hasOwnProperty(key)) {
         // If boolean, have true be first
-        if (termsList[key][0] == 'False' || termsList[key][0] == 'True') {
+        if (termsList[key][0] === 'False' || termsList[key][0] === 'True') {
           termsList[key] = ['True', 'False']; // TODO: Better method of handling boolean than hard coded
         } else {
           termsList[key].sort();
@@ -597,9 +586,9 @@ export class DataGridService {
    * @param gridProps
    */
   public columnsResize(columns: Datagrid.Column[], gridProps: Datagrid.Props) {
-    let widthTotal = gridProps.widthTotal;
+    const widthTotal = gridProps.widthTotal;
     return columns.map(column => {
-        if (column.width){
+        if (column.width) {
             column.width = Math.ceil(column.width * gridProps.widthBody / widthTotal) + 1;
         }
       return column;
@@ -616,7 +605,7 @@ export class DataGridService {
     // Loop through supplied columns, attach templates
     for (let i = 0; i < columns.length; i++) {
       // If custom cell templates were supplied, attach them to their appropriate column
-      let column = columns[i];
+      const column = columns[i];
       if (columnTemplates[column.prop]) {
         // Cell Templates
         if (columnTemplates[column.prop].templateCell) {
@@ -635,7 +624,7 @@ export class DataGridService {
    * @param arr
    */
   public templatesMapColumns(arr: any[]) {
-    //const result: any[] = [];
+ 
     const result: { [key: string]: any } = {};
 
     for (const temp of arr) {
@@ -665,18 +654,17 @@ export class DataGridService {
    * @param makeVisible
    */
   public rowPositions(rows: any[], rowHeight: number, makeVisible: boolean = false) {
-    //console.log('rowPositions start', rows);
-
+ 
     let y = 0;
     return rows.filter((row, i) => {
       row.$$rowIndex = i; // Set rowIndex
 
       // If hidden prop is not set, set default to false
-      if (typeof row.$$hidden == 'undefined' || makeVisible) {
+      if (typeof row.$$hidden === 'undefined' || makeVisible) {
         row.$$hidden = false;
       }
       // If visible
-      if (row.$$hidden == false) {
+      if (row.$$hidden === false) {
         row.$$rowPosition = y; // Set y position
         y += rowHeight + 1;
         return true;

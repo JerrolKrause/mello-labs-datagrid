@@ -54,7 +54,7 @@ export class BodyComponent implements OnInit {
   /**
    * Throttle the scroll event
    */
-  public onScrollThrottled = _.throttle((event:any) => this.onScroll(event), 20, { trailing: true, leading: true });
+  public onScrollThrottled = _.throttle((event: any) => this.onScroll(event), 20, { trailing: true, leading: true });
 
   /**
    * When the datatable is scrolled
@@ -63,7 +63,7 @@ export class BodyComponent implements OnInit {
   private onScroll(event: any) {
     //console.log('onScroll', event.target.scrollTop);
     requestAnimationFrame(() => {
-      let scrollProps = {
+      const scrollProps = {
         scrollTop: event.target.scrollTop,
         scrollLeft: event.target.scrollLeft,
       };

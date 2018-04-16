@@ -103,10 +103,10 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit, OnDestro
    */
   public rowUpdated(event: any) {
     if (this.column.prop && this.row) {
-      let valueOld = this.row[this.column.prop];
+      const valueOld = this.row[this.column.prop];
       this.row[this.column.prop] = event.target.value;
 
-      let fieldData: Datagrid.FieldEdit = {
+      const fieldData: Datagrid.FieldEdit = {
         valueNew: event.target.value,
         valueOld: valueOld,
         prop: this.column.prop,

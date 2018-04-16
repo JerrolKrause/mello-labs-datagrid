@@ -57,9 +57,9 @@ TODOS:
     host: {
         '(document:keydown)': 'handleKeyboardEvents($event)',
         '(document:keyup)': 'handleKeyboardEvents($event)',
-        //'(document:mousedown )': 'handleMouseDown($event)',
-        //'(document:mouseup)': 'handleMouseUp($event)',
-        //'(document:mousemove)': 'handleMouseMove($event)',
+        // '(document:mousedown )': 'handleMouseDown($event)',
+        // '(document:mouseup)': 'handleMouseUp($event)',
+        // '(document:mousemove)': 'handleMouseMove($event)',
         '(window:resize)': 'onWindowResizeThrottled($event)',
     },
 })
@@ -74,7 +74,7 @@ export class DataGridComponent
     @Input()
     set columns(columns: Datagrid.Column[]) {
         if (columns && columns.length) {
-            let slug = Math.floor(Math.random() * 1000000); // Create a random number slug so if different columns are passed a new instance is created every time
+            const slug = Math.floor(Math.random() * 1000000); // Create a random number slug so if different columns are passed a new instance is created every time
             // Create custom track property and new reference for each column
             columns = columns.map((column, i) => {
                 column.$$track = slug + '-' + i;
@@ -100,7 +100,7 @@ export class DataGridComponent
     @Input()
     set rows(rows: any[]) {
         if (rows && rows.length) {
-            let slug = Math.floor(Math.random() * 1000000); // Create a random number slug so if different rows are passed a new instance is created every time
+            const slug = Math.floor(Math.random() * 1000000); // Create a random number slug so if different rows are passed a new instance is created every time
             rows.forEach((row, i) => {
                 row.$$track = slug + '-' + i;
                 row.$$selected = false;
@@ -122,7 +122,7 @@ export class DataGridComponent
     @Input()
     set state(state: Datagrid.State) {
         // If no state passed down, set a default and empty state object
-        let stateNew: any = state ? state : {};
+        const stateNew: any = state ? state : {};
 
         if (!stateNew.filters) {
             stateNew.filters = [];
@@ -196,7 +196,7 @@ export class DataGridComponent
     public scrollProps: Datagrid.ScrollProps = { scrollTop: 0, scrollLeft: 0 };
     /** Holds custom templates for cells */
     public templatesCell: { [key: string]: ElementRef } = {};
-    //private scrollDebounce$: BehaviorSubject<Datagrid.ScrollProps> = new BehaviorSubject(this.scrollProps);
+    // private scrollDebounce$: BehaviorSubject<Datagrid.ScrollProps> = new BehaviorSubject(this.scrollProps);
     /** A dictionary of columns based on primary key, used for lookups */
     public columnsMapped: { [key: string]: Datagrid.Column } = {};
     /** Last row that was selected */
@@ -212,11 +212,11 @@ export class DataGridComponent
     /** A dictionary that holds css STYLES for a given row. The lookup is the primary key specified in the options. Gets its data from options.rowStyle */
     public rowStyles = {};
     /** Does the datatable have the data it needs to draw the dom? */
-    public appReady: boolean = false;
+    public appReady = false;
     /** Does the datatable have the data it needs to draw the dom? */
-    public domReady: boolean = false;
+    public domReady = false;
     /** Is the user dragging with the mouse */
-    public dragging: boolean = false;
+    public dragging = false;
     public draggingPos: Datagrid.DragSelect = {
         hasMinSize: false,
         startX: 0,
@@ -233,7 +233,7 @@ export class DataGridComponent
             left: 0,
             right: 0,
         }
-    }
+    };
     /** Currently pressed key */
     public keyPressed: string | null;
     /** A dictionary of currently pressed keys */
@@ -244,7 +244,7 @@ export class DataGridComponent
         groupIndex: 0,
     };
     /** The height of the row. Necessary for virtual scroll calculation. Needs to be an odd number to prevent partial pixel problems. Has 1px border added*/
-    private rowHeight: number = 23;
+    private rowHeight = 23;
     /** Keep track of which indexes are visible to prevent the component tree from being updated unless actually changed */
     private rowsIndexes = { start: 0, end: 0 };
     private columnIndexes = { start: 0, end: 0 };
@@ -284,15 +284,15 @@ export class DataGridComponent
         // If columns are passed
         if (this.columns) {
             // If columnMap object is supplied, remap column props to what the datatable needs
-            let columns = this.options.columnMap
+            const columns = this.options.columnMap
                 ? this.dgSvc.mapPropertiesDown(this.columns, this.options.columnMap)
                 : this.columns;
 
-            let columnsPinnedLeft = columns.filter(column => (column.pinnedLeft ? true : false));
+            const columnsPinnedLeft = columns.filter(column => (column.pinnedLeft ? true : false));
             this.columnsPinnedLeft = columns.length ? this.dgSvc.columnCalculations(columnsPinnedLeft) : [];
 
             // Get un-pinned columns
-            let columnsInternal = columns.filter(column => (!column.pinnedLeft ? true : false));
+            const columnsInternal = columns.filter(column => (!column.pinnedLeft ? true : false));
             this.columnsInternal = columns.length ? this.dgSvc.columnCalculations(columnsInternal) : [];
 
             // Create a column map
@@ -340,7 +340,7 @@ export class DataGridComponent
             if (this.state.filters && this.state.filters.length) {
                 for (let i = this.state.filters.length - 1; i >= 0; i--) {
                     if (!this.columnsMapped[this.state.filters[i].prop]) {
-                        this.state.filters = this.state.filters.filter((_filter, index) => i != index);
+                        this.state.filters = this.state.filters.filter((_filter, index) => i !== index);
                         console.error(`Filter option is for a column that doesn't exist. Filter option has been removed.`);
                     }
                 }
@@ -358,7 +358,7 @@ export class DataGridComponent
             this.appReady = true;
             this.dataGridReady();
 
-            //Emit the state change to the parent component now that the first initial view has been created
+            // Emit the state change to the parent component now that the first initial view has been created
             this.emitState(this.state);
         }
     }
@@ -408,20 +408,20 @@ export class DataGridComponent
      * @param event
      */
     public onScroll(scrollPropsNew: Datagrid.ScrollProps) {
-        //console.log('onScroll', scrollPropsNew);
+        // console.log('onScroll', scrollPropsNew);
 
-        let scrollPropsOld = { ...this.scrollProps };
-        //this.ref.detach();
+        const scrollPropsOld = { ...this.scrollProps };
+        // this.ref.detach();
         this.scrollProps = scrollPropsNew;
 
         // Update rows only if rows have changed
-        if (scrollPropsOld.scrollTop != this.scrollProps.scrollTop) {
-            let rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
+        if (scrollPropsOld.scrollTop !== this.scrollProps.scrollTop) {
+            const rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
             if (
                 !this.rowsIndexes ||
                 (rowsExternal[0] &&
-                    rowsExternal[0].$$track != this.rowsIndexes.start &&
-                    rowsExternal[rowsExternal.length - 1].$$track != this.rowsIndexes.end)
+                    rowsExternal[0].$$track !== this.rowsIndexes.start &&
+                    rowsExternal[rowsExternal.length - 1].$$track !== this.rowsIndexes.end)
             ) {
                 this.rowsExternal = rowsExternal;
                 this.rowsIndexes.start = rowsExternal[0].$$track;
@@ -429,13 +429,13 @@ export class DataGridComponent
             }
         }
         // Update columns only if columns have changed
-        if (scrollPropsOld.scrollLeft != this.scrollProps.scrollLeft) {
-            let columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
+        if (scrollPropsOld.scrollLeft !== this.scrollProps.scrollLeft) {
+            const columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
             if (
                 !this.columnIndexes ||
                 (columnsExternal[0] &&
-                    columnsExternal[0].$$track != this.columnIndexes.start &&
-                    columnsExternal[columnsExternal.length - 1].$$track != this.columnIndexes.end)
+                    columnsExternal[0].$$track !== this.columnIndexes.start &&
+                    columnsExternal[columnsExternal.length - 1].$$track !== this.columnIndexes.end)
             ) {
                 this.columnsExternal = columnsExternal;
                 this.columnIndexes.start = columnsExternal[0].$$track;
@@ -460,7 +460,7 @@ export class DataGridComponent
         this.ref.detach();
 
         let newRows = this.rows;
-        //console.log('Total Rows', newRows.length)
+        // console.log('Total Rows', newRows.length)
         // If global filter option is set filter
         if (this.filterGlobal && this.filterGlobal.term) {
             newRows = this.dgSvc.filterGlobal(newRows, this.filterGlobal);
@@ -481,7 +481,7 @@ export class DataGridComponent
             }
             // let groupings = this.dgSvc.cache.groupRows(newRows, this.columns, this.state.groups, this.state.sorts);
             // Non memoized
-            let groupings = this.dgSvc.groupRows(newRows, this.columns, this.state.groups, this.state.sorts, this.options);
+            const groupings = this.dgSvc.groupRows(newRows, this.columns, this.state.groups, this.state.sorts, this.options);
             newRows = groupings.rows;
             this.groups = groupings.groups;
         } else {
@@ -548,7 +548,7 @@ export class DataGridComponent
         // console.warn('this.status', this.status);
         this.state = { ...this.state };
 
-        //Emit the state change to the parent component
+        // Emit the state change to the parent component
         this.emitState(this.state);
         // Turn change detection back on
         this.ref.reattach();
@@ -567,11 +567,11 @@ export class DataGridComponent
      * When the datatable state is changed, usually via a control such as group/filter/sort etc
      * @param stateChange
      */
-    public onStateUpdated(stateChange: Datagrid.StateChange): void {
-        // console.warn('changeState ', newState);
+    public onStateUpdated(stateChange: Datagrid.StateChange) {
+         console.warn('changeState ', stateChange);
         this.ref.detach();
 
-        let newState: Datagrid.State = { ...this.state };
+        const newState: Datagrid.State = { ...this.state };
 
         // Legacy support for previous states of the grid. Ensure all arrays exist to prevent errors
         if (!newState.filters || !Array.isArray(newState.filters)) {
@@ -591,44 +591,44 @@ export class DataGridComponent
 
         // If the global filter is set
         if (this.filterGlobal && this.filterGlobal.term) {
-            //newRows = this.dgSvc.filterGlobal(newRows, this.filterGlobal);
+            // newRows = this.dgSvc.filterGlobal(newRows, this.filterGlobal);
         }
 
-        //### Update Sorting ###
-        if (stateChange.action == Actions.sort) {
+        // ### Update Sorting ###
+        if (stateChange.action === Actions.sort) {
             newState.sorts = stateChange.data.dir ? [stateChange.data] : [];
-        } else if (stateChange.action == Actions.group) {
-            //### Update Grouping ###
+        } else if (stateChange.action === Actions.group) {
+            // ### Update Grouping ###
             newState.groups = stateChange.data.dir ? [stateChange.data] : [];
-        } else if (stateChange.action == Actions.filter) {
-            //### Update Filtering ###
-            let newFilter: Datagrid.Filter = stateChange.data.filter;
-            if (stateChange.data.filterAction == 'change') {
+        } else if (stateChange.action === Actions.filter) {
+            // ### Update Filtering ###
+            const newFilter: Datagrid.Filter = stateChange.data.filter;
+            if (stateChange.data.filterAction === 'change') {
                 let index = 0;
                 for (let i = 0; i < newState.filters.length; i++) {
-                    if (newFilter.prop == newState.filters[i].prop && newFilter.operator == newState.filters[i].operator) {
+                    if (newFilter.prop === newState.filters[i].prop && newFilter.operator === newState.filters[i].operator) {
                         index = i;
                         break;
                     }
                 }
                 newState.filters[index] = newFilter;
-            } else if (stateChange.data.filterAction == 'add') {
+            } else if (stateChange.data.filterAction === 'add') {
                 newState.filters.push(newFilter);
-            } else if (stateChange.data.filterAction == 'remove') {
+            } else if (stateChange.data.filterAction === 'remove') {
                 let index = 0;
                 for (let i = 0; i < newState.filters.length; i++) {
                     // If this is a contains filter, only match against field and operator
                     if (
-                        newFilter.operator == 'contains' &&
-                        newFilter.prop == newState.filters[i].prop &&
-                        newFilter.operator == newState.filters[i].operator
+                        newFilter.operator === 'contains' &&
+                        newFilter.prop === newState.filters[i].prop &&
+                        newFilter.operator === newState.filters[i].operator
                     ) {
                         index = i;
                         break;
                     } else if (
-                        newFilter.prop == newState.filters[i].prop &&
-                        newFilter.operator == newState.filters[i].operator &&
-                        newFilter.value == newState.filters[i].value
+                        newFilter.prop === newState.filters[i].prop &&
+                        newFilter.operator === newState.filters[i].operator &&
+                        newFilter.value === newState.filters[i].value
                     ) {
                         // If not a contains filter, match against all 3 fields
                         index = i;
@@ -636,19 +636,19 @@ export class DataGridComponent
                     }
                 }
                 newState.filters.splice(index, 1);
-            } else if (stateChange.data.filterAction == 'clear') {
-                newState.filters = newState.filters.filter(item => item.prop != stateChange.data.filter.prop);
-                //console.warn('Clearing filters', newState.filters);
+            } else if (stateChange.data.filterAction === 'clear') {
+                newState.filters = newState.filters.filter(item => item.prop !== stateChange.data.filter.prop);
+                // console.warn('Clearing filters', newState.filters);
             }
-        } else if (stateChange.action == Actions.reset) {
-            //### Reset everything ###
-            //newRows = [...this.rows];
-        } else if (stateChange.action == Actions.column) {
-            //### Column Changes ###
-            //console.warn('Column Changes ', stateChange);
+        } else if (stateChange.action === Actions.reset) {
+            // ### Reset everything ###
+            // newRows = [...this.rows];
+        } else if (stateChange.action === Actions.column) {
+            // ### Column Changes ###
+            // console.warn('Column Changes ', stateChange);
             // Deletion
-            if (stateChange.data.action == 'delete') {
-                //stateChange.data.columnIndex
+            if (stateChange.data.action === 'delete') {
+                // stateChange.data.columnIndex
                 let goodbye = this.columnsInternal.splice(stateChange.data.columnIndex, 1);
                 this.columnsInternal = [...this.columnsInternal];
 
@@ -657,24 +657,24 @@ export class DataGridComponent
                 console.log('Fix column deletion', goodbye);
                 this.emitColumns();
             }
-        } else if (stateChange.action == Actions.pinLeft) {
-            //### Pinning ###
+        } else if (stateChange.action === Actions.pinLeft) {
+            // ### Pinning ###
             if (stateChange.data.isPinned) {
                 // Get column being unpinned
-                let colNew = this.columnsPinnedLeft[stateChange.data.index];
+                const colNew = this.columnsPinnedLeft[stateChange.data.index];
                 delete colNew.pinnedLeft; // Delete pinned prop
                 // Remove from pinned array
-                this.columnsPinnedLeft = this.columnsPinnedLeft.filter((_col, index) => stateChange.data.index != index);
+                this.columnsPinnedLeft = this.columnsPinnedLeft.filter((_col, index) => stateChange.data.index !== index);
                 // Add to main array
                 this.columnsInternal = [colNew, ...this.columnsInternal];
             } else {
-                //console.warn('Pinning to left', stateChange.data);
+                // console.warn('Pinning to left', stateChange.data);
                 // Get pinned column
-                let newCol = this.columnsInternal.filter(col => col.prop == stateChange.data.prop)[0];
+                const newCol = this.columnsInternal.filter(col => col.prop === stateChange.data.prop)[0];
                 newCol.pinnedLeft = true;
                 this.columnsPinnedLeft = [...this.columnsPinnedLeft, newCol];
-                //Update non pinned columns
-                this.columnsInternal = this.columnsInternal.filter(col => col.prop != stateChange.data.prop);
+                // Update non pinned columns
+                this.columnsInternal = this.columnsInternal.filter(col => col.prop !== stateChange.data.prop);
             }
 
             this.emitColumns();
@@ -700,27 +700,27 @@ export class DataGridComponent
         // console.log('columnsUpdated', columnData);
         // If this is a resize column event
         if (columnData && columnData.columnIndex) {
-            if (columnData.action == 'resize') {
+            if (columnData.action === 'resize') {
                 // Determine if updating pinned or regular columns
-                if (columnData.type == 'pinnedLeft') {
+                if (columnData.type === 'pinnedLeft') {
                     this.columnsPinnedLeft[columnData.columnIndex].width = columnData.width;
                     this.columnsPinnedLeft[columnData.columnIndex] = { ...this.columnsPinnedLeft[columnData.columnIndex] };
-                    //this.columnsPinnedLeft = [...this.columnsPinnedLeft];
+                    // this.columnsPinnedLeft = [...this.columnsPinnedLeft];
                 } else {
                     this.columnsInternal[columnData.columnIndex].width = columnData.width;
                     this.columnsInternal[columnData.columnIndex] = { ...this.columnsInternal[columnData.columnIndex] };
-                    //this.columnsInternal = [...this.columnsInternal];
+                    // this.columnsInternal = [...this.columnsInternal];
                 }
-            } else if (columnData.action == 'reorder') {
+            } else if (columnData.action === 'reorder') {
                 // If this is a reorder columns event
-                if (columnData.type == 'pinnedLeft') {
-                    let colOld = this.columnsPinnedLeft.filter(column => column.prop == columnData.prop)[0]; // Get column being moved
-                    let colsNew = this.columnsPinnedLeft.filter(column => column.prop != columnData.prop); // Get new array without that column
+                if (columnData.type === 'pinnedLeft') {
+                    const colOld = this.columnsPinnedLeft.filter(column => column.prop === columnData.prop)[0]; // Get column being moved
+                    const colsNew = this.columnsPinnedLeft.filter(column => column.prop !== columnData.prop); // Get new array without that column
                     colsNew.splice(columnData.columnIndex, 0, colOld); // Insert into index location
                     this.columnsPinnedLeft = colsNew; // Update reference
                 } else {
-                    let colOld = this.columnsInternal.filter(column => column.prop == columnData.prop)[0]; // Get column being moved
-                    let colsNew = this.columnsInternal.filter(column => column.prop != columnData.prop); // Get new array without that column
+                    const colOld = this.columnsInternal.filter(column => column.prop === columnData.prop)[0]; // Get column being moved
+                    const colsNew = this.columnsInternal.filter(column => column.prop !== columnData.prop); // Get new array without that column
                     colsNew.splice(columnData.columnIndex, 0, colOld); // Insert into index location
                     this.columnsInternal = colsNew; // Update reference
                 }
@@ -734,10 +734,10 @@ export class DataGridComponent
      * Global properties needed by grid to draw itself
      */
     public updateGridProps() {
-        let gridProps: Datagrid.Props = { ...this.gridProps };
+        const gridProps: Datagrid.Props = { ...this.gridProps };
         // Get total grid width
         gridProps.widthTotal = this.columns.map(b => b.width).reduce((p, c) => {
-            if (p && c){
+            if (p && c) {
                 return p + c;
             }
         }) || 0;
@@ -764,7 +764,7 @@ export class DataGridComponent
         if (this.options.heightMax) {
             gridProps.heightTotal = <number>this.options.heightMax;
         } else if (this.options.fullScreen) {
-            let height = this.dataGrid.nativeElement.getBoundingClientRect().height;
+            const height = this.dataGrid.nativeElement.getBoundingClientRect().height;
             let newHeight = height - 2 - this.rowHeight; // Add offsets for table header and bottom scrollbar
             // Check if the info bar is showing, deduct from total height
             if (this.options.showInfo && (this.state.sorts!.length || this.state.groups!.length || this.state.filters!.length)) {
@@ -811,7 +811,7 @@ export class DataGridComponent
         // Only drag on left mouse click
         // Make sure the drag starts within the datatable bounding box
         if (
-            event.which == 1 &&
+            event.which === 1 &&
             draggingPos.startY > draggingPos.bounding.top &&
             draggingPos.startY < draggingPos.bounding.bottom &&
             draggingPos.startX > draggingPos.bounding.left &&
@@ -827,7 +827,7 @@ export class DataGridComponent
      * @param event
      */
     public handleMouseUp(event: MouseEvent) {
-        //console.warn('handleMouseUp', event.pageY, this.dataGridBody.nativeElement.getBoundingClientRect().top);
+        // console.warn('handleMouseUp', event.pageY, this.dataGridBody.nativeElement.getBoundingClientRect().top);
         // Sometimes the mouse scrolls too fast to register the last hovered row. If the mouseup position is higher than the datatable top, set lasthovered to 0
         if (this.dragging && this.draggingPos && this.draggingPos.bounding && event.pageY < this.draggingPos.bounding.top) {
             this.rowHoveredLast = 0;
@@ -835,7 +835,7 @@ export class DataGridComponent
         // If a drag event ended NOT on a row, fire the onrowmouseup event with the last hovered row
         if (this.dragging && this.rowHoveredLast !== null) {
             this.onRowMouseEvent({ type: 'mouseup', rowIndex: this.rowHoveredLast, event: event });
-            //this.onRowMouseUp(this.rowHoveredLast, event);
+            // this.onRowMouseUp(this.rowHoveredLast, event);
             // Unselect all text after drag to prevent weird selection issues
             if (document.getSelection) {
                 document.getSelection().removeAllRanges();
@@ -852,8 +852,8 @@ export class DataGridComponent
      * @param event
      */
     public handleMouseMove(event: MouseEvent) {
-      
-            let draggingPos: Datagrid.DragSelect = {
+
+            const draggingPos: Datagrid.DragSelect = {
                 hasMinSize: false,
                 ...this.draggingPos,
             };
@@ -872,7 +872,7 @@ export class DataGridComponent
             // Set to local reference so they can be changed
             let pageY = event.pageY;
             let pageX = event.pageX;
-            
+
                 // Set top boundary
                 if (pageY < draggingPos.bounding.top) {
                     pageY = draggingPos.bounding.top;
@@ -921,14 +921,14 @@ export class DataGridComponent
                     draggingPos.hasMinSize = true;
                 }
 
-                //Make sure the top is lower than the bounding box, don't allow it to be dragged outside the box
+                // Make sure the top is lower than the bounding box, don't allow it to be dragged outside the box
                 if (draggingPos.top < draggingPos.bounding.top) {
                     draggingPos.top = draggingPos.bounding.top;
                 }
 
-                //Make sure the top is lower than the bounding box, don't allow it to be dragged outside the box
+                // Make sure the top is lower than the bounding box, don't allow it to be dragged outside the box
                 if (draggingPos.height > draggingPos.bounding.top) {
-                    //draggingPos.top = draggingPos.bounding.top;
+                    // draggingPos.top = draggingPos.bounding.top;
                 }
 
                 // Update DOM
@@ -943,13 +943,13 @@ export class DataGridComponent
     public handleKeyboardEvents(event: KeyboardEvent): void {
         // console.warn('handleKeyboardEvents 1');
         // Ignore keyboard repeat events
-        if (event.repeat == false) {
-            this.keyPressed = event.type == 'keydown' ? event.key : null;
+        if (event.repeat === false) {
+            this.keyPressed = event.type === 'keydown' ? event.key : null;
 
             // If this is a keydown event, add it to the dictionary
-            if (event.type == 'keydown') {
+            if (event.type === 'keydown') {
                 this.keysPressed[event.key.toString().toLowerCase()] = true;
-            } else if (event.type == 'keyup') {
+            } else if (event.type === 'keyup') {
                 // If this is a key up event, remove from dictionary
                 delete this.keysPressed[event.key.toString().toLowerCase()];
             }
@@ -983,11 +983,11 @@ export class DataGridComponent
         rowIndex: number;
         event: MouseEvent;
     }) {
-        if (action.type != 'mouseenter') {
+        if (action.type !== 'mouseenter') {
             // console.log('onRowMouseEvent', action);
         }
 
-        let row = this.rowsInternal.filter(row => row.$$rowIndex == action.rowIndex)[0]; //this.rowsInternal[action.rowIndex];
+        const row = this.rowsInternal.filter(row2 => row2.$$rowIndex === action.rowIndex)[0]; // this.rowsInternal[action.rowIndex];
 
         switch (action.type) {
             case 'click':
@@ -999,24 +999,24 @@ export class DataGridComponent
                 break;
             case 'mousedown':
                 this.handleMouseDown(action.event);
-                if (action.event.which == 1) {
+                if (action.event.which === 1) {
                     // Only function when the left mouse button is clicked
                     this.rowClickDrag.rowIndex = action.rowIndex;
                 }
                 break;
             case 'mouseup':
                 // Only function when the left mouse button is clicked
-                if (action.event.which == 1 && action.rowIndex != this.rowClickDrag.rowIndex) {
+                if (action.event.which === 1 && action.rowIndex !== this.rowClickDrag.rowIndex) {
                     // Check if the drag was top to bottom or bottom to top for ROWS. Always start at the lowest index
-                    let rowStart = this.rowClickDrag.rowIndex <= action.rowIndex ? this.rowClickDrag.rowIndex : action.rowIndex;
-                    let rowEnd = this.rowClickDrag.rowIndex >= action.rowIndex ? this.rowClickDrag.rowIndex : action.rowIndex;
-                    //console.warn('rowStart', rowStart, rowEnd);
+                    const rowStart = this.rowClickDrag.rowIndex <= action.rowIndex ? this.rowClickDrag.rowIndex : action.rowIndex;
+                    const rowEnd = this.rowClickDrag.rowIndex >= action.rowIndex ? this.rowClickDrag.rowIndex : action.rowIndex;
+
                     this.rowsInternal.forEach(rowNew => (rowNew.$$selected = false));
                     for (let j = rowStart; j <= rowEnd; j++) {
                         this.rowsInternal[j].$$selected = true;
                     }
 
-                    let selectedRows = this.rowsInternal.filter(rowNew => rowNew.$$selected);
+                    const selectedRows = this.rowsInternal.filter(rowNew => rowNew.$$selected);
                     this.rowsSelectedCount = selectedRows.length;
                     this.emitSelectedRows(selectedRows);
                 }
@@ -1043,17 +1043,17 @@ export class DataGridComponent
 
         // Only allow row selection if set
         if (this.options.selectionType) {
-            let newRows = [...this.rowsInternal];
+            const newRows = [...this.rowsInternal];
             // If control is pressed while clicking
-            if (this.keysPressed['control'] && this.options.selectionType == 'multi') {
+            if (this.keysPressed['control'] && this.options.selectionType === 'multi') {
                 row.$$selected = row.$$selected ? false : true;
-            } else if (this.keysPressed['shift'] && this.options.selectionType == 'multi' && this.rowSelectedLast) {
+            } else if (this.keysPressed['shift'] && this.options.selectionType === 'multi' && this.rowSelectedLast) {
                 // If shift is pressed while clicking
                 // Unset all selected flags
                 newRows.forEach(rowNew => (rowNew.$$selected = false));
                 // Figure out if the selection goes top to bottom or bottom to top
-                let startIndex = rowIndex > this.rowSelectedLast ? this.rowSelectedLast : rowIndex;
-                let endIndex = rowIndex < this.rowSelectedLast ? this.rowSelectedLast : rowIndex;
+                const startIndex = rowIndex > this.rowSelectedLast ? this.rowSelectedLast : rowIndex;
+                const endIndex = rowIndex < this.rowSelectedLast ? this.rowSelectedLast : rowIndex;
                 // Loop through the lowest index and set all selected flags
                 for (let i = startIndex; i < endIndex + 1; i++) {
                     if (newRows[i]) {
@@ -1065,7 +1065,7 @@ export class DataGridComponent
                 // Disable all other selected flags
                 newRows.forEach(rowNew => (rowNew.$$selected = false));
                 row.$$selected = true;
-                //this.rowsSelected = row;
+                // this.rowsSelected = row;
             } else {
                 // If this is a right click row, don't do anything special
                 if (isRightClick) {
@@ -1083,7 +1083,7 @@ export class DataGridComponent
                     row.$$selected = false;
                 }
             }
-            let selectedRows = newRows.filter(rowNew => rowNew.$$selected);
+            const selectedRows = newRows.filter(rowNew => rowNew.$$selected);
             this.rowSelectedLast = rowIndex;
             this.rowsSelectedCount = selectedRows.length;
             this.emitSelectedRows(selectedRows);
@@ -1093,13 +1093,13 @@ export class DataGridComponent
 
     /**
      * Manage right click functionality. If right clicking and row is unselected, select it, otherwise do nothing
-     * @param row 
-     * @param rowIndex 
-     * @param contextMenuEvent 
-  	
+     * @param row
+     * @param rowIndex
+     * @param contextMenuEvent
+
     public onRightClick(row, rowIndex: number, event?: MouseEvent) {
           this.selectRow(row, rowIndex, true);
-  
+
       this.onRightClickMenu.emit(event); // Emit right click event up to the parent
     }
        */
@@ -1109,11 +1109,11 @@ export class DataGridComponent
        * @param rowIndex
        * @param groupIndex
        * @param event
-       
+
     public onRowMouseDown(rowIndex: number | false, event) {
-  
+
           this.handleMouseDown(event);
-  
+
           // Only function when the left mouse button is clicked
       if (event.which == 1) {
         this.rowClickDrag.rowIndex = rowIndex;
@@ -1125,17 +1125,17 @@ export class DataGridComponent
        * @param rowIndex
        * @param groupIndex
        * @param event
-       
+
     public onRowMouseUp(rowIndex: number, event): false | void {
       //console.warn('onRowMouseUp', rowIndex, this.rowClickDrag.rowIndex);
-          
+
       if (!this.options.selectionType) {// || this.reSizing
         return false;
       }
-  
+
           // Only function when the left mouse button is clicked
       if (event.which == 1 && rowIndex != this.rowClickDrag.rowIndex) {
-      	
+
         // Check if the drag was top to bottom or bottom to top for ROWS. Always start at the lowest index
         let rowStart = this.rowClickDrag.rowIndex <= rowIndex ? this.rowClickDrag.rowIndex : rowIndex;
         let rowEnd = this.rowClickDrag.rowIndex >= rowIndex ? this.rowClickDrag.rowIndex : rowIndex;
@@ -1144,7 +1144,7 @@ export class DataGridComponent
         for (let j = rowStart; j <= rowEnd; j++) {
           this.rowsInternal[j].$$selected = true;
         }
-  
+
         let selectedRows = this.rowsInternal.filter(row => row.$$selected);
         this.rowsSelectedCount = selectedRows.length;
         this.emitSelectedRows(selectedRows);
@@ -1153,7 +1153,7 @@ export class DataGridComponent
   */
     /**
      * Calculate the height of the datatable
-  	
+
     public calculateHeight():number {
       if (this.options.heightMax) {
         this.tableContainerHeight = <number>this.options.heightMax;
@@ -1178,15 +1178,15 @@ export class DataGridComponent
         }
 
         let classes = '';
-        let results: any = this.options.rowClass(row);
-        for (let key in results) {
+        const results: any = this.options.rowClass(row);
+        for (const key in results) {
             if (results.hasOwnProperty(key)) {
                 if (results[key]) {
                     classes += key + ' ';
                 }
             }
         }
-        if (classes != '') {
+        if (classes !== '') {
             return classes;
         }
     }
@@ -1195,13 +1195,13 @@ export class DataGridComponent
      * Create a dictionary of row css classes based on inputs from options.rowClass
      */
     public createRowClasses(): void {
-        let rowClasses: { [key: string]: any } = {};
+        const rowClasses: { [key: string]: any } = {};
         if (this.options.rowClass) {
             this.rows.forEach(row => {
                 if (this.options.primaryKey && row[this.options.primaryKey] && this.options.rowClass) {
-                    let results: any = this.options.rowClass(row);
+                    const results: any = this.options.rowClass(row);
                     let classes = '';
-                    for (let key in results) {
+                    for (const key in results) {
                         if (results[key]) {
                             classes += key + ' ';
                         }
@@ -1225,7 +1225,7 @@ export class DataGridComponent
             return false;
         }
 
-        let primaryKey = this.options.primaryKey ? this.options.primaryKey : '';
+        const primaryKey = this.options.primaryKey ? this.options.primaryKey : '';
 
         if (!this.options.primaryKey) {
             console.log('Please specify a primary key to use rowStyles');
@@ -1241,8 +1241,8 @@ export class DataGridComponent
           });
         }
             */
-        let stylesWithModels: any[] = [];
-        let stylesNoModels: any[] = [];
+        const stylesWithModels: any[] = [];
+        const stylesNoModels: any[] = [];
 
         // Sort styles that have observable models and those that don't
         this.options.rowStyle.forEach(
@@ -1266,7 +1266,7 @@ export class DataGridComponent
         // Includes styles with no models in order to accomodate styles with mixed observables and non observables
         if (stylesWithModels.length) {
             // Create a single combine latest observable that will update when any of the inputs are updated
-            let subscription = Observable.combineLatest(stylesWithModels).subscribe((models: any[]) => {
+            const subscription = Observable.combineLatest(stylesWithModels).subscribe((models: any[]) => {
                 // Row styles needs to be complete refreshed everytime an observable changes
                 rowStyles = {};
 
@@ -1309,9 +1309,9 @@ export class DataGridComponent
                                 rowStyles[row[primaryKey]] = {
                                     ...rowStyles[row[primaryKey]] || {},
                                     ...(<any>this.options.rowStyle[index]).rules(row, model)
-                                }
+                                };
                             }
-                            
+
                         }
 
                     });
@@ -1334,10 +1334,10 @@ export class DataGridComponent
         // TODO: Mapping properties back up isn't seamless and needs work, commenting out for now
         // let remapColumns = this.dgSvc.mapPropertiesUp([...columns], this.options.columnMap);
         // Remove templates and emit new column references up. Templates have a circulate reference which blows up json usage
-        let columnsNew: any[] = [...this.columnsPinnedLeft, ...this.columnsInternal];
+        const columnsNew: any[] = [...this.columnsPinnedLeft, ...this.columnsInternal];
 
-        let columnsEmitted = columnsNew.map(column => {
-            let columnNew = { ...column };
+        const columnsEmitted = columnsNew.map(column => {
+            const columnNew = { ...column };
             columnNew.locked = columnNew.pinnedLeft ? true : false;
             delete columnNew.templateCell;
             delete columnNew.templateHeader;
@@ -1354,11 +1354,11 @@ export class DataGridComponent
      */
     public emitState(state: Datagrid.State) {
         // User columns has a circular reference somewhere so create new instance and remove that property before emitting up
-        let stateNew = { ...state };
+        const stateNew = { ...state };
         delete (<any>stateNew).usersColumns;
 
         // Create a new memory reference for the state and then remap all properties up into the layout
-        let remapProps = JSON.parse(JSON.stringify(stateNew));
+        const remapProps = JSON.parse(JSON.stringify(stateNew));
         remapProps.groups =
             remapProps.groups && remapProps.groups.length
                 ? this.dgSvc.mapPropertiesUp(remapProps.groups, this.options.controlsMap)
@@ -1411,9 +1411,9 @@ export class DataGridComponent
      */
     public onUpdateDatatable(action: 'update' | 'reset') {
         // Update datatable
-        if (action == 'update') {
+        if (action === 'update') {
             this.viewCreate();
-        } else if (action == 'reset') {
+        } else if (action === 'reset') {
             // Reset datatable
             this.reset();
         }
@@ -1433,12 +1433,12 @@ export class DataGridComponent
     public reset(resetType?: 'groups' | 'sorts' | 'filters') {
         this.ref.detach();
 
-        //Reset State
-        if (resetType && resetType == 'groups') {
+        // Reset State
+        if (resetType && resetType === 'groups') {
             this.state.groups = [];
-        } else if (resetType && resetType == 'sorts') {
+        } else if (resetType && resetType === 'sorts') {
             this.state.sorts = [];
-        } else if (resetType && resetType == 'filters') {
+        } else if (resetType && resetType === 'filters') {
             this.state.filters = [];
         } else {
             this.state.groups = [];
@@ -1447,7 +1447,7 @@ export class DataGridComponent
         }
 
         this.state.info = {};
-        //Reset Columns
+        // Reset Columns
         this.columnsInternal = this.columnsInternal.map(column => {
             column.pinnedLeft = false;
             column.locked = false;

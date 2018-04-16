@@ -56,7 +56,7 @@ export class HeaderComponent implements OnInit {
 
   /**
 	* On a successfull drag reorder of the column headers
-	
+
 	public onReorderSuccess() {
 		// If columns are being dragged before a pinned column, set that column to pinned
 		let isPinned = false;

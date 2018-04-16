@@ -35,7 +35,7 @@ export class ControlsComponent implements OnInit, OnDestroy {
   public modifySorts(action: Actions, prop: string, direction?: string) {
     if (!direction) {
       direction = 'asc';
-    } else if (direction == 'asc') {
+    } else if (direction === 'asc') {
       direction = 'desc';
     }
 
