@@ -32,11 +32,13 @@ export class ControlsComponent implements OnInit, OnDestroy {
    * @param prop
    * @param direction
    */
-  public modifySorts(action: Actions, prop: string, direction?: string) {
+  public modifySorts(action: Actions, prop: string, direction?: string | null) {
     if (!direction) {
       direction = 'asc';
     } else if (direction === 'asc') {
       direction = 'desc';
+    } else if (direction === 'desc') {
+        direction = null;
     }
 
     this.modifyState(action, { dir: direction, prop: prop });

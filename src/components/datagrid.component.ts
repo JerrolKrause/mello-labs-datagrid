@@ -248,12 +248,19 @@ export class DataGridComponent
     /** Keep track of which indexes are visible to prevent the component tree from being updated unless actually changed */
     private rowsIndexes = { start: 0, end: 0 };
     private columnIndexes = { start: 0, end: 0 };
+    /** Throttle the window resize event */
+    public onWindowResizeThrottled = _.throttle(() => this.onWindowResize(), 300, { trailing: true, leading: true });
+
+
+
     /** Hold subs for future unsub */
     private subscriptions: Subscription[] = [];
 
     public rowGroups: Datagrid.Group[] = [];
     public groups: any = {};
     public status: any = {};
+    
+
 
     constructor(private dgSvc: DataGridService, private ref: ChangeDetectorRef, private zone: NgZone) {}
 
@@ -397,9 +404,7 @@ export class DataGridComponent
         }
     }
 
-    /** Throttle the window resize event */
-    public onWindowResizeThrottled = _.throttle(() => this.onWindowResize(), 300, { trailing: true, leading: true });
-
+    
     /** Throttle keyboard events. Not really necessary since repeated key events are ignored but will allow for more events down the road */
     // public onKeyEventThrottled = _.debounce(event => this.handleKeyboardEvents(event), 100, { trailing: true, leading: true });
 
@@ -568,7 +573,7 @@ export class DataGridComponent
      * @param stateChange
      */
     public onStateUpdated(stateChange: Datagrid.StateChange) {
-         console.warn('changeState ', stateChange);
+        // console.warn('changeState ', stateChange);
         this.ref.detach();
 
         const newState: Datagrid.State = { ...this.state };
@@ -590,9 +595,9 @@ export class DataGridComponent
         newState.info.initial = false;
 
         // If the global filter is set
-        if (this.filterGlobal && this.filterGlobal.term) {
+        // if (this.filterGlobal && this.filterGlobal.term) {
             // newRows = this.dgSvc.filterGlobal(newRows, this.filterGlobal);
-        }
+        // }
 
         // ### Update Sorting ###
         if (stateChange.action === Actions.sort) {
