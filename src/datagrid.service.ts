@@ -605,7 +605,7 @@ export class DataGridService {
         column.$$leftOffset = leftOffset;
         leftOffset += column.$$width;
       }
-      return column;
+      return { ...column };
     });
   }
 
