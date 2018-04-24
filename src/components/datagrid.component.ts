@@ -188,7 +188,7 @@ export class DataGridComponent
         widthMain: 0,
         heightTotal: 0,
         heightBody: 0,
-        widthBody: 0,
+        widthViewPort: 0,
         widthFixed: true,
     };
     /** Properties related to scrolling of the main grid */
@@ -389,11 +389,11 @@ export class DataGridComponent
         if (this.appReady && this.domReady) {
             // Make sure that the datagrid is visible on the DOM so that the width can be extracted
             if (this.dataGrid && this.dataGrid.nativeElement) {
-                this.gridProps.widthBody = Math.floor(this.dataGrid.nativeElement.getBoundingClientRect().width);
+              this.gridProps.widthViewPort = Math.floor(this.dataGrid.nativeElement.getBoundingClientRect().width);
             }
 
             // If width is available, create the view and render the dom
-            if (this.gridProps.widthBody) {
+            if (this.gridProps.widthViewPort) {
                 this.viewCreate();
                 this.ref.detectChanges();
             } else {
@@ -528,7 +528,8 @@ export class DataGridComponent
           this.columnWidthsInternal < this.dataGrid.nativeElement.getBoundingClientRect().width
         ) {
           // Resize columns to fit available space
-          this.columnsInternal = this.dgSvc.columnsResize(this.columnsInternal, this.columnWidthsInternal, this.gridProps.widthMain);
+          this.columnsInternal = this.dgSvc.columnsResize(this.columnsInternal, this.columnWidthsInternal, this.gridProps.widthViewPort);
+          this.updateGridProps();
           this.gridProps.widthFixed = true;
         } else {
           // Reset widths
@@ -733,56 +734,59 @@ export class DataGridComponent
         }
     }
 
+
     /**
      * Global properties needed by grid to draw itself
      */
     public updateGridProps() {
       const gridProps: Datagrid.Props = { ...this.gridProps };
+
+      // Get width of DOM viewport
+      if (this.dataGrid && this.dataGrid.nativeElement.getBoundingClientRect().width) {
+        gridProps.widthViewPort = Math.floor(this.dataGrid.nativeElement.getBoundingClientRect().width) || 0;
+      }
+
+      // Get width of pinned columns
+      gridProps.widthPinned = this.columnsPinnedLeft.length
+        ? this.columnsPinnedLeft.reduce((a, b) => a + b.width, 0) : 0;
+
+      // Get width of non-pinned columns
+      gridProps.widthMain = this.columnsInternal.reduce((a, b) => a + b.width, 0) || 0;
       
-        // Get width of pinned columns
-        gridProps.widthPinned = this.columnsPinnedLeft.length
-          ? this.columnsPinnedLeft.reduce((a, b) => a + b.width, 0) : 0;
+      // Get width of internal columns minus pinned columns
+      gridProps.widthTotal = gridProps.widthMain - gridProps.widthPinned;
 
-        // Get total grid width
-        gridProps.widthTotal = Math.floor(this.dataGrid.nativeElement.getBoundingClientRect().width) || 0;
-
-        // Get width of internal columns minus pinned columns
-        gridProps.widthMain = Math.floor(this.dataGrid.nativeElement.getBoundingClientRect().width) - gridProps.widthPinned || 0;
-
-        // Get height of grid
-        if (this.options.heightMax) {
-            gridProps.heightTotal = <number>this.options.heightMax;
-        } else if (this.options.fullScreen) {
-            const height = this.dataGrid.nativeElement.getBoundingClientRect().height;
-            let newHeight = height - 2 - this.rowHeight; // Add offsets for table header and bottom scrollbar
-            // Check if the info bar is showing, deduct from total height
-            if (this.options.showInfo &&
-                (this.state.sorts.length || this.state.groups.length || this.state.filters.length)) {
-                newHeight -= this.rowHeight;
-            }
-
-            gridProps.heightTotal = newHeight;
-        } else {
-            // Set default height if non specified
-            gridProps.heightTotal = 300;
+      // Get height of grid
+      if (this.options.heightMax) {
+        gridProps.heightTotal = <number>this.options.heightMax;
+      } else if (this.options.fullScreen) {
+        const height = this.dataGrid.nativeElement.getBoundingClientRect().height;
+        let newHeight = height - 2 - this.rowHeight; // Add offsets for table header and bottom scrollbar
+        // Check if the info bar is showing, deduct from total height
+        if (this.options.showInfo &&
+          (this.state.sorts.length || this.state.groups.length || this.state.filters.length)) {
+          newHeight -= this.rowHeight;
         }
 
-        // gridProps.rowsVisible = Math.ceil(gridProps.heightTotal / this.rowHeight); // Get max visible rows
-        if (this.rowsInternal && this.rowsInternal.length) {
-            gridProps.heightBody = this.rowsInternal.length * this.rowHeight;
-        } else if (this.rows && this.rows.length) {
-            gridProps.heightBody = this.rows.length * this.rowHeight;
-        } else {
-            gridProps.heightBody = 300;
-        }
+        gridProps.heightTotal = newHeight;
+      } else {
+        // Set default height if non specified
+        gridProps.heightTotal = 300;
+      }
 
-        if (this.dataGrid && this.dataGrid.nativeElement.getBoundingClientRect().width) {
-            gridProps.widthBody = Math.floor(this.dataGrid.nativeElement.getBoundingClientRect().width);
-        } else {
-            gridProps.widthBody = this.gridProps.widthBody;
-        }
+      // gridProps.rowsVisible = Math.ceil(gridProps.heightTotal / this.rowHeight); // Get max visible rows
+      if (this.rowsInternal && this.rowsInternal.length) {
+        gridProps.heightBody = this.rowsInternal.length * this.rowHeight;
+      } else if (this.rows && this.rows.length) {
+        gridProps.heightBody = this.rows.length * this.rowHeight;
+      } else {
+        gridProps.heightBody = 300;
+      }
 
-        this.gridProps = { ...this.gridProps, ...gridProps };
+
+
+      console.log(gridProps)
+      this.gridProps = gridProps;
     }
 
     /**

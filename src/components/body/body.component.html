@@ -2,7 +2,7 @@
 	 [ngStyle]="{'height': gridProps.heightTotal + 'px'}"
 	 [ngClass]="{ 'widthFixed' : gridProps.widthFixed }">
 
-	<div class="datagrid-body" [ngStyle]="{'width' : gridProps.widthTotal + 'px', 'height' : gridProps.heightBody + 'px' }">
+	<div class="datagrid-body" [ngStyle]="{'width' : gridProps.widthViewPort + 'px', 'height' : gridProps.heightBody + 'px' }">
 
 		<ng-container *ngFor="let row of rows; let rowIndex = index; trackBy:trackRow;">
 

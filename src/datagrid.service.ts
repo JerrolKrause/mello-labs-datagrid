@@ -124,7 +124,7 @@ export class DataGridService {
       // If total column widths is less than the width of the body minus the left scroll position
       if (
         column.$$width + widthCurrent + buffer > scrollProps.scrollLeft &&
-        widthCurrent < gridProps.widthBody + scrollProps.scrollLeft + buffer
+        widthCurrent < gridProps.widthViewPort + scrollProps.scrollLeft + buffer
       ) {
         colsExternal.push(column);
       }

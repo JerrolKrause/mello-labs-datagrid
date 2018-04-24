@@ -12,7 +12,7 @@ declare namespace Datagrid {
     heightTotal: number;
     // rowsVisible: number;
     heightBody: number;
-    widthBody: number;
+    widthViewPort: number;
     widthFixed: boolean;
   }
 
