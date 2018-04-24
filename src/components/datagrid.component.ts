@@ -528,8 +528,7 @@ export class DataGridComponent
           this.columnWidthsInternal < this.dataGrid.nativeElement.getBoundingClientRect().width
         ) {
           // Resize columns to fit available space
-          this.columnsInternal = this.dgSvc.columnsResize(this.columnsInternal, this.columnWidthsInternal, this.gridProps.widthViewPort);
-          this.updateGridProps();
+          this.columnsInternal = this.dgSvc.columnsResize(this.columnsInternal, this.columnWidthsInternal, this.gridProps.widthViewPort - this.gridProps.widthPinned);
           this.gridProps.widthFixed = true;
         } else {
           // Reset widths
@@ -539,6 +538,8 @@ export class DataGridComponent
           });
           this.gridProps.widthFixed = false;
         }
+
+        this.updateGridProps();
 
         // Update internal modified rows
         this.rowsInternal = newRows;
@@ -748,13 +749,13 @@ export class DataGridComponent
 
       // Get width of pinned columns
       gridProps.widthPinned = this.columnsPinnedLeft.length
-        ? this.columnsPinnedLeft.reduce((a, b) => a + b.width, 0) : 0;
+        ? this.columnsPinnedLeft.reduce((a, b) => a + b.$$width, 0) : 0;
 
       // Get width of non-pinned columns
-      gridProps.widthMain = this.columnsInternal.reduce((a, b) => a + b.width, 0) || 0;
+      gridProps.widthMain = this.columnsInternal.reduce((a, b) => a + b.$$width, 0) || 0;
       
-      // Get width of internal columns minus pinned columns
-      gridProps.widthTotal = gridProps.widthMain - gridProps.widthPinned;
+      // Get width of internal columns plus pinned columns
+      gridProps.widthTotal = gridProps.widthMain + gridProps.widthPinned;
 
       // Get height of grid
       if (this.options.heightMax) {
@@ -783,9 +784,6 @@ export class DataGridComponent
         gridProps.heightBody = 300;
       }
 
-
-
-      console.log(gridProps)
       this.gridProps = gridProps;
     }
 

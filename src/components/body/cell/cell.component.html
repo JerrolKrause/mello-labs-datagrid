@@ -2,10 +2,14 @@
      [ngStyle]="{'width' : column.$$width + 'px'}"
      [ngClass]="{'canEdit': column.canEdit }"
      title="{{row[column.prop]}}"
-     [ngbPopover]="fieldContent" #p="ngbPopover" container="body" placement="top-left" triggers="manual" (dblclick)="fieldEdit();">
+     [ngbPopover]="fieldContent"
+     #p="ngbPopover"
+     container="body"
+     placement="top-left"
+     triggers="manual"
+     (dblclick)="fieldEdit();">
 
-    <div class="datagrid-cell-data-content"
-         #cellData>
+    <div class="datagrid-cell-data-content" #cellData>
 
         <ng-template #cellTemplate
                      *ngIf="column.templateCell"
