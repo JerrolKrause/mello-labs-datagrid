@@ -680,7 +680,8 @@ export class DataGridComponent
                 // Update non pinned columns
                 this.columnsInternal = this.columnsInternal.filter(col => col.prop !== stateChange.data.prop);
             }
-
+            // Update total width of internal columns
+            this.columnWidthsInternal = this.columnsInternal.reduce((a, b) => b.width ? a + b.width : 0, 0);
             this.emitColumns();
         }
 
