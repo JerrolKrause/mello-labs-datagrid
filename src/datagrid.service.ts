@@ -569,15 +569,11 @@ export class DataGridService {
         width = 44;
       }
       // If no width on the column, set a default property
-      if (!column.width) {
+      if (!column.width || !column.$$width) {
           column.width = width;
           column.$$width = width;
       }
-      // If no width on the column, set a default property
-      if (!column.$$width) {
-          column.$$width = width;
-      }
-
+      
       // If no column type, set default of string
       column.columnType = column.columnType ? column.columnType : 'string';
 

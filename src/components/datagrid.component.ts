@@ -301,7 +301,7 @@ export class DataGridComponent
             this.columnsInternal = columns.length ? this.dgSvc.columnCalculations(columnsInternal) : [];
 
             // Determine total width of internal columns
-            this.columnWidthsInternal = this.columnsInternal.reduce((a, b) => a + b.width,0);
+            this.columnWidthsInternal = this.columnsInternal.reduce((a, b) => b.width ? a + b.width : 0, 0);
 
             // Create a column map
             this.columnsMapped = this.dgSvc.mapColumns(this.columns);
@@ -422,7 +422,7 @@ export class DataGridComponent
 
         // Update rows only if rows have changed
         if (scrollPropsOld.scrollTop !== this.scrollProps.scrollTop) {
-          let rowsVisible = Math.ceil(this.gridProps.heightTotal / this.rowHeight);
+          const rowsVisible = Math.ceil(this.gridProps.heightTotal / this.rowHeight);
           const rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, rowsVisible, this.rowHeight);
             if (
                 !this.rowsIndexes ||
@@ -546,7 +546,7 @@ export class DataGridComponent
         // Update columns to go to the DOM
         this.columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
         // Updated rows to go to the DOM
-        let rowsVisible = Math.ceil(this.gridProps.heightTotal / this.rowHeight);
+        const rowsVisible = Math.ceil(this.gridProps.heightTotal / this.rowHeight);
         this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, rowsVisible, this.rowHeight);
 
         if (this.state.info) {
@@ -730,6 +730,9 @@ export class DataGridComponent
                     this.columnsInternal = colsNew; // Update reference
                 }
             }
+
+            // Update total width of internal columns
+            this.columnWidthsInternal = this.columnsInternal.reduce((a, b) => b.width ? a + b.width : 0, 0);
             this.emitColumns();
             this.viewCreate();
         }
@@ -749,10 +752,10 @@ export class DataGridComponent
 
       // Get width of pinned columns
       gridProps.widthPinned = this.columnsPinnedLeft.length
-        ? this.columnsPinnedLeft.reduce((a, b) => a + b.$$width, 0) : 0;
+          ? this.columnsPinnedLeft.reduce((a, b) => b.$$width ? a + b.$$width : 0, 0) : 0;
 
       // Get width of non-pinned columns
-      gridProps.widthMain = this.columnsInternal.reduce((a, b) => a + b.$$width, 0) || 0;
+      gridProps.widthMain = this.columnsInternal.reduce((a, b) => b.$$width ? a + b.$$width : 0, 0) || 0;
       
       // Get width of internal columns plus pinned columns
       gridProps.widthTotal = gridProps.widthMain + gridProps.widthPinned;
