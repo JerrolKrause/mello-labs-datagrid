@@ -1,7 +1,7 @@
 <div draggable="false">
 	<div class="datagrid-header-cell" [title]="column.label"
 		 *ngFor="let column of columns; let columnIndex = index; trackBy:trackColumn"
-		 [ngClass]="{'reorderable': column.canReorder }"
+		 [ngClass]="{'reorderable': column.canReorder, 'column-last' : columnIndex == columns.length - 1 }"
 		 [ngStyle]="{'width' : column.$$width + 'px', 'left' : column.$$leftOffset + 'px' }"
 		 mwlResizable [enableGhostResize]="true" [resizeEdges]="{right: column.canResize || false}" (resizeEnd)="onResizeEnd($event, column.$$index, columnType)"
 		 

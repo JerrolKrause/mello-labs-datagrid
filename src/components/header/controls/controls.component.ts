@@ -24,7 +24,8 @@ export class ControlsComponent implements OnInit, OnDestroy {
 
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit() {
+  }
 
   /**
    * When the modify sort button is clicked

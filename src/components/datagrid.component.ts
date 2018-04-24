@@ -16,14 +16,13 @@ import {
     QueryList,
     NgZone,
     AfterContentInit,
-    AfterViewChecked,
 } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/observable/fromEvent';
 
-import { DataGridService } from '../datagrid.service';
+import { DataGridService } from '../services/datagrid.service';
 import { DataTableColumnDirective } from '../directives/column.directive';
 import { Actions } from '../datagrid.props';
 import { Datagrid } from '../typings';
@@ -64,7 +63,7 @@ TODOS:
     },
 })
 export class DataGridComponent
-    implements OnInit, OnChanges, AfterViewInit, OnDestroy, AfterContentInit, AfterViewChecked {
+    implements OnInit, OnChanges, AfterViewInit, OnDestroy, AfterContentInit {
     /** Self reference */
     @ViewChild('dataGrid') dataGrid: ElementRef;
     @ViewChild('dataGridBody') dataGridBody: BodyComponent;
@@ -243,7 +242,7 @@ export class DataGridComponent
         groupIndex: 0,
     };
     /** The sum of the current column widths. Used to determine if column resize is necessary */
-    private columnWidthsInternal: number = 0;
+    private columnWidthsInternal = 0;
     /** The height of the row. Necessary for virtual scroll calculation. Needs to be an odd number to prevent partial pixel problems. Has 1px border added*/
     private rowHeight = 23;
     /** Keep track of which indexes are visible to prevent the component tree from being updated unless actually changed */
@@ -256,8 +255,8 @@ export class DataGridComponent
     private subscriptions: Subscription[] = [];
 
     public rowGroups: Datagrid.Group[] = [];
-    public groups: any = {};
-    public status: any = {};
+    public groups: Datagrid.Groupings | null = {};
+    public status: Datagrid.Status;
    
     constructor(private dgSvc: DataGridService, private ref: ChangeDetectorRef, private zone: NgZone) {}
 
@@ -377,9 +376,7 @@ export class DataGridComponent
             this.dataGridReady();
         });
     }
-
-    ngAfterViewChecked() { }
-
+    
     /**
      * Determine the conditions for when the datagrid is ready to render to the dom
      * TODO: Set max iterations to check to avoid infinite loop

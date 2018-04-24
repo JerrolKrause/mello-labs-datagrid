@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Datagrid } from './typings';
+import { Datagrid } from '../typings';
 
 import * as _ from 'lodash';
 

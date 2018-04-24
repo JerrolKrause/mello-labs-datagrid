@@ -24,7 +24,7 @@ import { DataGridColumnCellDirective } from './directives/cell-body.directive';
 import { DataGridColumnHeaderDirective } from './directives/cell-header.directive';
 
 // Services
-import { DataGridService } from './datagrid.service';
+import { DataGridService } from './services/datagrid.service';
 
 // 3rd party controls
 import { ResizableModule } from 'angular-resizable-element';
