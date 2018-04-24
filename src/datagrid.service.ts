@@ -82,7 +82,7 @@ export class DataGridService {
   public getVisibleRows(
     rows: any[],
     scrollProps: Datagrid.ScrollProps,
-    gridProps: Datagrid.Props,
+    rowsVisible: number,
     rowHeight: number,
   ): any[] {
     // console.log('getVisibleRowsoffSetRowsFromTop', rows, this.scrollProps, this.rowHeight, this.gridProps);
@@ -99,8 +99,8 @@ export class DataGridService {
     if (offSetRowsFromTop < buffer) {
       offSetRowsFromTop = 0;
     }
-
-    let rowsEnd = offSetRowsFromTop + gridProps.rowsVisible + buffer * 2;
+    
+    let rowsEnd = offSetRowsFromTop + rowsVisible + buffer * 2;
     if (rowsEnd > rowsNew.length) {
       rowsEnd = rowsNew.length;
     }
@@ -593,18 +593,20 @@ export class DataGridService {
   /**
    * If total combined width of grid cells is less than viewport, resize widths to match
    * @param columns
-   * @param gridProps
+   * @param widthColumns
+   * @param widthTable
    */
-  public columnsResize(columns: Datagrid.Column[], gridProps: Datagrid.Props) {
-      let leftOffset = 0;
-      return columns.map(column => {
-          if (column.width) {
-              column.$$width = Math.ceil(column.width * gridProps.widthBody / gridProps.widthTotal) + 1;
-              column.$$leftOffset = leftOffset;
-              leftOffset += column.$$width;
-          }
-          return column;
-      });
+  public columnsResize(columns: Datagrid.Column[], widthColumns: number, widthTable: number) {
+    let leftOffset = 0;
+    const multiplier = Math.floor(widthTable / widthColumns * 100) / 100;
+    return columns.map(column => {
+      if (column.width) {
+        column.$$width = Math.ceil(column.width * multiplier);
+        column.$$leftOffset = leftOffset;
+        leftOffset += column.$$width;
+      }
+      return column;
+    });
   }
 
   /**

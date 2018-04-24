@@ -29,7 +29,7 @@ $border-color: #ccc;
             .datagrid-header-main{display: flex;flex-flow: row;position: absolute;}
             .datagrid-header-cell{
                 line-height: 20px;font-weight: bold;display:inline-block;cursor:default;background-color: #f1f1f1;background-image: linear-gradient(to top, #dadada 0%, #f1f1f1 100%);
-                white-space: nowrap;padding:0;outline: 1px solid $border-color; top:0; position:absolute;z-index:6;border: 0;box-shadow: 5px 1px 5px rgba(0, 0, 0, 0.3);
+                white-space: nowrap;padding:0;outline: 1px solid $border-color; top:0; position:absolute;z-index:6;border: 0;
                 &.pinned{z-index:7!important;background-color: #f1f1f1;}
                 &.reorderable .datagrid-header-cell-label{cursor:grab;cursor:-webkit-grab;}
                 & > div{padding-right: 8px;}

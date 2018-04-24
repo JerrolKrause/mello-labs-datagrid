@@ -10,7 +10,7 @@ declare namespace Datagrid {
     widthPinned: number;
     widthMain: number;
     heightTotal: number;
-    rowsVisible: number;
+    // rowsVisible: number;
     heightBody: number;
     widthBody: number;
     widthFixed: boolean;

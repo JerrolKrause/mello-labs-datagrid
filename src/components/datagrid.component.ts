@@ -77,7 +77,7 @@ export class DataGridComponent
             const slug = Math.floor(Math.random() * 1000000); // Create a random number slug so if different columns are passed a new instance is created every time
             // Create custom track property and new reference for each column
             columns = columns.map((column, i) => {
-                column.$$track = slug + '-' + i;
+              column.$$track = slug + '-' + i;
                 return { ...column };
             });
             // If columnMap object is supplied, remap column props to what the datatable needs
@@ -94,7 +94,7 @@ export class DataGridComponent
     get columns(): Datagrid.Column[] {
         return this._columns && this._columns.length ? [...this._columns] : [];
     }
-
+    
     /** Rows */
     private _rows: any[];
     @Input()
@@ -187,7 +187,6 @@ export class DataGridComponent
         widthPinned: 0,
         widthMain: 0,
         heightTotal: 0,
-        rowsVisible: 0,
         heightBody: 0,
         widthBody: 0,
         widthFixed: true,
@@ -243,6 +242,8 @@ export class DataGridComponent
         rowIndex: 0,
         groupIndex: 0,
     };
+    /** The sum of the current column widths. Used to determine if column resize is necessary */
+    private columnWidthsInternal: number = 0;
     /** The height of the row. Necessary for virtual scroll calculation. Needs to be an odd number to prevent partial pixel problems. Has 1px border added*/
     private rowHeight = 23;
     /** Keep track of which indexes are visible to prevent the component tree from being updated unless actually changed */
@@ -250,8 +251,6 @@ export class DataGridComponent
     private columnIndexes = { start: 0, end: 0 };
     /** Throttle the window resize event */
     public onWindowResizeThrottled = _.throttle(() => this.onWindowResize(), 300, { trailing: true, leading: true });
-
-
 
     /** Hold subs for future unsub */
     private subscriptions: Subscription[] = [];
@@ -288,6 +287,7 @@ export class DataGridComponent
 
         // If columns are passed
         if (this.columns) {
+
             // If columnMap object is supplied, remap column props to what the datatable needs
             const columns = this.options.columnMap
                 ? this.dgSvc.mapPropertiesDown(this.columns, this.options.columnMap)
@@ -299,6 +299,9 @@ export class DataGridComponent
             // Get un-pinned columns
             const columnsInternal = columns.filter(column => (!column.pinnedLeft ? true : false));
             this.columnsInternal = columns.length ? this.dgSvc.columnCalculations(columnsInternal) : [];
+
+            // Determine total width of internal columns
+            this.columnWidthsInternal = this.columnsInternal.reduce((a, b) => a + b.width,0);
 
             // Create a column map
             this.columnsMapped = this.dgSvc.mapColumns(this.columns);
@@ -397,7 +400,7 @@ export class DataGridComponent
                 // If for some reason the DOM is not available, check every 100 seconds until it is
                 setTimeout(() => {
                     this.dataGridReady();
-                }, 100);
+                }, 50);
             }
         }
     }
@@ -419,7 +422,8 @@ export class DataGridComponent
 
         // Update rows only if rows have changed
         if (scrollPropsOld.scrollTop !== this.scrollProps.scrollTop) {
-            const rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
+          let rowsVisible = Math.ceil(this.gridProps.heightTotal / this.rowHeight);
+          const rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, rowsVisible, this.rowHeight);
             if (
                 !this.rowsIndexes ||
                 (rowsExternal[0] &&
@@ -511,28 +515,28 @@ export class DataGridComponent
         // Generate row vertical positions
         newRows = this.dgSvc.rowPositions(newRows, this.rowHeight);
 
-        // TODO: Grid props needed to build visible rows and columns but visible rows and columns needed to update grid props
         this.updateGridProps();
-        // console.log(this.columnsInternal);
-        // console.log(JSON.parse(JSON.stringify(this.gridProps)));
-
+        
         // Set updated columns
         this.columnsPinnedLeft = this.columnsPinnedLeft.length ? this.dgSvc.columnCalculations(this.columnsPinnedLeft) : [];
         this.columnsInternal = this.columnsInternal.length ? this.dgSvc.columnCalculations(this.columnsInternal) : [];
 
         // If the total width of the columns is less than the viewport, resize columns to fit
-        // TODO: This is very inefficient to call on every view change, memoize?
         if (
-            this.gridProps &&
-            this.gridProps.widthTotal &&
-            this.gridProps.widthBody &&
-            this.gridProps.widthTotal < this.gridProps.widthBody
+          this.dataGrid &&
+          this.dataGrid.nativeElement &&
+          this.columnWidthsInternal < this.dataGrid.nativeElement.getBoundingClientRect().width
         ) {
-            // console.log('Resizing');
-            this.columnsInternal = this.dgSvc.columnsResize(this.columnsInternal, this.gridProps);
-            this.gridProps.widthFixed = true;
+          // Resize columns to fit available space
+          this.columnsInternal = this.dgSvc.columnsResize(this.columnsInternal, this.columnWidthsInternal, this.gridProps.widthMain);
+          this.gridProps.widthFixed = true;
         } else {
-            this.gridProps.widthFixed = false;
+          // Reset widths
+          this.columnsInternal = this.columnsInternal.map(column => {
+            column.$$width = column.width;
+            return column;
+          });
+          this.gridProps.widthFixed = false;
         }
 
         // Update internal modified rows
@@ -540,10 +544,8 @@ export class DataGridComponent
         // Update columns to go to the DOM
         this.columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
         // Updated rows to go to the DOM
-        this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, this.gridProps, this.rowHeight);
-
-        // TODO: Grid props needed to build visible rows and columns but visible rows and columns needed to update grid props
-        this.updateGridProps();
+        let rowsVisible = Math.ceil(this.gridProps.heightTotal / this.rowHeight);
+        this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, rowsVisible, this.rowHeight);
 
         if (this.state.info) {
             // Add stats and info to be emitted
@@ -735,31 +737,17 @@ export class DataGridComponent
      * Global properties needed by grid to draw itself
      */
     public updateGridProps() {
-        const gridProps: Datagrid.Props = { ...this.gridProps };
-        // Get total grid width
-        gridProps.widthTotal = this.columns.map(b => b.$$width).reduce((p, c) => {
-            if (p && c) {
-                return p + c;
-            }
-        }) || 0;
-
+      const gridProps: Datagrid.Props = { ...this.gridProps };
+      
         // Get width of pinned columns
         gridProps.widthPinned = this.columnsPinnedLeft.length
-            ? this.columnsPinnedLeft.map(b => b.$$width).reduce((p, c) => {
-                if (p && c) {
-                    return p + c;
-                }
-            }) || 0
-            : 0;
+          ? this.columnsPinnedLeft.reduce((a, b) => a + b.width, 0) : 0;
 
-        // Get width of internal columns
-        gridProps.widthMain = this.columnsInternal.length
-            ? this.columnsInternal.map(b => b.$$width).reduce((p, c) => {
-                if (p && c) {
-                    return p + c;
-                }
-            }) || 0
-            : 0;
+        // Get total grid width
+        gridProps.widthTotal = Math.floor(this.dataGrid.nativeElement.getBoundingClientRect().width) || 0;
+
+        // Get width of internal columns minus pinned columns
+        gridProps.widthMain = Math.floor(this.dataGrid.nativeElement.getBoundingClientRect().width) - gridProps.widthPinned || 0;
 
         // Get height of grid
         if (this.options.heightMax) {
@@ -779,7 +767,7 @@ export class DataGridComponent
             gridProps.heightTotal = 300;
         }
 
-        gridProps.rowsVisible = Math.ceil(gridProps.heightTotal / this.rowHeight); // Get max visible rows
+        // gridProps.rowsVisible = Math.ceil(gridProps.heightTotal / this.rowHeight); // Get max visible rows
         if (this.rowsInternal && this.rowsInternal.length) {
             gridProps.heightBody = this.rowsInternal.length * this.rowHeight;
         } else if (this.rows && this.rows.length) {
