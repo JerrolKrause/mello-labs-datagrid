@@ -75,9 +75,9 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit, OnDestro
       if (
         this.cellData &&
         this.column &&
-        this.column.width &&
+        this.column.$$width &&
         this.cellData.nativeElement &&
-        this.cellData.nativeElement.getBoundingClientRect().width > this.column.width
+        this.cellData.nativeElement.getBoundingClientRect().width > this.column.$$width
       ) {
         this.truncated = true;
       } else {

@@ -123,13 +123,13 @@ export class DataGridService {
       // If current column width + all widths before this one is greater than the left scroll position
       // If total column widths is less than the width of the body minus the left scroll position
       if (
-        column.width + widthCurrent + buffer > scrollProps.scrollLeft &&
+        column.$$width + widthCurrent + buffer > scrollProps.scrollLeft &&
         widthCurrent < gridProps.widthBody + scrollProps.scrollLeft + buffer
       ) {
         colsExternal.push(column);
       }
       // Update current width by adding the current column
-      widthCurrent = widthCurrent + column.width;
+      widthCurrent = widthCurrent + column.$$width;
     }
     return [...colsExternal];
     // this.columnsExternal = colsExternal;
@@ -563,19 +563,29 @@ export class DataGridService {
     let leftOffset = offset;
     return columns.map((column, index) => {
       // If no width, set default to 150
-      column.width = column.width ? column.width : 150;
+      let width = column.width ? column.width : 150;
+      // Ensure min width of 44
+      if (width < 44) {
+        width = 44;
+      }
+      // If no width on the column, set a default property
+      if (!column.width) {
+          column.width = width;
+          column.$$width = width;
+      }
+      // If no width on the column, set a default property
+      if (!column.$$width) {
+          column.$$width = width;
+      }
+
       // If no column type, set default of string
       column.columnType = column.columnType ? column.columnType : 'string';
 
-      // Ensure min width of 44
-      if (column.width < 44) {
-        column.width = 44;
-      }
       // Ensure all column widths are divisible by 4, fixes a blurry text bug in chrome
-      column.width = Math.floor(column.width / 4) * 4;
+      // column.width = Math.floor(column.width / 4) * 4;
       column.$$index = index;
       column.$$leftOffset = leftOffset;
-      leftOffset += column.width;
+      leftOffset += width;
       return column;
     });
   }
@@ -586,13 +596,15 @@ export class DataGridService {
    * @param gridProps
    */
   public columnsResize(columns: Datagrid.Column[], gridProps: Datagrid.Props) {
-    const widthTotal = gridProps.widthTotal;
-    return columns.map(column => {
-        if (column.width) {
-            column.width = Math.ceil(column.width * gridProps.widthBody / widthTotal) + 1;
-        }
-      return column;
-    });
+      let leftOffset = 0;
+      return columns.map(column => {
+          if (column.width) {
+              column.$$width = Math.ceil(column.width * gridProps.widthBody / gridProps.widthTotal) + 1;
+              column.$$leftOffset = leftOffset;
+              leftOffset += column.$$width;
+          }
+          return column;
+      });
   }
 
   /**

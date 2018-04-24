@@ -259,9 +259,7 @@ export class DataGridComponent
     public rowGroups: Datagrid.Group[] = [];
     public groups: any = {};
     public status: any = {};
-    
-
-
+   
     constructor(private dgSvc: DataGridService, private ref: ChangeDetectorRef, private zone: NgZone) {}
 
     ngOnInit() { }
@@ -406,7 +404,7 @@ export class DataGridComponent
 
     
     /** Throttle keyboard events. Not really necessary since repeated key events are ignored but will allow for more events down the road */
-    // public onKeyEventThrottled = _.debounce(event => this.handleKeyboardEvents(event), 100, { trailing: true, leading: true });
+   // public onKeyEventThrottled = _.debounce(event => this.handleKeyboardEvents(event), 100, { trailing: true, leading: true });
 
     /**
      * When the datatable is scrolled
@@ -515,6 +513,13 @@ export class DataGridComponent
 
         // TODO: Grid props needed to build visible rows and columns but visible rows and columns needed to update grid props
         this.updateGridProps();
+        // console.log(this.columnsInternal);
+        // console.log(JSON.parse(JSON.stringify(this.gridProps)));
+
+        // Set updated columns
+        this.columnsPinnedLeft = this.columnsPinnedLeft.length ? this.dgSvc.columnCalculations(this.columnsPinnedLeft) : [];
+        this.columnsInternal = this.columnsInternal.length ? this.dgSvc.columnCalculations(this.columnsInternal) : [];
+
         // If the total width of the columns is less than the viewport, resize columns to fit
         // TODO: This is very inefficient to call on every view change, memoize?
         if (
@@ -523,15 +528,12 @@ export class DataGridComponent
             this.gridProps.widthBody &&
             this.gridProps.widthTotal < this.gridProps.widthBody
         ) {
+            // console.log('Resizing');
             this.columnsInternal = this.dgSvc.columnsResize(this.columnsInternal, this.gridProps);
             this.gridProps.widthFixed = true;
         } else {
             this.gridProps.widthFixed = false;
         }
-
-        // Set updated columns
-        this.columnsPinnedLeft = this.columnsPinnedLeft.length ? this.dgSvc.columnCalculations(this.columnsPinnedLeft) : [];
-        this.columnsInternal = this.columnsInternal.length ? this.dgSvc.columnCalculations(this.columnsInternal) : [];
 
         // Update internal modified rows
         this.rowsInternal = newRows;
@@ -735,7 +737,7 @@ export class DataGridComponent
     public updateGridProps() {
         const gridProps: Datagrid.Props = { ...this.gridProps };
         // Get total grid width
-        gridProps.widthTotal = this.columns.map(b => b.width).reduce((p, c) => {
+        gridProps.widthTotal = this.columns.map(b => b.$$width).reduce((p, c) => {
             if (p && c) {
                 return p + c;
             }
@@ -743,7 +745,7 @@ export class DataGridComponent
 
         // Get width of pinned columns
         gridProps.widthPinned = this.columnsPinnedLeft.length
-            ? this.columnsPinnedLeft.map(b => b.width).reduce((p, c) => {
+            ? this.columnsPinnedLeft.map(b => b.$$width).reduce((p, c) => {
                 if (p && c) {
                     return p + c;
                 }
@@ -752,7 +754,7 @@ export class DataGridComponent
 
         // Get width of internal columns
         gridProps.widthMain = this.columnsInternal.length
-            ? this.columnsInternal.map(b => b.width).reduce((p, c) => {
+            ? this.columnsInternal.map(b => b.$$width).reduce((p, c) => {
                 if (p && c) {
                     return p + c;
                 }
@@ -766,7 +768,8 @@ export class DataGridComponent
             const height = this.dataGrid.nativeElement.getBoundingClientRect().height;
             let newHeight = height - 2 - this.rowHeight; // Add offsets for table header and bottom scrollbar
             // Check if the info bar is showing, deduct from total height
-            if (this.options.showInfo && (this.state.sorts!.length || this.state.groups!.length || this.state.filters!.length)) {
+            if (this.options.showInfo &&
+                (this.state.sorts.length || this.state.groups.length || this.state.filters.length)) {
                 newHeight -= this.rowHeight;
             }
 
