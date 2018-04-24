@@ -657,6 +657,8 @@ export class DataGridComponent
             if (stateChange.data.action === 'delete') {
                 this.columnsInternal = this.columnsInternal.filter(column => column.$$index !== stateChange.data.columnIndex);
                 this.columns = this.columns.filter(column => column.$$index !== stateChange.data.columnIndex);
+                // Update total width of internal columns
+                this.columnWidthsInternal = this.columnsInternal.reduce((a, b) => b.width ? a + b.width : 0, 0);
                 this.emitColumns();
             }
         } else if (stateChange.action === Actions.pinLeft) {
