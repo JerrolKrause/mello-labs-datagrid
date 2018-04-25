@@ -53,22 +53,20 @@
         "zone.js": "0.8.4"
     },
     "devDependencies": {
-        "@angular/forms": "5.0.5",
-        "ng-packagr": "2.0.0-rc.9",
-        "angular-resizable-element": "2.0.0",
-        "bootstrap": "4.0.0-alpha.6",
-        "ng2-dnd": "4.2.0",
-        "@ng-bootstrap/ng-bootstrap": "1.0.0-beta.5",
         "@angular/common": "5.0.5",
         "@angular/compiler": "5.0.5",
         "@angular/compiler-cli": "5.0.5",
         "@angular/core": "5.0.5",
+        "@angular/forms": "5.0.5",
         "@angular/platform-browser": "5.0.5",
         "@angular/platform-browser-dynamic": "5.0.5",
         "@compodoc/compodoc": "1.0.0-beta.10",
+        "@ng-bootstrap/ng-bootstrap": "1.0.0-beta.5",
         "@types/jasmine": "2.5.53",
         "@types/node": "6.0.60",
         "angular-in-memory-web-api": "0.3.2",
+        "angular-resizable-element": "2.0.0",
+        "bootstrap": "4.0.0-alpha.6",
         "codelyzer": "3.2.0",
         "concurrently": "3.4.0",
         "core-js": "2.4.1",
@@ -85,7 +83,8 @@
         "karma-jasmine": "1.1.0",
         "karma-jasmine-html-reporter": "0.2.2",
         "lite-server": "2.3.0",
-        "node-sass": "4.5.2",
+        "ng-packagr": "2.0.0-rc.9",
+        "ng2-dnd": "4.2.0",
         "node-sass-tilde-importer": "1.0.0",
         "node-watch": "0.5.2",
         "protractor": "5.1.2",
@@ -101,5 +100,8 @@
     },
     "engines": {
         "node": ">=6.0.0"
+    },
+    "dependencies": {
+        "node-sass": "^4.8.3"
     }
 }
