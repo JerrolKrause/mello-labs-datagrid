@@ -1,19 +1,23 @@
 <div class="datagrid-cell-data"
-     [ngStyle]="{'width' : column.width + 'px'}"
-	 [ngClass]="{'canEdit': column.canEdit }"
      title="{{row[column.prop]}}"
-     [ngbPopover]="fieldContent" #p="ngbPopover" container="body" placement="top-left" triggers="manual" (dblclick)="fieldEdit($event);">
+     [ngStyle]="{'width' : column.$$width + 'px'}"
+     [ngClass]="{'canEdit': column.canEdit }"
+     [ngbPopover]="fieldContent"
+     #p="ngbPopover"
+     container="body"
+     placement="top-left"
+     triggers="manual"
+     (dblclick)="fieldEdit();">
 
-  <ng-template #cellTemplate
-               *ngIf="column.templateCell"
-               [ngTemplateOutlet]="column.templateCell"
-               [ngTemplateOutletContext]="cellContext">
-  </ng-template>
+  <div class="datagrid-cell-data-content" #cellData>
 
-  <div class="datagrid-cell-data-content"
-       #cellData
-       *ngIf="!column.templateCell">
-    <ng-container [ngSwitch]="column.columnType">
+    <ng-template #cellTemplate
+                 *ngIf="column.templateCell"
+                 [ngTemplateOutlet]="column.templateCell"
+                 [ngTemplateOutletContext]="cellContext">
+    </ng-template>
+
+    <ng-container [ngSwitch]="column.columnType" *ngIf="!column.templateCell">
 
       <!-- Date Time-->
       <ng-container *ngSwitchCase="'dateTime'">

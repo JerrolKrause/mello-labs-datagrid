@@ -29,15 +29,16 @@ $border-color: #ccc;
             .datagrid-header-main{display: flex;flex-flow: row;position: absolute;}
             .datagrid-header-cell{
                 line-height: 20px;font-weight: bold;display:inline-block;cursor:default;background-color: #f1f1f1;background-image: linear-gradient(to top, #dadada 0%, #f1f1f1 100%);
-                white-space: nowrap;padding:0;outline: 1px solid $border-color; top:0; position:absolute;z-index:6;border: 0;box-shadow: 5px 1px 5px rgba(0, 0, 0, 0.3);
+                white-space: nowrap;padding:0;outline: 1px solid $border-color; top:0; position:absolute;z-index:6;border: 0;
                 &.pinned{z-index:7!important;background-color: #f1f1f1;}
-                &.reorderable .header-content{cursor:grab;cursor:-webkit-grab;}
+                &.reorderable .datagrid-header-cell-label{cursor:grab;cursor:-webkit-grab;}
+                &.column-last .dropdown-submenu-flyout{left: auto!important;right: 100%!important;}
                 & > div{padding-right: 8px;}
                 .resize-handle{display:block;position: absolute;background:#f6ac38;top: 0;bottom: 0;right: -2px;width: 5px; z-index: 8;cursor:ew-resize;}
                 
                 .datagrid-header-cell-label{padding-right:5px;padding:2px 8px;overflow: hidden;display: block;}
                 a.active{color:red!important;}
-                .header-controls{display: inline-block !important;    position: absolute;    right: 3px;    padding-right: 5px;    padding-left: 5px;background-color: #f1f1f1;
+                .header-controls{display: inline-block !important;    position: absolute;    right: 0px;    padding-right: 5px;    padding-left: 5px;background-color: #f1f1f1;
                 background-image: linear-gradient(to top, #dadada 0%, #f1f1f1 100%);top: 50%;transform: translateY(-50%);}
             }
 

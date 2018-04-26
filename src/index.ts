@@ -18,42 +18,45 @@ import { CellComponent } from './components/body/cell/cell.component';
 
 import { InfoComponent } from './components/info/info.component';
 
-
 // Directives
 import { DataTableColumnDirective } from './directives/column.directive';
 import { DataGridColumnCellDirective } from './directives/cell-body.directive';
 import { DataGridColumnHeaderDirective } from './directives/cell-header.directive';
 
 // Services
-import { DataGridService } from './datagrid.service';
+import { DataGridService } from './services/datagrid.service';
 
-// 3rd party controls  
+// 3rd party controls
 import { ResizableModule } from 'angular-resizable-element';
 
-import { Datagrid } from './typings';
-export * from './typings';
+export * from './models/typings';
 
 @NgModule({
-		imports: [
-				CommonModule, NgbModule.forRoot(), FormsModule, ResizableModule
-		],
-		declarations: [
-				DataGridComponent, RowComponent, GroupHeaderComponent, HeaderComponent, ControlsComponent, FiltersComponent, BodyComponent, CellComponent,
-				InfoComponent, HeaderRowComponent,
+  imports: [CommonModule, NgbModule.forRoot(), FormsModule, ResizableModule],
+  declarations: [
+    DataGridComponent,
+    RowComponent,
+    GroupHeaderComponent,
+    HeaderComponent,
+    ControlsComponent,
+    FiltersComponent,
+    BodyComponent,
+    CellComponent,
+    InfoComponent,
+    HeaderRowComponent,
 
-				DataTableColumnDirective, DataGridColumnCellDirective, DataGridColumnHeaderDirective
-		],
-		providers: [DataGridService],
-		exports: [
-				DataGridComponent,
-				DataTableColumnDirective, DataGridColumnCellDirective, DataGridColumnHeaderDirective
-		]
+    DataTableColumnDirective,
+    DataGridColumnCellDirective,
+    DataGridColumnHeaderDirective,
+  ],
+  providers: [DataGridService],
+  exports: [DataGridComponent, DataTableColumnDirective, DataGridColumnCellDirective, DataGridColumnHeaderDirective],
 })
 export class DatagridModule {
-		static forRoot(): ModuleWithProviders {
-				return {
-						ngModule: DatagridModule,
-						providers: [DataGridService]
-				};
-		}
+  static forRoot(): ModuleWithProviders {
+    return {
+      ngModule: DatagridModule,
+      providers: [DataGridService],
+    };
+  }
 }
