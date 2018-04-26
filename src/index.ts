@@ -29,7 +29,7 @@ import { DataGridService } from './services/datagrid.service';
 // 3rd party controls
 import { ResizableModule } from 'angular-resizable-element';
 
-export * from './typings';
+export * from './models/typings';
 
 @NgModule({
   imports: [CommonModule, NgbModule.forRoot(), FormsModule, ResizableModule],

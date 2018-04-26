@@ -8,7 +8,7 @@ import {
   ElementRef,
   NgZone,
 } from '@angular/core';
-import { Datagrid } from '../../typings';
+import { Datagrid } from '../../models/typings';
 import * as _ from 'lodash';
 
 @Component({
@@ -61,7 +61,7 @@ export class BodyComponent implements OnInit {
    * @param event
    */
   private onScroll(event: any) {
-    //console.log('onScroll', event.target.scrollTop);
+    // console.log('onScroll', event.target.scrollTop);
     requestAnimationFrame(() => {
       const scrollProps = {
         scrollTop: event.target.scrollTop,
@@ -77,7 +77,7 @@ export class BodyComponent implements OnInit {
    * @param item - The column
    */
   public trackRow(_index: number, item: any) {
-    //console.log('Tracking Rows');
+    // console.log('Tracking Rows');
     return item.$$track;
   }
 

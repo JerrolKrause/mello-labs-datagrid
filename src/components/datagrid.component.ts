@@ -25,7 +25,7 @@ import 'rxjs/add/observable/fromEvent';
 import { DataGridService } from '../services/datagrid.service';
 import { DataTableColumnDirective } from '../directives/column.directive';
 import { Actions } from '../datagrid.props';
-import { Datagrid } from '../typings';
+import { Datagrid } from '../models/typings';
 
 import * as _ from 'lodash';
 import { BodyComponent } from './body/body.component';

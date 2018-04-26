@@ -3,7 +3,7 @@
  */
 import { Observable } from 'rxjs/Observable';
 
-declare namespace Datagrid {
+export declare namespace Datagrid {
 
   export interface Props {
     widthTotal: number;
@@ -266,7 +266,7 @@ declare namespace Datagrid {
 
   export interface ModelRules {
     model?: false | Observable<any>;
-    rules?: (...args) => any;
+    rules?: (...args:any[]) => any;
   }
 
   export interface DragSelect {

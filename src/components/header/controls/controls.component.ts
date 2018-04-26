@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, Input, Output, E
 import { Subscription } from 'rxjs/Subscription';
 
 import { Actions } from '../../../datagrid.props';
-import { Datagrid } from '../../../typings';
+import { Datagrid } from '../../../models/typings';
 
 @Component({
   selector: 'datagrid-controls',

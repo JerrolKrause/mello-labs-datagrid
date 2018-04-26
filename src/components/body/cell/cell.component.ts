@@ -12,7 +12,7 @@ import {
   ViewContainerRef,
   OnDestroy,
 } from '@angular/core';
-import { Datagrid } from '../../../typings';
+import { Datagrid } from '../../../models/typings';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -114,7 +114,7 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit, OnDestro
       };
 
       // If the data has changed
-      if (fieldData.valueNew != fieldData.valueOld) {
+      if (fieldData.valueNew !== fieldData.valueOld) {
         // Pass data up chain
         this.onRowUpdated.emit(fieldData);
       }

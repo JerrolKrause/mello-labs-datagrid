@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, Input, EventEmitter, Output } from '@angular/core';
-import { Datagrid } from '../../typings';
+import { Datagrid } from '../../models/typings';
 
 @Component({
   selector: 'datagrid-info',

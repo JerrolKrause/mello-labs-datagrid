@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 
-import { Datagrid } from '../../../typings';
+import { Datagrid } from '../../../models/typings';
 
 @Component({
   selector: 'group-header',

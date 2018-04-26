@@ -8,7 +8,7 @@ import {
   ElementRef,
   OnChanges,
 } from '@angular/core';
-import { Datagrid } from '../../../typings';
+import { Datagrid } from '../../../models/typings';
 
 @Component({
   selector: 'datagrid-body-row',

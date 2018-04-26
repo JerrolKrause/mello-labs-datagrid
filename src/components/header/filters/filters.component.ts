@@ -4,7 +4,7 @@ import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/operator/debounceTime';
 
-import { Datagrid } from '../../../typings';
+import { Datagrid } from '../../../models/typings';
 
 @Component({
   selector: '<filters>',
