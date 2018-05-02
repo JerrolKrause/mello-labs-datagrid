@@ -51,7 +51,7 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit, OnDestro
 
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   ngOnChanges() {
      

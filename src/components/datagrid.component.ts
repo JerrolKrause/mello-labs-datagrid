@@ -278,10 +278,6 @@ export class DataGridComponent
     constructor(private dgSvc: DataGridService, private ref: ChangeDetectorRef) {}
 
     ngOnInit() {
-        // If custom templates are available, create templates property
-        if (this.columnTemplates && Object.keys(this.columnTemplates).length && this.columns) {
-            this.templates = this.dgSvc.templatesAddToColumns(this.columns, this.columnTemplates);
-        }
     }
 
     ngOnChanges(model: any) {
@@ -295,7 +291,6 @@ export class DataGridComponent
 
         // If NEW columns are passed
         if (model.columns) {
-           
             // If columnMap object is supplied, remap column props to what the datatable needs
             const columns = this.options.columnMap
                 ? this.dgSvc.mapPropertiesDown(this.columns, this.options.columnMap)

@@ -19,7 +19,7 @@
 						 [scrollProps]="scrollProps"
 						 [gridProps]="gridProps"
 						 [filterTerms]="filterTerms"
-             [templates]="templates"
+             [templates]="columnTemplates"
 						 (onStateUpdated)="onStateUpdated($event)"
 						 (onColumnsUpdated)="columnsUpdated($event)"
 						 (onCustomLinkEvent)="customLinkEvent($event)">
@@ -43,7 +43,7 @@
 					   [status]="status"
 					   [options]="options"
 					   [gridProps]="gridProps"
-             [templates]="templates"
+             [templates]="columnTemplates"
 					   (onRowMouseEvent)="onRowMouseEvent($event)"
 					   (onRowUpdated)="rowUpdated($event)"
 					   (onGroupToggled)="groupToggled($event)"
