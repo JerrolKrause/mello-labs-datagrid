@@ -2,6 +2,7 @@
  * Datatable Definitions
  */
 import { Observable } from 'rxjs/Observable';
+import { TemplateRef } from '@angular/core';
 
 export declare namespace Datagrid {
 
@@ -243,6 +244,13 @@ export declare namespace Datagrid {
     term: string;
     /** A global filter/search object independent of column filtering.  */
     props: string[];
+  }
+
+  export interface Templates {
+      [key: string]: {
+          templateCell: TemplateRef<any>;
+          templateHeader: TemplateRef<any>;
+      }
   }
 
   export interface Groupings {

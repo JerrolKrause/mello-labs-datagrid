@@ -25,6 +25,7 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit, OnDestro
   @Input() column: Datagrid.Column;
   @Input() row: { [key: string]: any };
   @Input() options: Datagrid.Options;
+  @Input() templates: Datagrid.Templates;
 
   @Output() updateDatatable: EventEmitter<any> = new EventEmitter();
   @Output() onRowUpdated: EventEmitter<any> = new EventEmitter();
@@ -53,6 +54,7 @@ export class CellComponent implements OnInit, OnChanges, AfterViewInit, OnDestro
   ngOnInit() {}
 
   ngOnChanges() {
+     
     if (this.row && this.column.prop) {
       this.checkTruncated();
       this.cellContext.column = this.column;

@@ -76,7 +76,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
     // Adding new filter
     if ((oldTerm === '' || !oldTerm) && newTerm !== '') {
       filterObj.filterAction = 'add';
-    } else if (newTerm === '' || newTerm == false || !newTerm || newTerm === oldTerm) {
+    } else if (newTerm === '' || newTerm === false || !newTerm || newTerm === oldTerm) {
       // Removing existing filter
       filterObj.filterAction = 'remove';
     } else if (newTerm !== oldTerm) {
@@ -84,7 +84,7 @@ export class FiltersComponent implements OnInit, OnDestroy {
       filterObj.filterAction = 'change';
     }
 
-    //console.warn('modifyFilter 2', JSON.parse(JSON.stringify(filterObj)));
+    // console.warn('modifyFilter 2', JSON.parse(JSON.stringify(filterObj)));
     this.filterTerm.next(filterObj);
   }
 

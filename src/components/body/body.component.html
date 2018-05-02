@@ -34,6 +34,7 @@
 						<datagrid-body-row [columns]="columnsPinnedLeft"
 										   [row]="row"
 										   [options]="options"
+                       [templates]="templates"
 										   (onRowUpdated)="rowUpdated($event, row.$$rowIndex)">
 						</datagrid-body-row>
 					</div>
@@ -51,6 +52,7 @@
 						<datagrid-body-row [columns]="columns"
 										   [row]="row"
 										   [options]="options"
+                       [templates]="templates"
 										   (onRowUpdated)="rowUpdated($event, row.$$rowIndex)">
 						</datagrid-body-row>
 					</div>

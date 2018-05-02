@@ -16,6 +16,7 @@ export class HeaderComponent implements OnInit {
   @Input() gridProps: Datagrid.Props;
   @Input() scrollProps: Datagrid.ScrollProps;
   @Input() filterTerms: any;
+  @Input() templates: Datagrid.Templates;
 
   @Output() onColumnsUpdated: EventEmitter<any> = new EventEmitter();
   @Output() onStateUpdated: EventEmitter<any> = new EventEmitter();

@@ -1,6 +1,7 @@
 import {
   Component,
   OnInit,
+  OnDestroy,
   ChangeDetectionStrategy,
   Input,
   Output,
@@ -9,7 +10,8 @@ import {
   NgZone,
 } from '@angular/core';
 import { Datagrid } from '../../models/typings';
-import * as _ from 'lodash';
+declare var require: any;
+const throttle = require('lodash/throttle');
 
 @Component({
   selector: 'datagrid-body',
@@ -17,7 +19,7 @@ import * as _ from 'lodash';
   styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BodyComponent implements OnInit {
+export class BodyComponent implements OnInit, OnDestroy {
   @Input() columns: Datagrid.Column[];
   @Input() columnsPinnedLeft: Datagrid.Column[];
   @Input() rows: any[];
@@ -26,6 +28,7 @@ export class BodyComponent implements OnInit {
   @Input() status: Datagrid.Status;
   @Input() options: Datagrid.Options;
   @Input() gridProps: Datagrid.Props;
+  @Input() templates: Datagrid.Templates;
 
   @Output() onColumnsUpdated: EventEmitter<any> = new EventEmitter();
   @Output() onStateUpdated: EventEmitter<any> = new EventEmitter();
@@ -54,7 +57,7 @@ export class BodyComponent implements OnInit {
   /**
    * Throttle the scroll event
    */
-  public onScrollThrottled = _.throttle((event: any) => this.onScroll(event), 20, { trailing: true, leading: true });
+  public onScrollThrottled = throttle((event: any) => this.onScroll(event), 20, { trailing: true, leading: true });
 
   /**
    * When the datatable is scrolled
