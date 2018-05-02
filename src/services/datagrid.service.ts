@@ -5,50 +5,50 @@ declare var require: any;
 const startCase = require('lodash/startCase');
 const toLower = require('lodash/toLower');
 
-const memoize = require('fast-memoize');
-const cacheStore = new Map;
-const memoizeCache = {
-    create() {
-        const store = cacheStore;
-        return {
-            has(key:string) {
-                return store.has(key)
-            },
-            get(key: string) {
-                return store.get(key)
-            },
-            set(key: string, value:any) {
-                store.set(key, value)
-            }
-        }
-    }
-}
-
+// const memoize = require('fast-memoize');
+// const cacheStore = new Map;
+// const memoizeCache = {
+//    create() {
+//        const store = cacheStore;
+//        return {
+//            has(key:string) {
+//                return store.has(key)
+//            },
+//            get(key: string) {
+//                return store.get(key)
+//            },
+//            set(key: string, value:any) {
+//                store.set(key, value)
+//            }
+//        }
+//    }
+// }
 
 @Injectable()
 export class DataGridService {
-
-    public memoized = {
-        getVisibleRows: memoize(this.getVisibleRows, { cache: memoizeCache }),
-        sortArray: memoize(this.sortArray, { cache: memoizeCache }),
-        getVisibleColumns: memoize(this.getVisibleColumns, { cache: memoizeCache }),
-        groupRows: memoize(this.groupRows, { cache: memoizeCache }),
-        columnCalculations: memoize(this.columnCalculations, { cache: memoizeCache }),
-        rowPositions: memoize(this.rowPositions, { cache: memoizeCache }),
-        columnsResize: memoize(this.columnsResize, { cache: memoizeCache }),
-        createStatuses: memoize(this.createStatuses, { cache: memoizeCache }),
-        filterGlobal: memoize(this.filterGlobal, { cache: memoizeCache }),
-        filterArray: memoize(this.filterArray, { cache: memoizeCache }),
-    };
+    // Memoization DISABLED since it is actually slower
+    // USAGE: this.dgSvc.memoized.columnCalculations(columnsPinnedLeft)
+    // public memoized = {
+    //    getVisibleRows: memoize(this.getVisibleRows, { cache: memoizeCache }),
+    //    sortArray: memoize(this.sortArray, { cache: memoizeCache }),
+    //    getVisibleColumns: memoize(this.getVisibleColumns, { cache: memoizeCache }),
+    //    groupRows: memoize(this.groupRows, { cache: memoizeCache }),
+    //    columnCalculations: memoize(this.columnCalculations, { cache: memoizeCache }),
+    //    rowPositions: memoize(this.rowPositions, { cache: memoizeCache }),
+    //    columnsResize: memoize(this.columnsResize, { cache: memoizeCache }),
+    //    createStatuses: memoize(this.createStatuses, { cache: memoizeCache }),
+    //    filterGlobal: memoize(this.filterGlobal, { cache: memoizeCache }),
+    //    filterArray: memoize(this.filterArray, { cache: memoizeCache }),
+    // };
 
     constructor() { }
 
     /**
      * Clear memoized caches
      */
-    public clearCaches() {
-        cacheStore.clear();
-    }
+    //public clearCaches() {
+    //    cacheStore.clear();
+    //}
 
     /**
      * Maps external table/column/control properties to those needed by the datatable
@@ -425,14 +425,14 @@ export class DataGridService {
         }
 
         // Sort the group
-        grouped = this.memoized.sortArray(grouped, 'label', group.dir);
+        grouped = this.sortArray(grouped, 'label', group.dir);
 
         let newRows: any[] = [];
         const groupsFinal: Datagrid.Groupings = {};
         // Sort the rows within the group
         grouped.forEach((group2: Datagrid.Group) => {
             if (sorts.length) {
-                this.memoized.sortArray(group2.rows, sorts[0].prop, sorts[0].dir);
+                this.sortArray(group2.rows, sorts[0].prop, sorts[0].dir);
             }
 
             if (options.primaryKey) {

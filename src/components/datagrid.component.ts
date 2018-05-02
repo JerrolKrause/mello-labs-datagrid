@@ -286,7 +286,7 @@ export class DataGridComponent
 
     ngOnChanges(model: any) {
         // Clear all memoized caches anytime new data is loaded into the grid
-        this.dgSvc.clearCaches();
+        // this.dgSvc.clearCaches();
 
         // If filter global is set or updated
         if (model.filterGlobal && this.filterGlobal && this.filterGlobal.term) {
@@ -302,11 +302,11 @@ export class DataGridComponent
                 : this.columns;
 
             const columnsPinnedLeft = columns.filter(column => (column.pinnedLeft ? true : false));
-            this.columnsPinnedLeft = columns.length ? this.dgSvc.memoized.columnCalculations(columnsPinnedLeft) : [];
+            this.columnsPinnedLeft = columns.length ? this.dgSvc.columnCalculations(columnsPinnedLeft) : [];
 
             // Get un-pinned columns
             const columnsInternal = columns.filter(column => (!column.pinnedLeft ? true : false));
-            this.columnsInternal = columns.length ? this.dgSvc.memoized.columnCalculations(columnsInternal) : [];
+            this.columnsInternal = columns.length ? this.dgSvc.columnCalculations(columnsInternal) : [];
 
             // Determine total width of internal columns
             this.columnWidthsInternal = this.columnsInternal.reduce((a, b) => b.width ? a + b.width : 0, 0);
@@ -402,7 +402,7 @@ export class DataGridComponent
         // Update rows only if rows have changed
         if (scrollPropsOld.scrollTop !== scrollProps.scrollTop) {
             const rowsVisible = Math.ceil(this.gridProps.heightTotal / this.rowHeight);
-            const rowsExternal = this.dgSvc.memoized.getVisibleRows(this.rowsInternal, scrollProps, rowsVisible, this.rowHeight);
+            const rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, scrollProps, rowsVisible, this.rowHeight);
             if (
                 !this.rowsIndexes ||
                 (rowsExternal[0] &&
@@ -418,7 +418,7 @@ export class DataGridComponent
         }
         // Update columns only if columns have changed
         if (scrollPropsOld.scrollLeft !== scrollProps.scrollLeft) {
-            const columnsExternal = this.dgSvc.memoized.getVisibleColumns(this.columnsInternal, scrollProps, this.gridProps);
+            const columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, scrollProps, this.gridProps);
             if (
                 !this.columnIndexes ||
                 (columnsExternal[0] &&
@@ -443,6 +443,7 @@ export class DataGridComponent
      * Create the view by assembling everything that modifies the state
      * @param state
      */
+     @measure
     public viewCreate() {
         // console.warn('createView', this.state, this.status, this.filterTerms );
         // console.time('Creating View');
@@ -459,7 +460,7 @@ export class DataGridComponent
 
         // If custom filters are specified
         if (this.state && this.state.filters && this.state.filters.length) {
-            newRows = this.dgSvc.memoized.filterArray(newRows, this.state.filters);
+            newRows = this.dgSvc.filterArray(newRows, this.state.filters);
         }
 
         // If grouped
@@ -483,19 +484,19 @@ export class DataGridComponent
             ) {
                 
                 // Sort Arrays
-                newRows = this.dgSvc.memoized.sortArray(newRows, this.state.sorts[0].prop, this.state.sorts[0].dir);
+                newRows = this.dgSvc.sortArray(newRows, this.state.sorts[0].prop, this.state.sorts[0].dir);
             }
         }
 
         // Generate row vertical positions
-        newRows = this.dgSvc.memoized.rowPositions(newRows, this.rowHeight);
+        newRows = this.dgSvc.rowPositions(newRows, this.rowHeight);
 
         this.updateGridProps();
         
         // Set updated columns
-        this.columnsPinnedLeft = this.columnsPinnedLeft.length ? this.dgSvc.memoized.columnCalculations(this.columnsPinnedLeft) : [];
-        this.columnsInternal = this.columnsInternal.length ? this.dgSvc.memoized.columnCalculations(this.columnsInternal) : [];
-
+        this.columnsPinnedLeft = this.columnsPinnedLeft.length ? this.dgSvc.columnCalculations(this.columnsPinnedLeft) : [];
+        this.columnsInternal = this.columnsInternal.length ? this.dgSvc.columnCalculations(this.columnsInternal) : [];
+       
         // If the total width of the columns is less than the viewport, resize columns to fit
         if (
           this.dataGrid &&
@@ -503,7 +504,7 @@ export class DataGridComponent
           this.columnWidthsInternal < this.dataGrid.nativeElement.getBoundingClientRect().width
         ) {
             // Resize columns to fit available space
-            this.columnsInternal = this.dgSvc.memoized.columnsResize(this.columnsInternal, this.columnWidthsInternal, this.gridProps.widthViewPort - this.gridProps.widthPinned);
+            this.columnsInternal = this.dgSvc.columnsResize(this.columnsInternal, this.columnWidthsInternal, this.gridProps.widthViewPort - this.gridProps.widthPinned);
           this.gridProps.widthFixed = true;
         } else {
           // Reset widths
@@ -519,11 +520,11 @@ export class DataGridComponent
         // Update internal modified rows
         this.rowsInternal = newRows;
         // Update columns to go to the DOM
-        this.columnsExternal = this.dgSvc.memoized.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
+        this.columnsExternal = this.dgSvc.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
         // Updated rows to go to the DOM
         const rowsVisible = Math.ceil(this.gridProps.heightTotal / this.rowHeight);
 
-        this.rowsExternal = this.dgSvc.memoized.getVisibleRows(this.rowsInternal, this.scrollProps, rowsVisible, this.rowHeight);
+        this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, rowsVisible, this.rowHeight);
         // this.rowsExternal = this.dgSvc.getVisibleRows(this.rowsInternal, this.scrollProps, rowsVisible, this.rowHeight);
         
         if (this.state.info) {
@@ -532,7 +533,7 @@ export class DataGridComponent
             this.state.info.rowsVisible = this.rowsInternal.filter(row => !row.type).length; // Filter out any group columns
         }
 
-        this.status = this.dgSvc.memoized.createStatuses(this.state, this.columnsInternal);
+        this.status = this.dgSvc.createStatuses(this.state, this.columnsInternal);
         // console.warn('this.status', this.status);
         this.state = { ...this.state };
 
