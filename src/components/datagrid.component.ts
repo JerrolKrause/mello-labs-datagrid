@@ -22,7 +22,7 @@ import 'rxjs/add/observable/fromEvent';
 
 declare var require: any;
 const throttle = require('lodash/throttle');
-import { measure } from 'helpful-decorators';
+// import { measure } from 'helpful-decorators';
 import { DataGridService } from '../services/datagrid.service';
 import { DataTableColumnDirective } from '../directives/column.directive';
 import { Actions } from '../datagrid.props';
@@ -443,7 +443,6 @@ export class DataGridComponent
      * Create the view by assembling everything that modifies the state
      * @param state
      */
-     @measure
     public viewCreate() {
         // console.warn('createView', this.state, this.status, this.filterTerms );
         // console.time('Creating View');
