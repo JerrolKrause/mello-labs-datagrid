@@ -392,18 +392,17 @@ export class DataGridComponent
      * When the datatable is scrolled
      * @param event
      */
-    @measure
     public onScroll(scrollPropsNew: Datagrid.ScrollProps) {
         // console.log('onScroll', scrollPropsNew);
+        this.ref.detach();
 
         const scrollPropsOld = { ...this.scrollProps };
-        // this.ref.detach();
-        this.scrollProps = scrollPropsNew;
+        const scrollProps = { ...scrollPropsNew };
 
         // Update rows only if rows have changed
-        if (scrollPropsOld.scrollTop !== this.scrollProps.scrollTop) {
+        if (scrollPropsOld.scrollTop !== scrollProps.scrollTop) {
             const rowsVisible = Math.ceil(this.gridProps.heightTotal / this.rowHeight);
-            const rowsExternal = this.dgSvc.memoized.getVisibleRows(this.rowsInternal, this.scrollProps, rowsVisible, this.rowHeight);
+            const rowsExternal = this.dgSvc.memoized.getVisibleRows(this.rowsInternal, scrollProps, rowsVisible, this.rowHeight);
             if (
                 !this.rowsIndexes ||
                 (rowsExternal[0] &&
@@ -411,13 +410,15 @@ export class DataGridComponent
                     rowsExternal[rowsExternal.length - 1].$$track !== this.rowsIndexes.end)
             ) {
                 this.rowsExternal = rowsExternal;
-                this.rowsIndexes.start = rowsExternal[0].$$track;
-                this.rowsIndexes.end = rowsExternal[rowsExternal.length - 1].$$track;
+                this.rowsIndexes = {
+                    start: rowsExternal[0].$$track,
+                    end: rowsExternal[rowsExternal.length - 1].$$track
+                }
             }
         }
         // Update columns only if columns have changed
-        if (scrollPropsOld.scrollLeft !== this.scrollProps.scrollLeft) {
-            const columnsExternal = this.dgSvc.memoized.getVisibleColumns(this.columnsInternal, this.scrollProps, this.gridProps);
+        if (scrollPropsOld.scrollLeft !== scrollProps.scrollLeft) {
+            const columnsExternal = this.dgSvc.memoized.getVisibleColumns(this.columnsInternal, scrollProps, this.gridProps);
             if (
                 !this.columnIndexes ||
                 (columnsExternal[0] &&
@@ -425,23 +426,24 @@ export class DataGridComponent
                     columnsExternal[columnsExternal.length - 1].$$track !== this.columnIndexes.end)
             ) {
                 this.columnsExternal = columnsExternal;
-                this.columnIndexes.start = columnsExternal[0].$$track;
-                this.columnIndexes.end = columnsExternal[columnsExternal.length - 1].$$track;
+                this.columnIndexes = {
+                    start: columnsExternal[0].$$track,
+                    end: columnsExternal[columnsExternal.length - 1].$$track
+                }
             }
         }
+        this.scrollProps = scrollProps;
+        this.ref.reattach();
         // Does not scroll seamlessly without calling detectChanges
-        // Detect changes is pretty costly, need another way to determine change detection
+        // TODO: Detect changes is pretty costly, need another way to determine change detection
         this.ref.detectChanges();
-        // this.ref.reattach();
     }
 
     /**
      * Create the view by assembling everything that modifies the state
      * @param state
      */
-    @measure
     public viewCreate() {
-        // TODO Fix issues with memoization with group and sorting
         // console.warn('createView', this.state, this.status, this.filterTerms );
         // console.time('Creating View');
         // Set manual change detection
@@ -1289,7 +1291,7 @@ export class DataGridComponent
                 // Tell DOM to updated after observable is done udpated
                 this.ref.detectChanges();
             });
-            this.subscriptions.push(subscription);
+            this.subscriptions.push(<any>subscription);
         }
 
         this.rowStyles = rowStyles;
