@@ -1,37 +1,37 @@
 <div draggable="false">
-	<div class="datagrid-header-cell" [title]="column.label"
-		 *ngFor="let column of columns; let columnIndex = index; trackBy:trackColumn"
-		 [ngClass]="{'reorderable': column.canReorder, 'column-last' : columnIndex == columns.length - 1 }"
-		 [ngStyle]="{'width' : column.$$width + 'px', 'left' : column.$$leftOffset + 'px' }"
-		 mwlResizable [enableGhostResize]="true" [resizeEdges]="{right: column.canResize || false}" (resizeEnd)="onResizeEnd($event, column.$$index, columnType)"
-		 
-		 [draggable]="column.canReorder" (dragstart)="dragStartProp = column.prop;" (dragover)="$event.preventDefault()" (drop)="dragDrop(columnType, column.$$index)">
+    <div class="datagrid-header-cell" [title]="column.label"
+         *ngFor="let column of columns; let columnIndex = index; trackBy:trackColumn"
+         [ngClass]="{'reorderable': column.canReorder, 'column-last' : columnIndex == columns.length - 1 }"
+         [ngStyle]="{'width' : column.$$width + 'px', 'left' : column.$$leftOffset + 'px' }"
+         mwlResizable [enableGhostResize]="true" [resizeEdges]="{right: column.canResize || false}" (resizeEnd)="onResizeEnd($event, column.$$index, columnType)"
+         [draggable]="column.canReorder" (dragstart)="dragStartProp = column.prop;" (dragover)="$event.preventDefault()" (drop)="dragDrop(columnType, column.$$index)">
 
-		<!-- Column Label -->
-		<span class="datagrid-header-cell-label">
-			<ng-template #cellTemplate
-						 *ngIf="column.templateHeader"
-						 [ngTemplateOutlet]="column.templateHeader"
-						 [ngTemplateOutletContext]="cellContext">
-			</ng-template>
-			<ng-container *ngIf="!column.templateHeader">
-				{{column.label}}
-			</ng-container>
-		</span>
+        <!-- Column Label -->
+        <span class="datagrid-header-cell-label">
+            <ng-template #cellTemplate
+                         *ngIf="templates && templates[column.prop] && templates[column.prop].templateHeader; else defaults"
+                         [ngTemplateOutlet]="templates[column.prop].templateHeader"
+                         [ngTemplateOutletContext]="cellContext">
+            </ng-template>
 
-		<!-- Controls Dropdown -->
-		<datagrid-controls *ngIf="options.controlsDropdown"
-						   [options]="options"
-						   [status]="status"
-						   [column]="column"
-						   [columnIndex]="columnIndex"
-						   [filterTerms]="filterTerms"
-						   (onStateUpdated)="stateUpdated($event)"
-						   (onCustomLinkEvent)="customLinkEvent($event)">
-		</datagrid-controls>
+            <ng-template #defaults>
+                {{column.label}}
+            </ng-template>
+        </span>
 
-		<!-- Resize Handle -->
-		<a class="resize-handle" mwlResizeHandle [resizeEdges]="{right: true}" *ngIf="column.canResize" (mousedown)="reSizing = true"></a>
+        <!-- Controls Dropdown -->
+        <datagrid-controls *ngIf="options.controlsDropdown"
+                           [options]="options"
+                           [status]="status"
+                           [column]="column"
+                           [columnIndex]="columnIndex"
+                           [filterTerms]="filterTerms"
+                           (onStateUpdated)="stateUpdated($event)"
+                           (onCustomLinkEvent)="customLinkEvent($event)">
+        </datagrid-controls>
 
-	</div>
+        <!-- Resize Handle -->
+        <a class="resize-handle" mwlResizeHandle [resizeEdges]="{right: true}" *ngIf="column.canResize" (mousedown)="reSizing = true"></a>
+
+    </div>
 </div>

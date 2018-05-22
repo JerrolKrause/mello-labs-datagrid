@@ -9,38 +9,41 @@
      triggers="manual"
      (dblclick)="fieldEdit();">
 
-  <div class="datagrid-cell-data-content" #cellData>
+    <div class="datagrid-cell-data-content" #cellData>
+        
+        <ng-template #cellTemplate
+                     *ngIf="templates && templates[column.prop] && templates[column.prop].templateCell; else defaults"
+                     [ngTemplateOutlet]="templates[column.prop].templateCell"
+                     [ngTemplateOutletContext]="cellContext">
+        </ng-template>
 
-    <ng-template #cellTemplate
-                 *ngIf="column.templateCell"
-                 [ngTemplateOutlet]="column.templateCell"
-                 [ngTemplateOutletContext]="cellContext">
-    </ng-template>
+        <ng-template #defaults>
+            <ng-container [ngSwitch]="column.columnType">
 
-    <ng-container [ngSwitch]="column.columnType" *ngIf="!column.templateCell">
+                <!-- Date Time-->
+                <ng-container *ngSwitchCase="'dateTime'">
+                    {{row[column.prop] | date: 'MM/dd/yyyy - h:mm a' }}
+                </ng-container>
 
-      <!-- Date Time-->
-      <ng-container *ngSwitchCase="'dateTime'">
-        {{row[column.prop] | date: 'MM/dd/yyyy - h:mm a' }}
-      </ng-container>
+                <!-- Date-->
+                <ng-container *ngSwitchCase="'date'">
+                    {{row[column.prop] | date: 'MM/dd/yyyy' }}
+                </ng-container>
 
-      <!-- Date-->
-      <ng-container *ngSwitchCase="'date'">
-        {{row[column.prop] | date: 'MM/dd/yyyy' }}
-      </ng-container>
+                <!-- Money -->
+                <ng-container *ngSwitchCase="'money'">
+                    {{row[column.prop] | currency:'USD' }}
+                </ng-container>
 
-      <!-- Money -->
-      <ng-container *ngSwitchCase="'money'">
-        {{row[column.prop] | currency:'USD' }}
-      </ng-container>
+                <!-- Default -->
+                <ng-container *ngSwitchDefault>
+                    {{row[column.prop]}}
+                </ng-container>
 
-      <!-- Default -->
-      <ng-container *ngSwitchDefault>
-        {{row[column.prop]}}
-      </ng-container>
+            </ng-container>
+        </ng-template>
 
-    </ng-container>
-  </div>
+    </div>
 
   <div class="datagrid-truncated" *ngIf="truncated"></div>
 </div>

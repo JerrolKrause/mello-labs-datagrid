@@ -8,7 +8,7 @@ import {
   OnDestroy,
   OnChanges,
 } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
 import { Datagrid } from '../../../models/typings';
 
@@ -75,11 +75,17 @@ export class GroupHeaderComponent implements OnInit, OnChanges, OnDestroy {
     ) {
       // Sub to the observable
       this.sub = options.columnData[group.columnProp].model.subscribe(model => {
-
         // If this row property is an array, join all possible settings
-          if (options.columnData && group && group.label && Array.isArray(group.label) && group.columnProp && group.rows) {
-              const columnData = options.columnData[group.columnProp];
-              const newLabel: any[] = [];
+        if (
+          options.columnData &&
+          group &&
+          group.label &&
+          Array.isArray(group.label) &&
+          group.columnProp &&
+          group.rows
+        ) {
+          const columnData = options.columnData[group.columnProp];
+          const newLabel: any[] = [];
           // Loop through the labels in the group prop
           group.rows[0][group.columnProp].forEach((id: string) => {
             model[columnData.modelSrc].forEach((element: any) => {

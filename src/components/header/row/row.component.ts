@@ -15,6 +15,7 @@ export class HeaderRowComponent implements OnInit, OnChanges {
   @Input() scrollProps: Datagrid.ScrollProps;
   @Input() filterTerms: any;
   @Input() columnType: 'pinnedLeft' | 'main';
+  @Input() templates: Datagrid.Templates;
 
   // private columnsOriginal;
 
