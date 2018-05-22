@@ -1,11 +1,10 @@
 /**
  * Datatable Definitions
  */
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { TemplateRef } from '@angular/core';
 
 export declare namespace Datagrid {
-
   export interface Props {
     widthTotal: number;
     widthPinned: number;
@@ -247,10 +246,10 @@ export declare namespace Datagrid {
   }
 
   export interface Templates {
-      [key: string]: {
-          templateCell: TemplateRef<any>;
-          templateHeader: TemplateRef<any>;
-      }
+    [key: string]: {
+      templateCell: TemplateRef<any>;
+      templateHeader: TemplateRef<any>;
+    };
   }
 
   export interface Groupings {
@@ -274,7 +273,7 @@ export declare namespace Datagrid {
 
   export interface ModelRules {
     model?: false | Observable<any>;
-    rules?: (...args:any[]) => any;
+    rules?: (...args: any[]) => any;
   }
 
   export interface DragSelect {

@@ -1,8 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subject } from 'rxjs/Subject';
-import { Subscription } from 'rxjs/Subscription';
-import 'rxjs/add/operator/debounceTime';
+import { BehaviorSubject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 import { Datagrid } from '../../../models/typings';
 
@@ -26,37 +24,37 @@ export class FiltersComponent implements OnInit, OnDestroy {
   public modelClasses: string;
   public modelStyles: string;
 
-  private filterTerm: Subject<any> = new BehaviorSubject(null);
+  private filterTerm: BehaviorSubject<any> = new BehaviorSubject(null);
   private subs: Subscription[] = [];
 
   constructor() {}
 
   ngOnInit() {
-      // Create an subscription to debounce the user input
-      this.filterTerm.debounceTime(300).subscribe(filter => {
-          if (filter) {
-              this.onFiltersUpdated.emit(filter);
-          }
-      });
-
-      // If custom column data has been supplied
-      if (this.options.columnData) {
-          const sub = this.options.columnData[this.column.prop].model.subscribe(model => {
-              if (this.options.columnData) {
-                  // If a modelSrc has been supplied, fetch data from that. If not get it straight from the model
-                  this.model = this.options.columnData[this.column.prop].modelSrc
-                      ? model[this.options.columnData[this.column.prop].modelSrc]
-                      : model;
-
-                  // Simplify some of the properties for easier use in the dom
-                  this.modelLabel = this.options.columnData[this.column.prop].label || '';
-                  this.modelValue = this.options.columnData[this.column.prop].value || '';
-                  this.modelClasses = this.options.columnData[this.column.prop].classes || '';
-                  this.modelStyles = this.options.columnData[this.column.prop].styles || '';
-              }
-          });
-          this.subs.push(sub);
+    // Create an subscription to debounce the user input
+    this.filterTerm.pipe(debounceTime(300)).subscribe(filter => {
+      if (filter) {
+        this.onFiltersUpdated.emit(filter);
       }
+    });
+
+    // If custom column data has been supplied
+    if (this.options.columnData) {
+      const sub = this.options.columnData[this.column.prop].model.subscribe(model => {
+        if (this.options.columnData) {
+          // If a modelSrc has been supplied, fetch data from that. If not get it straight from the model
+          this.model = this.options.columnData[this.column.prop].modelSrc
+            ? model[this.options.columnData[this.column.prop].modelSrc]
+            : model;
+
+          // Simplify some of the properties for easier use in the dom
+          this.modelLabel = this.options.columnData[this.column.prop].label || '';
+          this.modelValue = this.options.columnData[this.column.prop].value || '';
+          this.modelClasses = this.options.columnData[this.column.prop].classes || '';
+          this.modelStyles = this.options.columnData[this.column.prop].styles || '';
+        }
+      });
+      this.subs.push(sub);
+    }
   }
 
   /**

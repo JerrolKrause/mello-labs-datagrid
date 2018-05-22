@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 
 import { Actions } from '../../../datagrid.props';
 import { Datagrid } from '../../../models/typings';
@@ -24,8 +24,7 @@ export class ControlsComponent implements OnInit, OnDestroy {
 
   constructor() {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   /**
    * When the modify sort button is clicked
@@ -39,7 +38,7 @@ export class ControlsComponent implements OnInit, OnDestroy {
     } else if (direction === 'asc') {
       direction = 'desc';
     } else if (direction === 'desc') {
-        direction = null;
+      direction = null;
     }
 
     this.modifyState(action, { dir: direction, prop: prop });

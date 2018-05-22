@@ -14,8 +14,7 @@ export class InfoComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   /**
    * Reset one of the datatable controls
